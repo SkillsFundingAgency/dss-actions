@@ -27,11 +27,12 @@ namespace NCS.DSS.Action.GetActionByIdHttpTrigger
                     DateActionAimsToBeCompletedBy = DateTime.Today.AddDays(10),
                     DateActionActuallyCompleted = DateTime.Today.AddDays(12),
                     ActionSummary = "This is a fake summary",
+                    SignpostedTo = "test",
                     ActionTypeId = 1,
                     ActionStatusId = 1,
                     PersonResponsibleId = 1,
                     LastModifiedDate = DateTime.Today.AddYears(1),
-                    LastModifiedBy = Guid.NewGuid()
+                    LastModifiedTouchpointId = Guid.NewGuid()
                 },
                 new Models.Action
                 {
@@ -42,11 +43,12 @@ namespace NCS.DSS.Action.GetActionByIdHttpTrigger
                     DateActionAimsToBeCompletedBy = DateTime.Today.AddDays(5),
                     DateActionActuallyCompleted = DateTime.Today.AddDays(5),
                     ActionSummary = "This is a fake summary v2",
+                    SignpostedTo = "test",
                     ActionTypeId = 2,
                     ActionStatusId = 2,
                     PersonResponsibleId = 2,
                     LastModifiedDate = DateTime.Today.AddYears(1),
-                    LastModifiedBy = Guid.NewGuid()
+                    LastModifiedTouchpointId = Guid.NewGuid()
                 },
                 new Models.Action
                 {
@@ -57,11 +59,12 @@ namespace NCS.DSS.Action.GetActionByIdHttpTrigger
                     DateActionAimsToBeCompletedBy = DateTime.Today.AddDays(2),
                     DateActionActuallyCompleted = DateTime.Today.AddDays(1),
                     ActionSummary = "This is a fake summary v3",
+                    SignpostedTo = "test",
                     ActionTypeId = 3,
                     ActionStatusId = 3,
                     PersonResponsibleId = 3,
                     LastModifiedDate = DateTime.Today,
-                    LastModifiedBy = Guid.NewGuid()
+                    LastModifiedTouchpointId = Guid.NewGuid()
                 }
             };
 

@@ -10,8 +10,9 @@ namespace NCS.DSS.Action.GetActionHttpTrigger
 {
     public static class GetActionHttpTrigger
     {
+        [Disable]
         [FunctionName("Get")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId:guid}/Interactions/{interactionId:guid}/ActionPlans/{actionplanId:guid}/Actions/")]HttpRequestMessage req, TraceWriter log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/")]HttpRequestMessage req, TraceWriter log)
         {
             log.Info("Get Actions C# HTTP trigger function processed a request.");
 

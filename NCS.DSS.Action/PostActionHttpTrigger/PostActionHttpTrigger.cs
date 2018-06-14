@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -12,7 +13,8 @@ namespace NCS.DSS.Action.PostActionHttpTrigger
     {
         [FunctionName("Post")]
         [ResponseType(typeof(Models.Action))]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/{customerId:guid}/Interactions/{interactionId:guid}/ActionPlans/{actionplanId:guid}/Actions/")]HttpRequestMessage req, TraceWriter log)
+        [Display(Name = "Post", Description = "Ability to create a new action for a given action plan.")]
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/")]HttpRequestMessage req, TraceWriter log, string customerId, string interactionId, string actionPlanId)
         {
             log.Info("Post Action C# HTTP trigger function processed a request.");
 
