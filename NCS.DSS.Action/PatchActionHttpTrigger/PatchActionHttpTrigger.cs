@@ -6,6 +6,7 @@ using System.Web.Http.Description;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
+using NCS.DSS.Action.Annotations;
 using Newtonsoft.Json;
 
 namespace NCS.DSS.Action.PatchActionHttpTrigger
@@ -14,6 +15,8 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger
     {
         [FunctionName("Patch")]
         [ResponseType(typeof(Models.Action))]
+        [ActionResponse(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Action Updated", ShowSchema = true)]
+        [ActionResponse(HttpStatusCode = (int)HttpStatusCode.NotFound, Description = "Supplied Action Id does not exist", ShowSchema = false)]
         [Display(Name = "Patch", Description = "Ability to update an existing action record.")]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/{actionId}")]HttpRequestMessage req, TraceWriter log, string customerId, string interactionId, string actionPlanId, string actionId)
         {
