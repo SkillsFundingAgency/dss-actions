@@ -248,13 +248,13 @@ namespace NCS.DSS.Action.APIDefinition
 
             foreach (var response in responseCodes)
             {
-                var actionPlanResponse = (ActionResponse)response;
+                var actionResponse = (ActionResponse)response;
 
-                if (!actionPlanResponse.ShowSchema)
+                if (!actionResponse.ShowSchema)
                     responseDef = new ExpandoObject();
 
-                responseDef.description = actionPlanResponse.Description;
-                AddToExpando(responses, actionPlanResponse.HttpStatusCode.ToString(), responseDef);
+                responseDef.description = actionResponse.Description;
+                AddToExpando(responses, actionResponse.HttpStatusCode.ToString(), responseDef);
             }
 
             return responses;
@@ -368,6 +368,22 @@ namespace NCS.DSS.Action.APIDefinition
                 }
                 dynamic propDef = new ExpandoObject();
                 propDef.description = GetPropertyDescription(property);
+
+                var stringAttribute = (StringLengthAttribute)property.GetCustomAttributes(typeof(StringLengthAttribute), false).FirstOrDefault();
+
+                if (stringAttribute != null)
+                {
+                    propDef.maxLength = stringAttribute.MaximumLength;
+                    propDef.minLength = stringAttribute.MinimumLength;
+                }
+
+                var regexAttribute = (RegularExpressionAttribute)property.GetCustomAttributes(typeof(RegularExpressionAttribute), false).FirstOrDefault();
+
+                if (regexAttribute != null)
+                {
+                    propDef.pattern = regexAttribute.Pattern;
+                }
+
                 SetParameterType(property.PropertyType, propDef, definitions);
                 AddToExpando(objDef.properties, property.Name, propDef);
             }
