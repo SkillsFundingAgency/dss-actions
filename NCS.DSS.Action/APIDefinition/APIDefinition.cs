@@ -123,7 +123,7 @@ namespace NCS.DSS.Action.APIDefinition
                 foreach (string verb in verbs)
                 {
                     dynamic operation = new ExpandoObject();
-                    operation.operationId = ToTitleCase(functionAttr.Name) + ToTitleCase(verb);
+                    operation.operationId = ToTitleCase(functionAttr.Name);
                     operation.produces = new[] { "application/json" };
                     operation.consumes = new[] { "application/json" };
                     operation.parameters = GenerateFunctionParametersSignature(methodInfo, route, doc);
