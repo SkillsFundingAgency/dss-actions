@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NCS.DSS.Action.ReferenceData;
 
 namespace NCS.DSS.Action.GetActionHttpTrigger
 {
@@ -26,9 +27,9 @@ namespace NCS.DSS.Action.GetActionHttpTrigger
                     DateActionActuallyCompleted = DateTime.Today.AddDays(12),
                     ActionSummary = "This is a fake summary",
                     SignpostedTo = "test",
-                    ActionTypeId = 1,
-                    ActionStatusId = 1,
-                    PersonResponsibleId = 1,
+                    ActionType = 1,
+                    ActionStatus = ActionStatus.NotStarted,
+                    PersonResponsible = PersonResponsible.Adviser,
                     LastModifiedDate = DateTime.Today.AddYears(1),
                     LastModifiedTouchpointId = Guid.NewGuid()
                 },
@@ -42,9 +43,9 @@ namespace NCS.DSS.Action.GetActionHttpTrigger
                     DateActionActuallyCompleted = DateTime.Today.AddDays(5),
                     ActionSummary = "This is a fake summary v2",
                     SignpostedTo = "test",
-                    ActionTypeId = 2,
-                    ActionStatusId = 2,
-                    PersonResponsibleId = 2,
+                    ActionType = 2,
+                    ActionStatus = ActionStatus.InProgress,
+                    PersonResponsible = PersonResponsible.Customer,
                     LastModifiedDate = DateTime.Today.AddYears(1),
                     LastModifiedTouchpointId = Guid.NewGuid()
                 },
@@ -58,9 +59,9 @@ namespace NCS.DSS.Action.GetActionHttpTrigger
                     DateActionActuallyCompleted = DateTime.Today.AddDays(1),
                     ActionSummary = "This is a fake summary v3",
                     SignpostedTo = "test",
-                    ActionTypeId = 3,
-                    ActionStatusId = 3,
-                    PersonResponsibleId = 3,
+                    ActionType = 3,
+                    ActionStatus = ActionStatus.NoLongerApplicable,
+                    PersonResponsible = PersonResponsible.Adviser,
                     LastModifiedDate = DateTime.Today,
                     LastModifiedTouchpointId = Guid.NewGuid()
                 }

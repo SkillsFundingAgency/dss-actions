@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using NCS.DSS.Action.ReferenceData;
 
 namespace NCS.DSS.Action.Models
 {
@@ -31,22 +32,24 @@ namespace NCS.DSS.Action.Models
         public DateTime DateActionActuallyCompleted { get; set; }
 
         [Required]
+        [StringLength(4000)]
         [Display(Description = "Summary of the action.")]
         public string ActionSummary { get; set; }
 
+        [StringLength(255)]
         [Display(Description = "Details of any signposting to external parties.")]
         public string SignpostedTo { get; set; }
 
         [Required]
         [Display(Description = "ActionType reference data.")]
-        public int ActionTypeId { get; set; }
+        public int ActionType { get; set; }
 
         [Display(Description = "ActionStatus reference data.")]
-        public int ActionStatusId { get; set; }
+        public ActionStatus ActionStatus { get; set; }
 
         [Required]
         [Display(Description = "PersonResponsible reference data.")]
-        public int PersonResponsibleId { get; set; }
+        public PersonResponsible PersonResponsible { get; set; }
 
         [DataType(DataType.DateTime)]
         [Display(Description = "Date and time of the last modification to the record.")]
