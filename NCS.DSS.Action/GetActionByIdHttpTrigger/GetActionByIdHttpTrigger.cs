@@ -6,13 +6,16 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
+using NCS.DSS.Action.Annotations;
 
 namespace NCS.DSS.Action.GetActionByIdHttpTrigger
 {
     public static class GetActionByIdHttpTrigger
     {
-        [Disable]
+
         [FunctionName("GetById")]
+        [ActionResponse(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Action found", ShowSchema = true)]
+        [ActionResponse(HttpStatusCode = (int)HttpStatusCode.NotFound, Description = "Supplied Action Id does not exist", ShowSchema = false)]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/{actionId}")]HttpRequestMessage req, TraceWriter log, string actionId)
         {
             log.Info("Get Action By Id C# HTTP trigger function  processed a request.");

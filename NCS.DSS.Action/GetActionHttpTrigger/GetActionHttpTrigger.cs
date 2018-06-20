@@ -5,13 +5,14 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
+using NCS.DSS.Action.Annotations;
 
 namespace NCS.DSS.Action.GetActionHttpTrigger
 {
     public static class GetActionHttpTrigger
     {
-        [Disable]
         [FunctionName("Get")]
+        [ActionResponse(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Actions found", ShowSchema = true)]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/")]HttpRequestMessage req, TraceWriter log)
         {
             log.Info("Get Actions C# HTTP trigger function processed a request.");
