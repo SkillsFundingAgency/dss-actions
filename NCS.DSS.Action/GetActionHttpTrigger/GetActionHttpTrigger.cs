@@ -12,7 +12,11 @@ namespace NCS.DSS.Action.GetActionHttpTrigger
     public static class GetActionHttpTrigger
     {
         [FunctionName("Get")]
-        [ActionResponse(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Actions found", ShowSchema = true)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Action found", ShowSchema = true)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Action does not exist", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Request was malformed", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/")]HttpRequestMessage req, TraceWriter log, string customerId, string interactionId, string actionPlanId)
         {
             log.Info("Get Actions C# HTTP trigger function processed a request.");

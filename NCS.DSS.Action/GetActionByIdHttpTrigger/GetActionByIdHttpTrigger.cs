@@ -14,8 +14,11 @@ namespace NCS.DSS.Action.GetActionByIdHttpTrigger
     {
 
         [FunctionName("GetById")]
-        [ActionResponse(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Action found", ShowSchema = true)]
-        [ActionResponse(HttpStatusCode = (int)HttpStatusCode.NotFound, Description = "Supplied Action Id does not exist", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Actions found", ShowSchema = true)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Actions do not exist", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Request was malformed", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/{actionId}")]HttpRequestMessage req, TraceWriter log, string customerId, string interactionId, string actionPlanId, string actionId)
         {
             log.Info("Get Action By Id C# HTTP trigger function  processed a request.");

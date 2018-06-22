@@ -15,8 +15,12 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger
     {
         [FunctionName("Patch")]
         [ResponseType(typeof(Models.Action))]
-        [ActionResponse(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Action Updated", ShowSchema = true)]
-        [ActionResponse(HttpStatusCode = (int)HttpStatusCode.NotFound, Description = "Supplied Action Id does not exist", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Action Updated", ShowSchema = true)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Action does not exist", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Request was malformed", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
+        [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
+        [Response(HttpStatusCode = 422, Description = "Action validation error(s)", ShowSchema = false)]
         [Display(Name = "Patch", Description = "Ability to update an existing action record.")]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/{actionId}")]HttpRequestMessage req, TraceWriter log, string customerId, string interactionId, string actionPlanId, string actionId)
         {
