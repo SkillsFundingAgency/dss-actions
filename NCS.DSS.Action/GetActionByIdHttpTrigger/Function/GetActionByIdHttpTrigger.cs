@@ -1,14 +1,15 @@
 using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
-using Newtonsoft.Json;
-using System.Net.Http;
-using System.Net;
-using System.Threading.Tasks;
 using NCS.DSS.Action.Annotations;
+using NCS.DSS.Action.GetActionByIdHttpTrigger.Service;
+using Newtonsoft.Json;
 
-namespace NCS.DSS.Action.GetActionByIdHttpTrigger
+namespace NCS.DSS.Action.GetActionByIdHttpTrigger.Function
 {
     public static class GetActionByIdHttpTrigger
     {

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace NCS.DSS.Action.PostActionHttpTrigger
+namespace NCS.DSS.Action.PostActionHttpTrigger.Service
 {
-    public class PostActionHttpTriggerService
+    public class PostActionHttpTriggerService : IPostActionHttpTriggerService
     {
         public Guid? Create(Models.Action action)
         {

@@ -7,8 +7,9 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using NCS.DSS.Action.Annotations;
+using NCS.DSS.Action.PostActionHttpTrigger.Service;
 
-namespace NCS.DSS.Action.PostActionHttpTrigger
+namespace NCS.DSS.Action.PostActionHttpTrigger.Function
 {
     public static class PostActionHttpTrigger
     {

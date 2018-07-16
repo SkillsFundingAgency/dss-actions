@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using NCS.DSS.Action.ReferenceData;
 
-namespace NCS.DSS.Action.GetActionByIdHttpTrigger
+namespace NCS.DSS.Action.GetActionByIdHttpTrigger.Service
 {
-    public class GetActionByIdHttpTriggerService
+    public class GetActionByIdHttpTriggerService : IGetActionByIdHttpTriggerService
     {
         public async Task<Models.Action> GetAction(Guid actionId)
         {

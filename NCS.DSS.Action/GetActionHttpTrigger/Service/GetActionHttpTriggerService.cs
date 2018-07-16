@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using NCS.DSS.Action.ReferenceData;
 
-namespace NCS.DSS.Action.GetActionHttpTrigger
+namespace NCS.DSS.Action.GetActionHttpTrigger.Service
 {
-    public class GetActionHttpTriggerService
+    public class GetActionHttpTriggerService : IGetActionHttpTriggerService
     {
         public async Task<List<Models.Action>> GetActions()
         {
