@@ -5,7 +5,7 @@ namespace NCS.DSS.Action.Helpers
 {
     public class HttpRequestMessageHelper : IHttpRequestMessageHelper
     {
-        public async Task<T> GetActionPlanFromRequest<T>(HttpRequestMessage req)
+        public async Task<T> GetActionFromRequest<T>(HttpRequestMessage req)
         {
             return await req.Content.ReadAsAsync<T>();
         }

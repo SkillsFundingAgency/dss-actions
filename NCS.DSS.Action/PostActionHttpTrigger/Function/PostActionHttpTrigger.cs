@@ -8,6 +8,7 @@ using System.Web.Http.Description;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 using NCS.DSS.Action.Annotations;
 using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.Helpers;
@@ -29,13 +30,13 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
         [Response(HttpStatusCode = 422, Description = "Action validation error(s)", ShowSchema = false)]
         [Display(Name = "Post", Description = "Ability to create a new action for a given action plan.")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/")]HttpRequestMessage req, TraceWriter log, string customerId, string interactionId, string actionPlanId,
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/")]HttpRequestMessage req, ILogger log, string customerId, string interactionId, string actionPlanId,
             [Inject]IResourceHelper resourceHelper,
             [Inject]IHttpRequestMessageHelper httpRequestMessageHelper,
             [Inject]IValidate validate,
             [Inject]IPostActionHttpTriggerService actionPostService)
         {
-            log.Info("Post Action C# HTTP trigger function processed a request.");
+            log.LogInformation("Post Action C# HTTP trigger function processed a request.");
 
             if (!Guid.TryParse(customerId, out var customerGuid))
                 return HttpResponseMessageHelper.BadRequest(customerGuid);
@@ -50,7 +51,7 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
 
             try
             {
-                actionRequest = await httpRequestMessageHelper.GetActionPlanFromRequest<Models.Action>(req);
+                actionRequest = await httpRequestMessageHelper.GetActionFromRequest<Models.Action>(req);
             }
             catch (JsonSerializationException ex)
             {

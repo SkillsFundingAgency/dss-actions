@@ -4,13 +4,12 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 using NCS.DSS.Action.Annotations;
 using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.GetActionByIdHttpTrigger.Service;
 using NCS.DSS.Action.Helpers;
 using NCS.DSS.Action.Ioc;
-using Newtonsoft.Json;
 
 namespace NCS.DSS.Action.GetActionByIdHttpTrigger.Function
 {
@@ -22,11 +21,11 @@ namespace NCS.DSS.Action.GetActionByIdHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Request was malformed", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/{actionId}")]HttpRequestMessage req, TraceWriter log, string customerId, string interactionId, string actionPlanId, string actionId,
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/{actionId}")]HttpRequestMessage req, ILogger log, string customerId, string interactionId, string actionPlanId, string actionId,
             [Inject]IResourceHelper resourceHelper,
             [Inject]IGetActionByIdHttpTriggerService actionGetService)
         {
-            log.Info("Get Action By Id C# HTTP trigger function  processed a request.");
+            log.LogInformation("Get Action By Id C# HTTP trigger function  processed a request.");
 
             if (!Guid.TryParse(customerId, out var customerGuid))
                 return HttpResponseMessageHelper.BadRequest(customerGuid);
@@ -55,7 +54,7 @@ namespace NCS.DSS.Action.GetActionByIdHttpTrigger.Function
             if (!doesActionPlanExist)
                 return HttpResponseMessageHelper.NoContent(actionPlanGuid);
 
-            var action = await actionGetService.GetActionPlanForCustomerAsync(customerGuid, actionGuid);
+            var action = await actionGetService.GetActionForCustomerAsync(customerGuid, actionGuid);
 
             return action == null ?
                 HttpResponseMessageHelper.NoContent(customerGuid) :

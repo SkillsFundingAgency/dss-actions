@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Web.Http.Description;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 using NCS.DSS.Action.Annotations;
 using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.Helpers;
@@ -29,13 +29,13 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
         [Response(HttpStatusCode = 422, Description = "Action validation error(s)", ShowSchema = false)]
         [Display(Name = "Patch", Description = "Ability to update an existing action record.")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/{actionId}")]HttpRequestMessage req, TraceWriter log, string customerId, string interactionId, string actionPlanId, string actionId,
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/{actionId}")]HttpRequestMessage req, ILogger log, string customerId, string interactionId, string actionPlanId, string actionId,
             [Inject]IResourceHelper resourceHelper,
             [Inject]IHttpRequestMessageHelper httpRequestMessageHelper,
             [Inject]IValidate validate,
             [Inject]IPatchActionHttpTriggerService actionPatchService)
         {
-            log.Info("Patch Action C# HTTP trigger function processed a request.");
+            log.LogInformation("Patch Action C# HTTP trigger function processed a request.");
 
             if (!Guid.TryParse(customerId, out var customerGuid))
                 return HttpResponseMessageHelper.BadRequest(customerGuid);
@@ -53,7 +53,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
 
             try
             {
-                actionPatchRequest = await httpRequestMessageHelper.GetActionPlanFromRequest<Models.ActionPatch>(req);
+                actionPatchRequest = await httpRequestMessageHelper.GetActionFromRequest<Models.ActionPatch>(req);
             }
             catch (JsonSerializationException ex)
             {
