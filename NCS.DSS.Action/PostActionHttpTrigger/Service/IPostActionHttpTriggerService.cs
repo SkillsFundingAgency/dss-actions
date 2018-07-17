@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace NCS.DSS.Action.PostActionHttpTrigger.Service
 {
     public interface IPostActionHttpTriggerService
     {
-        Guid? Create(Models.Action action);
+        Task<Models.Action> CreateAsync(Models.Action action);
     }
 }

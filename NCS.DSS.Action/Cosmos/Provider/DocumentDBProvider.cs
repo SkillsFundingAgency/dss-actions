@@ -49,7 +49,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public bool DoesActionPlanResourceExist(Guid actionPlanId)
         {
-            var collectionUri = _documentDbHelper.CreateInteractionDocumentCollectionUri();
+            var collectionUri = _documentDbHelper.CreateActionPlanDocumentCollectionUri();
 
             var client = _databaseClient.CreateDocumentClient();
 

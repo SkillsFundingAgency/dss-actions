@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace NCS.DSS.Action.GetActionHttpTrigger.Service
 {
     public interface IGetActionHttpTriggerService
     {
-        Task<List<Models.Action>> GetActions();
+        Task<List<Models.Action>> GetActionsAsync(Guid customerId);
     }
 }
