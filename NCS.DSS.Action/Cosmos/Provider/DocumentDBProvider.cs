@@ -47,6 +47,19 @@ namespace NCS.DSS.Action.Cosmos.Provider
             return interactionQuery.Where(x => x.Id == interactionId.ToString()).Select(x => x.Id).AsEnumerable().Any();
         }
 
+        public bool DoesActionPlanResourceExist(Guid actionPlanId)
+        {
+            var collectionUri = _documentDbHelper.CreateInteractionDocumentCollectionUri();
+
+            var client = _databaseClient.CreateDocumentClient();
+
+            if (client == null)
+                return false;
+
+            var actionPlanQuery = client.CreateDocumentQuery<Document>(collectionUri, new FeedOptions() { MaxItemCount = 1 });
+            return actionPlanQuery.Where(x => x.Id == actionPlanId.ToString()).Select(x => x.Id).AsEnumerable().Any();
+        }
+
         public async Task<List<Models.Action>> GetActionsForCustomerAsync(Guid customerId)
         {
             var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();

@@ -20,6 +20,9 @@ namespace NCS.DSS.Action.Cosmos.Helper
         private readonly string _interactionDatabaseId = ConfigurationManager.AppSettings["InteractionDatabaseId"];
         private readonly string _interactionCollectionId = ConfigurationManager.AppSettings["InteractionCollectionId"];
 
+        private Uri _actionPlanDocumentCollectionUri;
+        private readonly string _actionPlanDatabaseId = ConfigurationManager.AppSettings["ActionPlanDatabaseId"];
+        private readonly string _actionPlanCollectionId = ConfigurationManager.AppSettings["ActionPlanCollectionId"];
 
         public Uri CreateDocumentCollectionUri()
         {
@@ -70,6 +73,21 @@ namespace NCS.DSS.Action.Cosmos.Helper
                 _interactionDatabaseId, _interactionCollectionId);
 
             return _interactionDocumentCollectionUri;
+        }
+
+        #endregion
+
+        #region ActionPlanDB
+
+        public Uri CreateActionPlanDocumentCollectionUri()
+        {
+            if (_actionPlanDocumentCollectionUri != null)
+                return _actionPlanDocumentCollectionUri;
+
+            _actionPlanDocumentCollectionUri = UriFactory.CreateDocumentCollectionUri(
+                _actionPlanDatabaseId, _actionPlanCollectionId);
+
+            return _actionPlanDocumentCollectionUri;
         }
 
         #endregion   

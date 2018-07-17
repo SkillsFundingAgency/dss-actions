@@ -20,5 +20,13 @@ namespace NCS.DSS.Action.Cosmos.Helper
 
             return doesInteractionExist;
         }
+
+        public bool DoesActionPlanExist(Guid actionPlanId)
+        {
+            var documentDbProvider = new DocumentDBProvider();
+            var doesActionPlanExist = documentDbProvider.DoesActionPlanResourceExist(actionPlanId);
+
+            return doesActionPlanExist;
+        }
     }
 }

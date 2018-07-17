@@ -6,5 +6,6 @@ namespace NCS.DSS.Action.Cosmos.Helper
     {
         bool DoesCustomerExist(Guid customerId);
         bool DoesInteractionExist(Guid interactionId);
+        bool DoesActionPlanExist(Guid actionPlanId);
     }
 }
