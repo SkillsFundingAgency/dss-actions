@@ -53,7 +53,7 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
             {
                 actionRequest = await httpRequestMessageHelper.GetActionFromRequest<Models.Action>(req);
             }
-            catch (JsonSerializationException ex)
+            catch (JsonException ex)
             {
                 return HttpResponseMessageHelper.UnprocessableEntity(ex);
             }

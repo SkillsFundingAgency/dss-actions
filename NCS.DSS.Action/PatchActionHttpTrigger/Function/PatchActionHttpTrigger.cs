@@ -55,7 +55,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
             {
                 actionPatchRequest = await httpRequestMessageHelper.GetActionFromRequest<Models.ActionPatch>(req);
             }
-            catch (JsonSerializationException ex)
+            catch (JsonException ex)
             {
                 return HttpResponseMessageHelper.UnprocessableEntity(ex);
             }

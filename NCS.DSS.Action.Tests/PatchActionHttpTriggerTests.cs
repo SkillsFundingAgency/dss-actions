@@ -10,7 +10,9 @@ using NCS.DSS.Action.Helpers;
 using NCS.DSS.Action.Models;
 using NCS.DSS.Action.PatchActionHttpTrigger.Service;
 using NCS.DSS.Action.Validation;
+using Newtonsoft.Json;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
 namespace NCS.DSS.Action.Tests
@@ -117,8 +119,7 @@ namespace NCS.DSS.Action.Tests
         [Test]
         public async Task PatchActionHttpTrigger_ReturnsStatusCodeUnprocessableEntity_WhenActionRequestIsInvalid()
         {
-            var validationResults = new List<ValidationResult> { new ValidationResult("Customer Id is Required") };
-            _validate.ValidateResource(Arg.Any<ActionPatch>()).Returns(validationResults);
+            _httpRequestMessageHelper.GetActionFromRequest<Models.Action>(_request).Throws(new JsonException());
 
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionId, ValidActionPlanId);
 

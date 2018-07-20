@@ -9,7 +9,9 @@ using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.Helpers;
 using NCS.DSS.Action.PostActionHttpTrigger.Service;
 using NCS.DSS.Action.Validation;
+using Newtonsoft.Json;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
 namespace NCS.DSS.Action.Tests
@@ -101,8 +103,7 @@ namespace NCS.DSS.Action.Tests
         [Test]
         public async Task PostActionHttpTrigger_ReturnsStatusCodeUnprocessableEntity_WhenActionRequestIsInvalid()
         {
-            var validationResults = new List<ValidationResult> { new ValidationResult("Customer Id is Required") };
-            _validate.ValidateResource(Arg.Any<Models.Action>()).Returns(validationResults);
+            _httpRequestMessageHelper.GetActionFromRequest<Models.Action>(_request).Throws(new JsonException());
 
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId);
 
