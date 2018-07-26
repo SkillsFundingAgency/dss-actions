@@ -13,8 +13,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
             if (action == null)
                 return null;
 
-            if (!actionPatch.LastModifiedDate.HasValue)
-                actionPatch.LastModifiedDate = DateTime.Now;
+            actionPatch.SetDefaultValues();
 
             action.Patch(actionPatch);
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using NCS.DSS.Action.Cosmos.Provider;
 
@@ -12,11 +11,7 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Service
             if (action == null)
                 return null;
 
-            var actionPlanId = Guid.NewGuid();
-            action.ActionPlanId = actionPlanId;
-
-            if (!action.LastModifiedDate.HasValue)
-                action.LastModifiedDate = DateTime.Now;
+            action.SetDefaultValues();
 
             var documentDbProvider = new DocumentDBProvider();
 
