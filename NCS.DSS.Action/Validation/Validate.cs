@@ -33,6 +33,9 @@ namespace NCS.DSS.Action.Validation
             if (actionResource.DateActionActuallyCompleted.HasValue && actionResource.DateActionActuallyCompleted.Value > DateTime.UtcNow)
                 results.Add(new ValidationResult("Date Action Actually Completed must be less the current date/time", new[] { "DateActionActuallyCompleted" }));
 
+            if (actionResource.LastModifiedDate.HasValue && actionResource.LastModifiedDate.Value > DateTime.UtcNow)
+                results.Add(new ValidationResult("Last Modified Date must be less the current date/time", new[] { "LastModifiedDate" }));
+
             if (actionResource.ActionType.HasValue && !Enum.IsDefined(typeof(ActionType), actionResource.ActionType.Value))
                 results.Add(new ValidationResult("Please supply a valid Action Type", new[] { "ActionType" }));
 
