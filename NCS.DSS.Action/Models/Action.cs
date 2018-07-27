@@ -80,8 +80,10 @@ namespace NCS.DSS.Action.Models
 
             if (!LastModifiedDate.HasValue)
                 LastModifiedDate = DateTime.Now;
-        }
 
+            if (ActionStatus == null)
+                ActionStatus = ReferenceData.ActionStatus.NotStarted;
+        }
 
         public void Patch(ActionPatch actionPatch)
         {
