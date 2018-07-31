@@ -50,10 +50,24 @@ namespace NCS.DSS.Action.Tests
             _httpRequestMessageHelper = Substitute.For<IHttpRequestMessageHelper>();
             _validate = Substitute.For<IValidate>();
             _postActionHttpTriggerService = Substitute.For<IPostActionHttpTriggerService>();
+            _httpRequestMessageHelper.GetTouchpointId(_request).Returns(new Guid());
         }
 
         [Test]
-        public async Task GetActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenCustomerIdIsInvalid()
+        public async Task PostActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenTouchpointIdIsNotProvided()
+        {
+            _httpRequestMessageHelper.GetTouchpointId(_request).Returns((Guid?)null);
+
+            // Act
+            var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId);
+
+            // Assert
+            Assert.IsInstanceOf<HttpResponseMessage>(result);
+            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
+        [Test]
+        public async Task PostActionHttpTrigge_ReturnsStatusCodeBadRequest_WhenCustomerIdIsInvalid()
         {
             // Act
             var result = await RunFunction(InValidId, ValidInteractionId, ValidActionPlanId);
@@ -64,7 +78,7 @@ namespace NCS.DSS.Action.Tests
         }
 
         [Test]
-        public async Task GetActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenInteractionIdIsInvalid()
+        public async Task PostActionHttpTrigge_ReturnsStatusCodeBadRequest_WhenInteractionIdIsInvalid()
         {
             // Act
             var result = await RunFunction(ValidCustomerId, InValidId, ValidActionPlanId);
@@ -75,7 +89,7 @@ namespace NCS.DSS.Action.Tests
         }
 
         [Test]
-        public async Task GetActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenActionPlanIdIsInvalid()
+        public async Task PostActionHttpTrigge_ReturnsStatusCodeBadRequest_WhenActionPlanIdIsInvalid()
         {
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, InValidId);
@@ -142,7 +156,7 @@ namespace NCS.DSS.Action.Tests
         }
 
         [Test]
-        public async Task GetActionHttpTrigger_ReturnsStatusCodeOk_WhenActionPlanDoesNotExist()
+        public async Task PostActionHttpTrigge_ReturnsStatusCodeOk_WhenActionPlanDoesNotExist()
         {
             _httpRequestMessageHelper.GetActionFromRequest<Models.Action>(_request).Returns(Task.FromResult(_actionPlan).Result);
 

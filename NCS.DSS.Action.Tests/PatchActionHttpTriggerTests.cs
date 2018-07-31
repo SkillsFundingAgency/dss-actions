@@ -55,10 +55,24 @@ namespace NCS.DSS.Action.Tests
             _validate = Substitute.For<IValidate>();
             _httpRequestMessageHelper = Substitute.For<IHttpRequestMessageHelper>();
             _patchActionHttpTriggerService = Substitute.For<IPatchActionHttpTriggerService>();
+            _httpRequestMessageHelper.GetTouchpointId(_request).Returns(new Guid());
         }
 
         [Test]
-        public async Task GetActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenCustomerIdIsInvalid()
+        public async Task PatchActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenTouchpointIdIsNotProvided()
+        {
+            _httpRequestMessageHelper.GetTouchpointId(_request).Returns((Guid?)null);
+
+            // Act
+            var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId, ValidActionId);
+
+            // Assert
+            Assert.IsInstanceOf<HttpResponseMessage>(result);
+            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
+        [Test]
+        public async Task PatchActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenCustomerIdIsInvalid()
         {
             // Act
             var result = await RunFunction(InValidId, ValidInteractionId, ValidActionId, ValidActionPlanId);
@@ -69,7 +83,7 @@ namespace NCS.DSS.Action.Tests
         }
 
         [Test]
-        public async Task GetActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenInteractionIdIsInvalid()
+        public async Task PatchActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenInteractionIdIsInvalid()
         {
             // Act
             var result = await RunFunction(ValidCustomerId, InValidId, ValidActionId, ValidActionPlanId);
@@ -80,7 +94,7 @@ namespace NCS.DSS.Action.Tests
         }
 
         [Test]
-        public async Task GetActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenActionPlanIdIsInvalid()
+        public async Task PatchActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenActionPlanIdIsInvalid()
         {
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, InValidId , ValidActionPlanId);
@@ -91,7 +105,7 @@ namespace NCS.DSS.Action.Tests
         }
 
         [Test]
-        public async Task GetActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenActionIdIsInvalid()
+        public async Task PatchActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenActionIdIsInvalid()
         {
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId, InValidId);
@@ -160,22 +174,7 @@ namespace NCS.DSS.Action.Tests
         }
 
         [Test]
-        public async Task GetActionHttpTrigger_ReturnsStatusCodeNoContent_WhenCustomerDoesNotExist()
-        {
-            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPlanPatch).Result);
-
-            _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).ReturnsForAnyArgs(false);
-
-            // Act
-            var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionId, ValidActionPlanId);
-
-            // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.NoContent, result.StatusCode);
-        }
-
-        [Test]
-        public async Task GetActionHttpTrigger_ReturnsStatusCodeNoContent_WhenInteractionDoesNotExist()
+        public async Task PatchActionHttpTrigger_ReturnsStatusCodeNoContent_WhenInteractionDoesNotExist()
         {
             _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPlanPatch).Result);
 
@@ -191,7 +190,7 @@ namespace NCS.DSS.Action.Tests
         }
 
         [Test]
-        public async Task GetActionHttpTrigger_ReturnsStatusCodeOk_WhenActionPlanDoesNotExist()
+        public async Task PatchActionHttpTrigger_ReturnsStatusCodeOk_WhenActionPlanDoesNotExist()
         {
             _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPlanPatch).Result);
 
