@@ -6,6 +6,6 @@ namespace NCS.DSS.Action.Validation
 {
     public interface IValidate
     {
-        List<ValidationResult> ValidateResource(IAction resource);
+        List<ValidationResult> ValidateResource(IAction resource, bool validateModelForPost);
     }
 }

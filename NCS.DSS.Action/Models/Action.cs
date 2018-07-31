@@ -79,7 +79,7 @@ namespace NCS.DSS.Action.Models
             ActionPlanId = actionPlanId;
 
             if (!LastModifiedDate.HasValue)
-                LastModifiedDate = DateTime.Now;
+                LastModifiedDate = DateTime.UtcNow;
 
             if (ActionStatus == null)
                 ActionStatus = ReferenceData.ActionStatus.NotStarted;

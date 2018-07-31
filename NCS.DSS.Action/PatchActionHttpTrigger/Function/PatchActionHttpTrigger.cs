@@ -63,7 +63,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
             if (actionPatchRequest == null)
                 return HttpResponseMessageHelper.UnprocessableEntity(req);
 
-            var errors = validate.ValidateResource(actionPatchRequest);
+            var errors = validate.ValidateResource(actionPatchRequest, false);
 
             if (errors != null && errors.Any())
                 return HttpResponseMessageHelper.UnprocessableEntity(errors);

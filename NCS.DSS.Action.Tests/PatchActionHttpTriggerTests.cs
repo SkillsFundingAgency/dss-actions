@@ -107,7 +107,7 @@ namespace NCS.DSS.Action.Tests
             _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPlanPatch).Result);
 
             var validationResults = new List<ValidationResult> { new ValidationResult("interaction Id is Required") };
-            _validate.ValidateResource(Arg.Any<ActionPatch>()).Returns(validationResults);
+            _validate.ValidateResource(Arg.Any<ActionPatch>(), false).Returns(validationResults);
 
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionId, ValidActionPlanId);
 

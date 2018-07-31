@@ -8,24 +8,27 @@ namespace NCS.DSS.Action.Validation
 {
     public class Validate : IValidate
     {
-        public List<ValidationResult> ValidateResource(IAction resource)
+        public List<ValidationResult> ValidateResource(IAction resource, bool validateModelForPost)
         {
             var context = new ValidationContext(resource, null, null);
             var results = new List<ValidationResult>();
 
             Validator.TryValidateObject(resource, context, results, true);
-            ValidateActionRules(resource, results);
+            ValidateActionRules(resource, results, validateModelForPost);
 
             return results;
         }
 
-        private void ValidateActionRules(IAction actionResource, List<ValidationResult> results)
+        private void ValidateActionRules(IAction actionResource, List<ValidationResult> results, bool validateModelForPost)
         {
             if (actionResource == null)
                 return;
 
-            if (string.IsNullOrWhiteSpace(actionResource.ActionSummary))
-                results.Add(new ValidationResult("Action Summary is a required field", new[] { "ActionSummary" }));
+            if (validateModelForPost)
+            {
+                if (string.IsNullOrWhiteSpace(actionResource.ActionSummary))
+                    results.Add(new ValidationResult("Action Summary is a required field", new[] { "ActionSummary" }));
+            }
 
             if (actionResource.DateActionAgreed.HasValue && actionResource.DateActionAgreed.Value > DateTime.UtcNow)
                 results.Add(new ValidationResult("Date Action Agreed must be less the current date/time", new[] { "DateActionAgreed" }));
