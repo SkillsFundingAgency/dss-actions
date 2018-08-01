@@ -75,8 +75,7 @@ namespace NCS.DSS.Action.Models
 
         public void SetDefaultValues()
         {
-            var actionPlanId = Guid.NewGuid();
-            ActionPlanId = actionPlanId;
+            ActionId = Guid.NewGuid();
 
             if (!LastModifiedDate.HasValue)
                 LastModifiedDate = DateTime.UtcNow;
