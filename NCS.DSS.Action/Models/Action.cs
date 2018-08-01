@@ -89,26 +89,36 @@ namespace NCS.DSS.Action.Models
             if (actionPatch == null)
                 return;
 
-            DateActionAgreed = actionPatch.DateActionAgreed;
+            if(actionPatch.DateActionAgreed.HasValue)
+                DateActionAgreed = actionPatch.DateActionAgreed;
 
-            DateActionAimsToBeCompletedBy = actionPatch.DateActionAimsToBeCompletedBy;
+            if(actionPatch.DateActionAimsToBeCompletedBy.HasValue)
+                DateActionAimsToBeCompletedBy = actionPatch.DateActionAimsToBeCompletedBy;
 
-            DateActionActuallyCompleted = actionPatch.DateActionActuallyCompleted;
+            if(actionPatch.DateActionActuallyCompleted.HasValue)
+                DateActionActuallyCompleted = actionPatch.DateActionActuallyCompleted;
 
-            ActionSummary = actionPatch.ActionSummary;
+            if(!string.IsNullOrWhiteSpace(actionPatch.ActionSummary))
+                ActionSummary = actionPatch.ActionSummary;
 
-            SignpostedTo = actionPatch.SignpostedTo;
+            if(!string.IsNullOrWhiteSpace(actionPatch.SignpostedTo))
+                SignpostedTo = actionPatch.SignpostedTo;
 
-            ActionType = actionPatch.ActionType;
+            if(actionPatch.ActionType.HasValue)
+                ActionType = actionPatch.ActionType;
 
+            if(actionPatch.ActionStatus.HasValue)
+                ActionStatus = actionPatch.ActionStatus;
 
-            ActionStatus = actionPatch.ActionStatus;
-
-            PersonResponsible = actionPatch.PersonResponsible;
+            if(actionPatch.PersonResponsible.HasValue)
+                PersonResponsible = actionPatch.PersonResponsible;
             
-            LastModifiedDate = actionPatch.LastModifiedDate;
+            if(actionPatch.LastModifiedDate.HasValue)
+                LastModifiedDate = actionPatch.LastModifiedDate;
 
-            LastModifiedTouchpointId = actionPatch.LastModifiedTouchpointId;
+            if(actionPatch.LastModifiedTouchpointId.HasValue)
+                LastModifiedTouchpointId = actionPatch.LastModifiedTouchpointId;
         }
+
     }
 }
