@@ -9,6 +9,10 @@ namespace NCS.DSS.Action.Helpers
     {
         public async Task<T> GetActionFromRequest<T>(HttpRequestMessage req)
         {
+            if (req == null)
+                return default(T);
+
+            req.Content.Headers.ContentType.MediaType = "application/json";
             return await req.Content.ReadAsAsync<T>();
         }
 
