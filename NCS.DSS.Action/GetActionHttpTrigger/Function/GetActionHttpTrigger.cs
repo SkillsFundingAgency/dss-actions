@@ -63,7 +63,7 @@ namespace NCS.DSS.Action.GetActionHttpTrigger.Function
 
             return actions == null ?
                 HttpResponseMessageHelper.NoContent(customerGuid) :
-                HttpResponseMessageHelper.Ok(actions);
+                HttpResponseMessageHelper.Ok(JsonHelper.SerializeObjects(actions));
         }
     }
 }

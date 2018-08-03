@@ -10,7 +10,6 @@ namespace NCS.DSS.Action.Helpers
 {
     public static class HttpResponseMessageHelper
     {
-
         #region Ok(200)
 
         public static HttpResponseMessage Ok(Guid id)
@@ -22,21 +21,11 @@ namespace NCS.DSS.Action.Helpers
             };
         }
 
-        public static HttpResponseMessage Ok<T>(T resource)
+        public static HttpResponseMessage Ok(string resourceJson)
         {
             return new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent(JsonConvert.SerializeObject(resource), 
-                    Encoding.UTF8, "application/json")
-            };
-        }
-
-        public static HttpResponseMessage Ok<T>(List<T> resourcesList)
-        {
-            return new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(resourcesList),
-                    Encoding.UTF8, "application/json")
+                Content = new StringContent(resourceJson, Encoding.UTF8, "application/json")
             };
         }
 
@@ -44,12 +33,11 @@ namespace NCS.DSS.Action.Helpers
 
         #region Created(201) 
 
-        public static HttpResponseMessage Created<T>( T resource)
+        public static HttpResponseMessage Created(string resourceJson)
         {
             return new HttpResponseMessage(HttpStatusCode.Created)
             {
-                Content = new StringContent(JsonConvert.SerializeObject(resource), 
-                    Encoding.UTF8, "application/json")
+                Content = new StringContent(resourceJson, Encoding.UTF8, "application/json")
             };
         }
 
