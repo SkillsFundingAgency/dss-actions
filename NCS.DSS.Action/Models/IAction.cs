@@ -14,7 +14,7 @@ namespace NCS.DSS.Action.Models
         ActionStatus? ActionStatus { get; set; }
         PersonResponsible? PersonResponsible { get; set; }
         DateTime? LastModifiedDate { get; set; }
-        Guid? LastModifiedTouchpointId { get; set; }
+        string LastModifiedTouchpointId { get; set; }
 
         void SetDefaultValues();
 
