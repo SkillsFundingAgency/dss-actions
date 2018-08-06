@@ -265,6 +265,14 @@ namespace NCS.DSS.Action.APIDefinition
         private static List<object> GenerateFunctionParametersSignature(MethodInfo methodInfo, string route, dynamic doc)
         {
             var parameterSignatures = new List<object>();
+
+            dynamic opHeaderParam = new ExpandoObject();
+            opHeaderParam.name = "TouchpointId";
+            opHeaderParam.@in = "header";
+            opHeaderParam.required = true;
+            opHeaderParam.type = "string";
+            parameterSignatures.Add(opHeaderParam);
+
             foreach (ParameterInfo parameter in methodInfo.GetParameters())
             {
                 if (parameter.ParameterType == typeof(HttpRequestMessage)) continue;
@@ -315,6 +323,7 @@ namespace NCS.DSS.Action.APIDefinition
                     parameterSignatures.Add(opParam);
                 }
             }
+
             return parameterSignatures;
         }
 
