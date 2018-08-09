@@ -12,12 +12,10 @@ namespace NCS.DSS.Action.Models
         [Newtonsoft.Json.JsonProperty(PropertyName = "id")]
         public Guid? ActionId { get; set; }
 
-        [Required]
         [Display(Description = "Unique identifier of a customer.")]
         [Example(Description = "2730af9c-fc34-4c2b-a905-c4b584b0f379")]
         public Guid? CustomerId { get; set; }
 
-        [Required]
         [Display(Description = "Unique identifier of the customer action plan.")]
         [Example(Description = "a79ba4cc-5da5-4eb0-8913-eb5e69f90ab8")]
         public Guid? ActionPlanId { get; set; }
@@ -76,13 +74,19 @@ namespace NCS.DSS.Action.Models
 
         public void SetDefaultValues()
         {
-            ActionId = Guid.NewGuid();
-
             if (!LastModifiedDate.HasValue)
                 LastModifiedDate = DateTime.UtcNow;
 
             if (ActionStatus == null)
                 ActionStatus = ReferenceData.ActionStatus.NotStarted;
+        }
+
+        public void SetIds(Guid customerId, Guid actionPlanId, string touchpointId)
+        {
+            ActionId = Guid.NewGuid();
+            CustomerId = customerId;
+            ActionPlanId = actionPlanId;
+            LastModifiedTouchpointId = touchpointId;
         }
 
         public void Patch(ActionPatch actionPatch)
