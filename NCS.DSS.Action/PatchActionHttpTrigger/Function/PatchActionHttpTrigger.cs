@@ -99,6 +99,9 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
 
             var updatedAction = await actionPatchService.UpdateAsync(action, actionPatchRequest);
 
+            if (updatedAction != null)
+                await actionPatchService.SendToServiceBusQueueAsync(updatedAction, customerGuid, req.RequestUri.AbsoluteUri);
+
             return updatedAction == null ?
                 HttpResponseMessageHelper.BadRequest(actionPlanGuid) :
                 HttpResponseMessageHelper.Ok(JsonHelper.SerializeObject(updatedAction));

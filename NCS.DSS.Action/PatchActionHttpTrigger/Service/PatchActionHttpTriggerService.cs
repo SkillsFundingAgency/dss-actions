@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using NCS.DSS.Action.Cosmos.Provider;
 using NCS.DSS.Action.Models;
+using NCS.DSS.Action.ServiceBus;
 
 namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
 {
@@ -31,6 +32,11 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
             var action = await documentDbProvider.GetActionForCustomerAsync(customerId, actionId);
 
             return action;
+        }
+
+        public async Task SendToServiceBusQueueAsync(Models.Action action, Guid customerId, string reqUrl)
+        {
+            await ServiceBusClient.SendPatchMessageAsync(action, customerId, reqUrl);
         }
     }
 }
