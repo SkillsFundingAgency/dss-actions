@@ -89,11 +89,14 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
             if (!doesActionPlanExist)
                 return HttpResponseMessageHelper.NoContent(actionPlanGuid);
             
-            var actionPlan = await actionPostService.CreateAsync(actionRequest);
+            var action = await actionPostService.CreateAsync(actionRequest);
 
-            return actionPlan == null
+            if (action != null)
+                await actionPostService.SendToServiceBusQueueAsync(action, req.RequestUri.AbsoluteUri);
+
+            return action == null
                 ? HttpResponseMessageHelper.BadRequest(customerGuid)
-                : HttpResponseMessageHelper.Created(JsonHelper.SerializeObject(actionPlan));
+                : HttpResponseMessageHelper.Created(JsonHelper.SerializeObject(action));
 
         }
     }
