@@ -28,10 +28,11 @@ namespace NCS.DSS.Action.ServiceBus
                 CustomerGuid = action.CustomerId,
                 LastModifiedDate = action.LastModifiedDate,
                 URL = reqUrl,
-                IsNewCustomer = false
+                IsNewCustomer = false,
+                TouchpointId = action.LastModifiedTouchpointId
             };
 
-            var msg = new BrokeredMessage(messageModel)
+            var msg = new BrokeredMessage(new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel))))
             {
                 ContentType = "application/json",
                 MessageId = action.CustomerId + " " + DateTime.UtcNow
@@ -46,13 +47,15 @@ namespace NCS.DSS.Action.ServiceBus
             var tokenProvider = TokenProvider.CreateSharedAccessSignatureTokenProvider(KeyName, AccessKey);
             var messagingFactory = MessagingFactory.Create(BaseAddress, tokenProvider);
             var sender = messagingFactory.CreateMessageSender(QueueName);
+
             var messageModel = new MessageModel
             {
                 TitleMessage = "Action record modification for {" + customerId + "} at " + DateTime.UtcNow,
                 CustomerGuid = customerId,
                 LastModifiedDate = action.LastModifiedDate,
                 URL = reqUrl,
-                IsNewCustomer = false
+                IsNewCustomer = false,
+                TouchpointId = action.LastModifiedTouchpointId
             };
 
             var msg = new BrokeredMessage(new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel))))
@@ -74,6 +77,7 @@ namespace NCS.DSS.Action.ServiceBus
         public DateTime? LastModifiedDate { get; set; }
         public string URL { get; set; }
         public bool IsNewCustomer { get; set; }
+        public string TouchpointId { get; set; }
     }
 
 }
