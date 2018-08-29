@@ -49,10 +49,10 @@ namespace NCS.DSS.Action.Models
         public string SignpostedTo { get; set; }
 
         [Required]
-        [Display(Description = "ActionType reference data {%<br>%} " +
-                                "[ 1 - Skills Health Check {%<br>%} " +
-                                "2 - Create or update CV {%<br>%} " +
-                                "3 - Interview skills workshop {%<br>%} " +
+        [Display(Description = "ActionType reference data, " +
+                                "[ 1 - Skills Health Check, " +
+                                "2 - Create or update CV, " +
+                                "3 - Interview skills workshop, " +
                                 "4 - Search for vacancy, " +
                                 "5 - Enrol on a course, " +
                                 "6 - Careers management workshop, " +
@@ -68,16 +68,16 @@ namespace NCS.DSS.Action.Models
         public ActionType? ActionType { get; set; }
 
         [Display(Description = "ActionStatus reference data." +
-                                "1 - Not Started " +
-                                "2 - In Progress " +
-                                "3 - Completed " +
+                                "1 - Not Started, " +
+                                "2 - In Progress, " +
+                                "3 - Completed, " +
                                 "99 - No longer applicable")]
         [Example(Description = "1")]
         public ActionStatus? ActionStatus { get; set; }
 
         [Required]
         [Display(Description = "PersonResponsible reference data. " +
-                                "1 - Customer " + 
+                                "1 - Customer, " + 
                                 "2 - Adviser")]
         [Example(Description = "1")]
         public PersonResponsible? PersonResponsible { get; set; }
