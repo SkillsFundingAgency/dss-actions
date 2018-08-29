@@ -49,16 +49,36 @@ namespace NCS.DSS.Action.Models
         public string SignpostedTo { get; set; }
 
         [Required]
-        [Display(Description = "ActionType reference data.")]
+        [Display(Description = "ActionType reference data \n" +
+                                "1 - Skills Health Check \n" +
+                                "2 - Create or update CV \n" +
+                                "3 - Interview skills workshop \n" +
+                                "4 - Search for vacancy \n" +
+                                "5 - Enrol on a course \n" +
+                                "6 - Careers management workshop \n" +
+                                "7 - Apply for apprenticeship \n" +
+                                "8 - Apply for traineeship \n" +
+                                "9 - Attend skills fair or skills show \n" +
+                                "10 - Volunteer \n" +
+                                "11 - Use National Careers Service website \n" +
+                                "12 - Use external digital services \n" +
+                                "13 - Book follow up appointment \n" +
+                                "14 - Use social media \n")]
         [Example(Description = "1")]
         public ActionType? ActionType { get; set; }
 
-        [Display(Description = "ActionStatus reference data.")]
+        [Display(Description = "ActionStatus reference data." +
+                                "1 - Not Started \n" +
+                                "2 - In Progress \n" +
+                                "3 - Completed \n" +
+                                "99 - No longer applicable")]
         [Example(Description = "1")]
         public ActionStatus? ActionStatus { get; set; }
 
         [Required]
-        [Display(Description = "PersonResponsible reference data.")]
+        [Display(Description = "PersonResponsible reference data. \n" +
+                                "1 - Customer \n" + 
+                                "2 - Adviser")]
         [Example(Description = "1")]
         public PersonResponsible? PersonResponsible { get; set; }
 
