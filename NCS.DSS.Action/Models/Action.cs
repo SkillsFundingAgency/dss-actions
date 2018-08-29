@@ -49,35 +49,35 @@ namespace NCS.DSS.Action.Models
         public string SignpostedTo { get; set; }
 
         [Required]
-        [Display(Description = "ActionType reference data \n" +
-                                "1 - Skills Health Check \n" +
-                                "2 - Create or update CV \n" +
-                                "3 - Interview skills workshop \n" +
-                                "4 - Search for vacancy \n" +
-                                "5 - Enrol on a course \n" +
-                                "6 - Careers management workshop \n" +
-                                "7 - Apply for apprenticeship \n" +
-                                "8 - Apply for traineeship \n" +
-                                "9 - Attend skills fair or skills show \n" +
-                                "10 - Volunteer \n" +
-                                "11 - Use National Careers Service website \n" +
-                                "12 - Use external digital services \n" +
-                                "13 - Book follow up appointment \n" +
-                                "14 - Use social media \n")]
+        [Display(Description = "ActionType reference data </br>" +
+                                "1 - Skills Health Check </br>" +
+                                "2 - Create or update CV </br>" +
+                                "3 - Interview skills workshop </br>" +
+                                "4 - Search for vacancy </br>" +
+                                "5 - Enrol on a course </br>" +
+                                "6 - Careers management workshop </br>" +
+                                "7 - Apply for apprenticeship </br>" +
+                                "8 - Apply for traineeship </br>" +
+                                "9 - Attend skills fair or skills show </br>" +
+                                "10 - Volunteer </br>" +
+                                "11 - Use National Careers Service website </br>" +
+                                "12 - Use external digital services </br>" +
+                                "13 - Book follow up appointment </br>" +
+                                "14 - Use social media </br>")]
         [Example(Description = "1")]
         public ActionType? ActionType { get; set; }
 
         [Display(Description = "ActionStatus reference data." +
-                                "1 - Not Started \n" +
-                                "2 - In Progress \n" +
-                                "3 - Completed \n" +
+                                "1 - Not Started </br>" +
+                                "2 - In Progress </br>" +
+                                "3 - Completed </br>" +
                                 "99 - No longer applicable")]
         [Example(Description = "1")]
         public ActionStatus? ActionStatus { get; set; }
 
         [Required]
-        [Display(Description = "PersonResponsible reference data. \n" +
-                                "1 - Customer \n" + 
+        [Display(Description = "PersonResponsible reference data. </br>" +
+                                "1 - Customer </br>" + 
                                 "2 - Adviser")]
         [Example(Description = "1")]
         public PersonResponsible? PersonResponsible { get; set; }
