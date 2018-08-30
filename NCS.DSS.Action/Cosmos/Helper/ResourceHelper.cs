@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using NCS.DSS.Action.Cosmos.Provider;
 
 namespace NCS.DSS.Action.Cosmos.Helper
@@ -12,6 +13,15 @@ namespace NCS.DSS.Action.Cosmos.Helper
 
             return doesCustomerExist;
         }
+
+        public async Task<bool> IsCustomerReadOnly(Guid customerId)
+        {
+            var documentDbProvider = new DocumentDBProvider();
+            var isCustomerReadOnly = await documentDbProvider.DoesCustomerHaveATerminationDate(customerId);
+
+            return isCustomerReadOnly;
+        }
+
 
         public bool DoesInteractionExist(Guid interactionId)
         {
