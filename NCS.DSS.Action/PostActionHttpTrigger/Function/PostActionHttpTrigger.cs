@@ -42,6 +42,13 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
                 return HttpResponseMessageHelper.BadRequest();
             }
 
+            var ApimURL = httpRequestMessageHelper.GetApimURL(req);
+            if (string.IsNullOrEmpty(ApimURL))
+            {
+                log.LogInformation("Unable to locate 'apimurl' in request header");
+                return HttpResponseMessageHelper.BadRequest();
+            }
+
             log.LogInformation("Post Action HTTP trigger function processed a request. By Touchpoint " + touchpointId);
 
             if (!Guid.TryParse(customerId, out var customerGuid))
@@ -97,7 +104,7 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
             var action = await actionPostService.CreateAsync(actionRequest);
 
             if (action != null)
-                await actionPostService.SendToServiceBusQueueAsync(action, req.RequestUri.AbsoluteUri);
+                await actionPostService.SendToServiceBusQueueAsync(action, ApimURL);
 
             return action == null
                 ? HttpResponseMessageHelper.BadRequest(customerGuid)
