@@ -12,20 +12,11 @@ namespace NCS.DSS.Action.Cosmos.Provider
 {
     public class DocumentDBProvider : IDocumentDBProvider
     {
-        private readonly DocumentDBHelper _documentDbHelper;
-        private readonly DocumentDBClient _databaseClient;
-
-        public DocumentDBProvider()
-        {
-            _documentDbHelper = new DocumentDBHelper();
-            _databaseClient = new DocumentDBClient();
-        }
-
         public bool DoesCustomerResourceExist(Guid customerId)
         {
-            var collectionUri = _documentDbHelper.CreateCustomerDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateCustomerDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return false;
@@ -36,9 +27,9 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public async Task<bool> DoesCustomerHaveATerminationDate(Guid customerId)
         {
-            var collectionUri = _documentDbHelper.CreateCustomerDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateCustomerDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             var customerByIdQuery = client
                 ?.CreateDocumentQuery<Document>(collectionUri, new FeedOptions { MaxItemCount = 1 })
@@ -62,9 +53,9 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public bool DoesInteractionResourceExist(Guid interactionId)
         {
-            var collectionUri = _documentDbHelper.CreateInteractionDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateInteractionDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return false;
@@ -75,9 +66,9 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public bool DoesActionPlanResourceExist(Guid actionPlanId)
         {
-            var collectionUri = _documentDbHelper.CreateActionPlanDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateActionPlanDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return false;
@@ -88,9 +79,9 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public async Task<List<Models.Action>> GetActionsForCustomerAsync(Guid customerId)
         {
-            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return null;
@@ -111,9 +102,9 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public async Task<Models.Action> GetActionForCustomerAsync(Guid customerId, Guid actionId)
         {
-            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             var actionForCustomerQuery = client
                 ?.CreateDocumentQuery<Models.Action>(collectionUri, new FeedOptions { MaxItemCount = 1 })
@@ -131,9 +122,9 @@ namespace NCS.DSS.Action.Cosmos.Provider
         public async Task<ResourceResponse<Document>> CreateActionAsync(Models.Action action)
         {
 
-            var collectionUri = _documentDbHelper.CreateDocumentCollectionUri();
+            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return null;
@@ -146,9 +137,9 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public async Task<ResourceResponse<Document>> UpdateActionAsync(Models.Action action)
         {
-            var documentUri = _documentDbHelper.CreateDocumentUri(action.ActionId.GetValueOrDefault());
+            var documentUri = DocumentDBHelper.CreateDocumentUri(action.ActionId.GetValueOrDefault());
 
-            var client = _databaseClient.CreateDocumentClient();
+            var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return null;
