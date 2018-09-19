@@ -44,17 +44,17 @@ namespace NCS.DSS.Action.GetActionHttpTrigger.Function
             if (!Guid.TryParse(actionPlanId, out var actionPlanGuid))
                 return HttpResponseMessageHelper.BadRequest(actionPlanGuid);
 
-            var doesCustomerExist = resourceHelper.DoesCustomerExist(customerGuid);
+            var doesCustomerExist = await resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
                 return HttpResponseMessageHelper.NoContent(customerGuid);
 
-            var doesInteractionExist = resourceHelper.DoesInteractionExist(interactionGuid);
+            var doesInteractionExist = await resourceHelper.DoesInteractionExist(interactionGuid);
 
             if (!doesInteractionExist)
                 return HttpResponseMessageHelper.NoContent(interactionGuid);
 
-            var doesActionPlanExist = resourceHelper.DoesActionPlanExist(actionPlanGuid);
+            var doesActionPlanExist = await resourceHelper.DoesActionPlanExist(actionPlanGuid);
 
             if (!doesActionPlanExist)
                 return HttpResponseMessageHelper.NoContent(actionPlanGuid);
