@@ -5,89 +5,97 @@ using Microsoft.Azure.Documents.Client;
 
 namespace NCS.DSS.Action.Cosmos.Helper
 {
-    public class DocumentDBHelper : IDocumentDBHelper
+    public static class DocumentDBHelper
     {
-        private Uri _documentCollectionUri;
-        private Uri _documentUri;
-        private readonly string _databaseId = ConfigurationManager.AppSettings["DatabaseId"];
-        private readonly string _collectionId = ConfigurationManager.AppSettings["CollectionId"];
+        private static Uri _documentCollectionUri;
+        private static readonly string DatabaseId = ConfigurationManager.AppSettings["DatabaseId"];
+        private static readonly string CollectionId = ConfigurationManager.AppSettings["CollectionId"];
 
-        private Uri _customerDocumentCollectionUri;
-        private readonly string _customerDatabaseId = ConfigurationManager.AppSettings["CustomerDatabaseId"];
-        private readonly string _customerCollectionId = ConfigurationManager.AppSettings["CustomerCollectionId"];
+        private static Uri _customerDocumentCollectionUri;
+        private static readonly string CustomerDatabaseId = ConfigurationManager.AppSettings["CustomerDatabaseId"];
+        private static readonly string CustomerCollectionId = ConfigurationManager.AppSettings["CustomerCollectionId"];
 
-        private Uri _interactionDocumentCollectionUri;
-        private readonly string _interactionDatabaseId = ConfigurationManager.AppSettings["InteractionDatabaseId"];
-        private readonly string _interactionCollectionId = ConfigurationManager.AppSettings["InteractionCollectionId"];
+        private static Uri _interactionDocumentCollectionUri;
+        private static readonly string InteractionDatabaseId = ConfigurationManager.AppSettings["InteractionDatabaseId"];
+        private static readonly string InteractionCollectionId = ConfigurationManager.AppSettings["InteractionCollectionId"];
 
-        private Uri _actionPlanDocumentCollectionUri;
-        private readonly string _actionPlanDatabaseId = ConfigurationManager.AppSettings["ActionPlanDatabaseId"];
-        private readonly string _actionPlanCollectionId = ConfigurationManager.AppSettings["ActionPlanCollectionId"];
+        private static Uri _actionPlanDocumentCollectionUri;
+        private static readonly string ActionPlanDatabaseId = ConfigurationManager.AppSettings["ActionPlanDatabaseId"];
+        private static readonly string ActionPlanCollectionId = ConfigurationManager.AppSettings["ActionPlanCollectionId"];
 
-        public Uri CreateDocumentCollectionUri()
+        public static Uri CreateDocumentCollectionUri()
         {
             if (_documentCollectionUri != null)
                 return _documentCollectionUri;
 
             _documentCollectionUri = UriFactory.CreateDocumentCollectionUri(
-                _databaseId,
-                _collectionId);
+                DatabaseId,
+                CollectionId);
 
             return _documentCollectionUri;
         }
         
-        public Uri CreateDocumentUri(Guid actionPlanId)
+        public static Uri CreateDocumentUri(Guid actionPlanId)
         {
-            if (_documentUri != null)
-                return _documentUri;
-
-            _documentUri = UriFactory.CreateDocumentUri(_databaseId, _collectionId, actionPlanId.ToString());
-
-            return _documentUri;
-
+            return UriFactory.CreateDocumentUri(DatabaseId, CollectionId, actionPlanId.ToString());
         }
 
         #region CustomerDB
 
-        public Uri CreateCustomerDocumentCollectionUri()
+        public static Uri CreateCustomerDocumentCollectionUri()
         {
             if (_customerDocumentCollectionUri != null)
                 return _customerDocumentCollectionUri;
 
             _customerDocumentCollectionUri = UriFactory.CreateDocumentCollectionUri(
-                _customerDatabaseId, _customerCollectionId);
+                CustomerDatabaseId, CustomerCollectionId);
 
             return _customerDocumentCollectionUri;
+        }
+
+        public static Uri CreateCustomerDocumentUri(Guid customerId)
+        {
+            return UriFactory.CreateDocumentUri(CustomerDatabaseId, CustomerCollectionId, customerId.ToString());
         }
 
         #endregion
 
         #region InteractionDB
 
-        public Uri CreateInteractionDocumentCollectionUri()
+        public static Uri CreateInteractionDocumentCollectionUri()
         {
             if (_interactionDocumentCollectionUri != null)
                 return _interactionDocumentCollectionUri;
 
             _interactionDocumentCollectionUri = UriFactory.CreateDocumentCollectionUri(
-                _interactionDatabaseId, _interactionCollectionId);
+                InteractionDatabaseId, InteractionCollectionId);
 
             return _interactionDocumentCollectionUri;
+        }
+
+        public static Uri CreateInteractionDocumentUri(Guid interactionId)
+        {
+            return UriFactory.CreateDocumentUri(InteractionDatabaseId, InteractionCollectionId, interactionId.ToString()); ;
         }
 
         #endregion
 
         #region ActionPlanDB
 
-        public Uri CreateActionPlanDocumentCollectionUri()
+        public static Uri CreateActionPlanDocumentCollectionUri()
         {
             if (_actionPlanDocumentCollectionUri != null)
                 return _actionPlanDocumentCollectionUri;
 
             _actionPlanDocumentCollectionUri = UriFactory.CreateDocumentCollectionUri(
-                _actionPlanDatabaseId, _actionPlanCollectionId);
+                ActionPlanDatabaseId, ActionPlanCollectionId);
 
             return _actionPlanDocumentCollectionUri;
+        }
+
+        public static Uri CreateActionPlanDocumentUri(Guid actionPlanId)
+        {
+            return UriFactory.CreateDocumentUri(ActionPlanDatabaseId, ActionPlanCollectionId, actionPlanId.ToString());
         }
 
         #endregion   
