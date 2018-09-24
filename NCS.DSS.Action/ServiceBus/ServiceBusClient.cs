@@ -27,7 +27,7 @@ namespace NCS.DSS.Action.ServiceBus
                 TitleMessage = "New Action record {" + action.ActionPlanId + "} added at " + DateTime.UtcNow,
                 CustomerGuid = action.CustomerId,
                 LastModifiedDate = action.LastModifiedDate,
-                URL = reqUrl + "/" + action.ActionPlanId,
+                URL = reqUrl + "/" + action.ActionId,
                 IsNewCustomer = false,
                 TouchpointId = action.LastModifiedTouchpointId
             };
