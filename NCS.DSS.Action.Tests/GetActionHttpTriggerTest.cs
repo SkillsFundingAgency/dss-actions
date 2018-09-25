@@ -125,7 +125,7 @@ namespace NCS.DSS.Action.Tests
         {
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).Returns(true);
             _resourceHelper.DoesInteractionExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
-            _resourceHelper.DoesActionPlanExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(false);
+            _resourceHelper.DoesActionPlanExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(false);
 
             _getActionHttpTriggerService.GetActionsAsync(Arg.Any<Guid>()).Returns(Task.FromResult<List<Models.Action>>(null).Result);
 
@@ -142,7 +142,7 @@ namespace NCS.DSS.Action.Tests
         {
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).Returns(true);
             _resourceHelper.DoesInteractionExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
-           _resourceHelper.DoesActionPlanExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
+           _resourceHelper.DoesActionPlanExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
 
             var listOfActiones = new List<Models.Action>();
             _getActionHttpTriggerService.GetActionsAsync(Arg.Any<Guid>()).Returns(Task.FromResult<List<Models.Action>>(listOfActiones).Result);

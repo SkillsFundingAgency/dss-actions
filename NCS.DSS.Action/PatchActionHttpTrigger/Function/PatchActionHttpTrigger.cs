@@ -99,7 +99,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
             if (!doesInteractionExistAndBelongToCustomer)
                 return HttpResponseMessageHelper.NoContent(interactionGuid);
 
-            var doesActionPlanExistAndBelongToCustomer = resourceHelper.DoesActionPlanExistAndBelongToCustomer(actionPlanGuid, customerGuid);
+            var doesActionPlanExistAndBelongToCustomer = resourceHelper.DoesActionPlanExistAndBelongToCustomer(actionPlanGuid, interactionGuid, customerGuid);
 
             if (!doesActionPlanExistAndBelongToCustomer)
                 return HttpResponseMessageHelper.NoContent(actionPlanGuid);
