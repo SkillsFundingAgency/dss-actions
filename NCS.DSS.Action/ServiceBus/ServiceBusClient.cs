@@ -24,7 +24,7 @@ namespace NCS.DSS.Action.ServiceBus
 
             var messageModel = new MessageModel()
             {
-                TitleMessage = "New Action record {" + action.ActionPlanId + "} added at " + DateTime.UtcNow,
+                TitleMessage = "New Action record {" + action.ActionId + "} added at " + DateTime.UtcNow,
                 CustomerGuid = action.CustomerId,
                 LastModifiedDate = action.LastModifiedDate,
                 URL = reqUrl + "/" + action.ActionId,

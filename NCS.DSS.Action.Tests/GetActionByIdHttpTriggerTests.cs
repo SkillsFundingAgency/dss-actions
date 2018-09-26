@@ -121,7 +121,7 @@ namespace NCS.DSS.Action.Tests
         public async Task GetActionHttpTrigger_ReturnsStatusCodeNoContent_WhenInteractionDoesNotExist()
         {
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).Returns(true);
-            _resourceHelper.DoesInteractionExist(Arg.Any<Guid>()).Returns(false);
+            _resourceHelper.DoesInteractionExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(false);
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId, ValidActionId);
@@ -135,8 +135,8 @@ namespace NCS.DSS.Action.Tests
         public async Task GetActionHttpTrigger_ReturnsStatusCodeNoContent_WhenActionPlanDoesNotExist()
         {
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).Returns(true);
-            _resourceHelper.DoesInteractionExist(Arg.Any<Guid>()).Returns(true);
-            _resourceHelper.DoesActionPlanExist(Arg.Any<Guid>()).Returns(false);
+            _resourceHelper.DoesInteractionExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
+           _resourceHelper.DoesActionPlanExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(false);
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId, ValidActionId);
@@ -150,8 +150,8 @@ namespace NCS.DSS.Action.Tests
         public async Task GetActionHttpTrigger_ReturnsStatusCodeOk_WhenActionDoesNotExist()
         {
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).Returns(true);
-            _resourceHelper.DoesInteractionExist(Arg.Any<Guid>()).Returns(true);
-            _resourceHelper.DoesActionPlanExist(Arg.Any<Guid>()).Returns(true);
+            _resourceHelper.DoesInteractionExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
+           _resourceHelper.DoesActionPlanExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
 
             _getActionByIdHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult<Models.Action>(null).Result);
 
@@ -167,8 +167,8 @@ namespace NCS.DSS.Action.Tests
         public async Task GetActionHttpTrigger_ReturnsStatusCodeOk_WhenActionExists()
         {
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).Returns(true);
-            _resourceHelper.DoesInteractionExist(Arg.Any<Guid>()).Returns(true);
-            _resourceHelper.DoesActionPlanExist(Arg.Any<Guid>()).Returns(true);
+            _resourceHelper.DoesInteractionExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
+           _resourceHelper.DoesActionPlanExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
 
             _getActionByIdHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult(_action).Result);
 

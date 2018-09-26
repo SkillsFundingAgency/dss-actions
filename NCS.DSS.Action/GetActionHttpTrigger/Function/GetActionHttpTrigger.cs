@@ -49,14 +49,14 @@ namespace NCS.DSS.Action.GetActionHttpTrigger.Function
             if (!doesCustomerExist)
                 return HttpResponseMessageHelper.NoContent(customerGuid);
 
-            var doesInteractionExist = await resourceHelper.DoesInteractionExist(interactionGuid);
+            var doesInteractionExistAndBelongToCustomer = resourceHelper.DoesInteractionExistAndBelongToCustomer(interactionGuid, customerGuid);
 
-            if (!doesInteractionExist)
+            if (!doesInteractionExistAndBelongToCustomer)
                 return HttpResponseMessageHelper.NoContent(interactionGuid);
 
-            var doesActionPlanExist = await resourceHelper.DoesActionPlanExist(actionPlanGuid);
+            var doesActionPlanExistAndBelongToCustomer = resourceHelper.DoesActionPlanExistAndBelongToCustomer(actionPlanGuid, interactionGuid, customerGuid);
 
-            if (!doesActionPlanExist)
+            if (!doesActionPlanExistAndBelongToCustomer)
                 return HttpResponseMessageHelper.NoContent(actionPlanGuid);
 
             var actions = await actionGetService.GetActionsAsync(customerGuid);
