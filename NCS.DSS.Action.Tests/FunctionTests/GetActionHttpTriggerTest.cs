@@ -10,7 +10,7 @@ using NCS.DSS.Action.Helpers;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace NCS.DSS.Action.Tests
+namespace NCS.DSS.Action.Tests.FunctionTests
 {
     [TestFixture]
     public class GetActionHttpTriggerTest

@@ -15,7 +15,7 @@ using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
-namespace NCS.DSS.Action.Tests
+namespace NCS.DSS.Action.Tests.FunctionTests
 {
     [TestFixture]
     public class PatchActionHttpTriggerTests
@@ -31,14 +31,14 @@ namespace NCS.DSS.Action.Tests
         private IValidate _validate;
         private IHttpRequestMessageHelper _httpRequestMessageHelper;
         private IPatchActionHttpTriggerService _patchActionHttpTriggerService;
-        private Models.Action _actionPlan;
-        private ActionPatch _actionPlanPatch;
+        private Models.Action _action;
+        private ActionPatch _actionPatch;
 
         [SetUp]
         public void Setup()
         {
-            _actionPlan = Substitute.For<Models.Action>();
-            _actionPlanPatch = Substitute.For<ActionPatch>();
+            _action = Substitute.For<Models.Action>();
+            _actionPatch = Substitute.For<ActionPatch>();
 
             _request = new HttpRequestMessage()
             {
@@ -57,6 +57,7 @@ namespace NCS.DSS.Action.Tests
             _patchActionHttpTriggerService = Substitute.For<IPatchActionHttpTriggerService>();
             _httpRequestMessageHelper.GetTouchpointId(_request).Returns("0000000001");
             _httpRequestMessageHelper.GetApimURL(_request).Returns("http://localhost:7071/");
+            _patchActionHttpTriggerService.PatchResource(Arg.Any<string>(), _actionPatch).Returns(_action.ToString());
         }
 
         [Test]
@@ -119,7 +120,7 @@ namespace NCS.DSS.Action.Tests
         [Test]
         public async Task PatchActionHttpTrigger_ReturnsStatusCodeUnprocessableEntity_WhenActionHasFailedValidation()
         {
-            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPlanPatch).Result);
+            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPatch).Result);
 
             var validationResults = new List<ValidationResult> { new ValidationResult("interaction Id is Required") };
             _validate.ValidateResource(Arg.Any<ActionPatch>(), false).Returns(validationResults);
@@ -146,7 +147,7 @@ namespace NCS.DSS.Action.Tests
         [Test]
         public async Task PatchActionHttpTrigger_ReturnsStatusCodeNoContent_WhenCustomerDoesNotExist()
         {
-            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPlanPatch).Result);
+            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPatch).Result);
 
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).Returns(false);
 
@@ -160,11 +161,11 @@ namespace NCS.DSS.Action.Tests
         [Test]
         public async Task PatchActionHttpTrigger_ReturnsStatusCodeNoContent_WhenActionDoesNotExist()
         {
-            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPlanPatch).Result);
+            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPatch).Result);
 
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).ReturnsForAnyArgs(true);
 
-            _patchActionHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult<Models.Action>(null).Result);
+            _patchActionHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult<string>(null).Result);
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionId, ValidActionPlanId);
@@ -177,7 +178,7 @@ namespace NCS.DSS.Action.Tests
         [Test]
         public async Task PatchActionHttpTrigger_ReturnsStatusCodeNoContent_WhenInteractionDoesNotExist()
         {
-            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPlanPatch).Result);
+            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPatch).Result);
 
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).Returns(true);
             _resourceHelper.DoesInteractionExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(false);
@@ -193,13 +194,13 @@ namespace NCS.DSS.Action.Tests
         [Test]
         public async Task PatchActionHttpTrigger_ReturnsStatusCodeOk_WhenActionPlanDoesNotExist()
         {
-            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPlanPatch).Result);
+            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPatch).Result);
 
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).Returns(true);
             _resourceHelper.DoesInteractionExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
             _resourceHelper.DoesActionPlanExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(false);
 
-            _patchActionHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult<Models.Action>(null).Result);
+            _patchActionHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult<string>(null).Result);
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionId, ValidActionPlanId);
@@ -212,15 +213,15 @@ namespace NCS.DSS.Action.Tests
         [Test]
         public async Task PatchActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenUnableToUpdateActionRecord()
         {
-            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPlanPatch).Result);
+            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPatch).Result);
 
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).ReturnsForAnyArgs(true);
             _resourceHelper.DoesInteractionExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
            _resourceHelper.DoesActionPlanExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
 
-            _patchActionHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult(_actionPlan).Result);
+            _patchActionHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult(_action.ToString()).Result);
 
-            _patchActionHttpTriggerService.UpdateAsync(Arg.Any<Models.Action>(), Arg.Any<ActionPatch>()).Returns(Task.FromResult<Models.Action>(null).Result);
+            _patchActionHttpTriggerService.UpdateCosmosAsync(Arg.Any<string>(), Arg.Any<Guid>()).Returns(Task.FromResult<Models.Action>(null).Result);
 
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionId, ValidActionPlanId);
 
@@ -232,15 +233,15 @@ namespace NCS.DSS.Action.Tests
         [Test]
         public async Task PatchActionHttpTrigger_ReturnsStatusCodeOK_WhenRequestIsValid()
         {
-            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPlanPatch).Result);
+            _httpRequestMessageHelper.GetActionFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPatch).Result);
 
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).ReturnsForAnyArgs(true);
             _resourceHelper.DoesInteractionExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
            _resourceHelper.DoesActionPlanExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
 
-            _patchActionHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult(_actionPlan).Result);
+            _patchActionHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult(_action.ToString()).Result);
 
-            _patchActionHttpTriggerService.UpdateAsync(Arg.Any<Models.Action>(), Arg.Any<ActionPatch>()).Returns(Task.FromResult(_actionPlan).Result);
+            _patchActionHttpTriggerService.UpdateCosmosAsync(Arg.Any<string>(), Arg.Any<Guid>()).Returns(Task.FromResult(_action).Result);
 
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionId, ValidActionPlanId);
 

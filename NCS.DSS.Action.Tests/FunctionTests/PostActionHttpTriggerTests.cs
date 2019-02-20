@@ -14,7 +14,7 @@ using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
-namespace NCS.DSS.Action.Tests
+namespace NCS.DSS.Action.Tests.FunctionTests
 {
     [TestFixture]
     public class PostActionHttpTriggerTests
