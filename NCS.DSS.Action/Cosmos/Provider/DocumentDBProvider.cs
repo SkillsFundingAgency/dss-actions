@@ -7,6 +7,7 @@ using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using NCS.DSS.Action.Cosmos.Client;
 using NCS.DSS.Action.Cosmos.Helper;
+using Newtonsoft.Json.Linq;
 
 namespace NCS.DSS.Action.Cosmos.Provider
 {
@@ -167,6 +168,25 @@ namespace NCS.DSS.Action.Cosmos.Provider
             return actions?.FirstOrDefault();
         }
 
+        public async Task<string> GetActionForCustomerToUpdateAsync(Guid customerId, Guid actionId)
+        {
+            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
+
+            var client = DocumentDBClient.CreateDocumentClient();
+
+            var actionForCustomerQuery = client
+                ?.CreateDocumentQuery<Models.Action>(collectionUri, new FeedOptions { MaxItemCount = 1 })
+                .Where(x => x.CustomerId == customerId && x.ActionId == actionId)
+                .AsDocumentQuery();
+
+            if (actionForCustomerQuery == null)
+                return null;
+
+            var actions = await actionForCustomerQuery.ExecuteNextAsync();
+
+            return actions?.FirstOrDefault()?.ToString();
+        }
+
         public async Task<ResourceResponse<Document>> CreateActionAsync(Models.Action action)
         {
 
@@ -183,16 +203,18 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         }
 
-        public async Task<ResourceResponse<Document>> UpdateActionAsync(Models.Action action)
+        public async Task<ResourceResponse<Document>> UpdateActionAsync(string action, Guid actionId)
         {
-            var documentUri = DocumentDBHelper.CreateDocumentUri(action.ActionId.GetValueOrDefault());
+            var documentUri = DocumentDBHelper.CreateDocumentUri(actionId);
 
             var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return null;
 
-            var response = await client.ReplaceDocumentAsync(documentUri, action);
+            var actionDocumentJObject = JObject.Parse(action);
+
+            var response = await client.ReplaceDocumentAsync(documentUri, actionDocumentJObject);
 
             return response;
         }

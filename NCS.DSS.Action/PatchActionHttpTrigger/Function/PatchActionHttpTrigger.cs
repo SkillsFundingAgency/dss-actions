@@ -104,12 +104,17 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
             if (!doesActionPlanExistAndBelongToCustomer)
                 return HttpResponseMessageHelper.NoContent(actionPlanGuid);
 
-            var action = await actionPatchService.GetActionForCustomerAsync(customerGuid, actionGuid);
+            var actionForCustomer = await actionPatchService.GetActionForCustomerAsync(customerGuid, actionGuid);
 
-            if (action == null)
+            if (actionForCustomer == null)
                 return HttpResponseMessageHelper.NoContent(actionGuid);
 
-            var updatedAction = await actionPatchService.UpdateAsync(action, actionPatchRequest);
+            var patchedAction = actionPatchService.PatchResource(actionForCustomer, actionPatchRequest);
+
+            if (patchedAction == null)
+                return HttpResponseMessageHelper.NoContent(actionGuid);
+            
+            var updatedAction = await actionPatchService.UpdateCosmosAsync(patchedAction, actionGuid);
 
             if (updatedAction != null)
                 await actionPatchService.SendToServiceBusQueueAsync(updatedAction, customerGuid, ApimURL);

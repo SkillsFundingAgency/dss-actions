@@ -72,11 +72,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GetActionByIdHttpTriggerTests.cs" />
-    <Compile Include="GetActionHttpTriggerTest.cs" />
-    <Compile Include="PatchActionHttpTriggerTests.cs" />
-    <Compile Include="PostActionHttpTriggerTests.cs" />
+    <Compile Include="FunctionTests\GetActionByIdHttpTriggerTests.cs" />
+    <Compile Include="FunctionTests\GetActionHttpTriggerTest.cs" />
+    <Compile Include="FunctionTests\PatchActionHttpTriggerTests.cs" />
+    <Compile Include="FunctionTests\PostActionHttpTriggerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceTests\ActionsPatchServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
