@@ -74,6 +74,14 @@
               "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsName'))).InstrumentationKey]"
             },
             {
+              "name": "ActionConnectionString",
+              "value": "[concat('AccountEndpoint=https://', parameters('cosmosDbEndpoint'), '.documents.azure.com:443/;AccountKey=', parameters('cosmosDbKey'), ';')]"
+            },
+            {
+              "name": "ChangeFeedQueueName",
+              "value": "dss.changefeedqueue"
+            },
+            {
               "name": "CollectionId",
               "value": "[parameters('cosmosDbCollectionId')]"
             },
@@ -112,6 +120,14 @@
             {
               "name": "ActionPlanDatabaseId",
               "value": "actionplans"
+            },
+            {
+              "name": "LeaseCollectionName",
+              "value": "action-lease"
+            },
+            {
+              "name": "LeaseCollectionPrefix",
+              "value": "actionChangeFeedPrefix"
             },
             {
               "name": "ServiceBusConnectionString",
