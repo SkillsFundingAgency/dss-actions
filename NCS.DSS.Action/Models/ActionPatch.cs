@@ -1,12 +1,14 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using NCS.DSS.Action.Annotations;
+using DFC.Swagger.Standard.Annotations;
 using NCS.DSS.Action.ReferenceData;
 
 namespace NCS.DSS.Action.Models
 {
     public class ActionPatch : IAction
     {
+        public Guid? ActionPlanId { get; set; }
+
         [DataType(DataType.DateTime)]
         [Display(Description = "Date the action plan was agreed with the customer.")]
         [Example(Description = "2018-06-21T07:20:00")]
@@ -29,7 +31,7 @@ namespace NCS.DSS.Action.Models
 
         [StringLength(255)]
         [Display(Description = "Details of any signposting to external parties.")]
-        [Example(Description = "this is some text")]
+        [Example(Description = "ASIST Team (Apprenticeships)")]
         public string SignpostedTo { get; set; }
 
         [Display(Description = "ActionType reference data, " +
@@ -74,10 +76,21 @@ namespace NCS.DSS.Action.Models
         [Example(Description = "0000000001")]
         public string LastModifiedTouchpointId { get; set; }
 
+        [StringLength(50)]
+        [Display(Description = "Identifier supplied by the touchpoint to indicate their subcontractor")]
+        [Example(Description = "01234567899876543210")]
+        public string SubcontractorId { get; set; }
+
         public void SetDefaultValues()
         {
             if (!LastModifiedDate.HasValue)
                 LastModifiedDate = DateTime.UtcNow;
+        }
+
+        public void SetIds(string touchpointId, string subcontractorId)
+        {
+            LastModifiedTouchpointId = touchpointId;
+            SubcontractorId = subcontractorId;
         }
     }
 }

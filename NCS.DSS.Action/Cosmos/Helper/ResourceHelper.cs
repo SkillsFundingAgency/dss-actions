@@ -6,36 +6,33 @@ namespace NCS.DSS.Action.Cosmos.Helper
 {
     public class ResourceHelper : IResourceHelper
     {
+
+        private readonly IDocumentDBProvider _documentDbProvider;
+
+        public ResourceHelper(IDocumentDBProvider documentDbProvider)
+        {
+            _documentDbProvider = documentDbProvider;
+        }
+
         public async Task<bool> DoesCustomerExist(Guid customerId)
         {
-            var documentDbProvider = new DocumentDBProvider();
-            var doesCustomerExist = await documentDbProvider.DoesCustomerResourceExist(customerId);
-
-            return doesCustomerExist;
+            return await _documentDbProvider.DoesCustomerResourceExist(customerId); ;
         }
 
         public async Task<bool> IsCustomerReadOnly(Guid customerId)
         {
-            var documentDbProvider = new DocumentDBProvider();
-            var isCustomerReadOnly = await documentDbProvider.DoesCustomerHaveATerminationDate(customerId);
-
-            return isCustomerReadOnly;
+            return await _documentDbProvider.DoesCustomerHaveATerminationDate(customerId);
         }
 
         public bool DoesInteractionExistAndBelongToCustomer(Guid interactionId, Guid customerGuid)
         {
-            var documentDbProvider = new DocumentDBProvider();
-            var doesInteractionExistAndBelongToCustomer = documentDbProvider.DoesInteractionResourceExistAndBelongToCustomer(interactionId, customerGuid);
-
-            return doesInteractionExistAndBelongToCustomer;
+            return _documentDbProvider.DoesInteractionResourceExistAndBelongToCustomer(interactionId, customerGuid);
         }
 
         public bool DoesActionPlanExistAndBelongToCustomer(Guid actionPlanId, Guid interactionId, Guid customerId)
         {
-            var documentDbProvider = new DocumentDBProvider();
-            var doesActionPlanExistAndBelongToCustomer = documentDbProvider.DoesActionPlanResourceExistAndBelongToCustomer(actionPlanId, interactionId, customerId);
-
-            return doesActionPlanExistAndBelongToCustomer;
+            return _documentDbProvider.DoesActionPlanResourceExistAndBelongToCustomer(actionPlanId, interactionId, customerId);
         }
+
     }
 }

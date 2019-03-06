@@ -7,6 +7,13 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Service
 {
     public class PostActionHttpTriggerService : IPostActionHttpTriggerService
     {
+        private readonly IDocumentDBProvider _documentDbProvider;
+
+        public PostActionHttpTriggerService(IDocumentDBProvider documentDbProvider)
+        {
+            _documentDbProvider = documentDbProvider;
+        }
+
         public async Task<Models.Action> CreateAsync(Models.Action action)
         {
             if (action == null)
@@ -14,9 +21,7 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Service
 
             action.SetDefaultValues();
 
-            var documentDbProvider = new DocumentDBProvider();
-
-            var response = await documentDbProvider.CreateActionAsync(action);
+            var response = await _documentDbProvider.CreateActionAsync(action);
 
             return response.StatusCode == HttpStatusCode.Created ? (dynamic)response.Resource : null;
         }

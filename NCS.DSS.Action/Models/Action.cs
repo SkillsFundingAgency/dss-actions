@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using NCS.DSS.Action.Annotations;
+using DFC.Swagger.Standard.Annotations;
 using NCS.DSS.Action.ReferenceData;
 
 namespace NCS.DSS.Action.Models
@@ -15,6 +15,11 @@ namespace NCS.DSS.Action.Models
         [Display(Description = "Unique identifier of a customer.")]
         [Example(Description = "2730af9c-fc34-4c2b-a905-c4b584b0f379")]
         public Guid? CustomerId { get; set; }
+
+        [StringLength(50)]
+        [Display(Description = "Identifier supplied by the touchpoint to indicate their subcontractor")]
+        [Example(Description = "01234567899876543210")]
+        public string SubcontractorId { get; set; }
 
         [Display(Description = "Unique identifier of the customer action plan.")]
         [Example(Description = "a79ba4cc-5da5-4eb0-8913-eb5e69f90ab8")]
@@ -45,7 +50,7 @@ namespace NCS.DSS.Action.Models
 
         [StringLength(255)]
         [Display(Description = "Details of any signposting to external parties.")]
-        [Example(Description = "this is some text")]
+        [Example(Description = "ASIST Team (Apprenticeships)")]
         public string SignpostedTo { get; set; }
 
         [Required]
@@ -63,7 +68,8 @@ namespace NCS.DSS.Action.Models
                                 "11 - Use National Careers Service website, " +
                                 "12 - Use external digital services, " +
                                 "13 - Book follow up appointment, " +
-                                "14 - Use social media ]")]
+                                "14 - Use social media " +
+                                " 99 - Other ]")]
         [Example(Description = "1")]
         public ActionType? ActionType { get; set; }
 
@@ -77,7 +83,7 @@ namespace NCS.DSS.Action.Models
 
         [Required]
         [Display(Description = "PersonResponsible reference data. " +
-                                "1 - Customer, " + 
+                                "1 - Customer, " +
                                 "2 - Adviser")]
         [Example(Description = "1")]
         public PersonResponsible? PersonResponsible { get; set; }
@@ -101,48 +107,13 @@ namespace NCS.DSS.Action.Models
                 ActionStatus = ReferenceData.ActionStatus.NotStarted;
         }
 
-        public void SetIds(Guid customerId, Guid actionPlanId, string touchpointId)
+        public void SetIds(Guid customerId, Guid actionPlanId, string touchpointId, string subcontractorId)
         {
             ActionId = Guid.NewGuid();
             CustomerId = customerId;
             ActionPlanId = actionPlanId;
             LastModifiedTouchpointId = touchpointId;
-        }
-
-        public void Patch(ActionPatch actionPatch)
-        {
-            if (actionPatch == null)
-                return;
-
-            if(actionPatch.DateActionAgreed.HasValue)
-                DateActionAgreed = actionPatch.DateActionAgreed;
-
-            if(actionPatch.DateActionAimsToBeCompletedBy.HasValue)
-                DateActionAimsToBeCompletedBy = actionPatch.DateActionAimsToBeCompletedBy;
-
-            if(actionPatch.DateActionActuallyCompleted.HasValue)
-                DateActionActuallyCompleted = actionPatch.DateActionActuallyCompleted;
-
-            if(!string.IsNullOrWhiteSpace(actionPatch.ActionSummary))
-                ActionSummary = actionPatch.ActionSummary;
-
-            if(!string.IsNullOrWhiteSpace(actionPatch.SignpostedTo))
-                SignpostedTo = actionPatch.SignpostedTo;
-
-            if(actionPatch.ActionType.HasValue)
-                ActionType = actionPatch.ActionType;
-
-            if(actionPatch.ActionStatus.HasValue)
-                ActionStatus = actionPatch.ActionStatus;
-
-            if(actionPatch.PersonResponsible.HasValue)
-                PersonResponsible = actionPatch.PersonResponsible;
-            
-            if(actionPatch.LastModifiedDate.HasValue)
-                LastModifiedDate = actionPatch.LastModifiedDate;
-
-            if(!string.IsNullOrEmpty(actionPatch.LastModifiedTouchpointId))
-                LastModifiedTouchpointId = actionPatch.LastModifiedTouchpointId;
+            SubcontractorId = subcontractorId;
         }
 
     }

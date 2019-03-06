@@ -5,6 +5,7 @@ namespace NCS.DSS.Action.Models
 {
     public interface IAction
     {
+        string SubcontractorId { get; set; }
         DateTime? DateActionAgreed { get; set; }
         DateTime? DateActionAimsToBeCompletedBy { get; set; }
         DateTime? DateActionActuallyCompleted { get; set; }
