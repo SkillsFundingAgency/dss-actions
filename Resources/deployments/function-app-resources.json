@@ -82,14 +82,6 @@
               "value": "[parameters('cosmosDbDatabaseId')]"
             },
             {
-              "name": "Endpoint",
-              "value": "[parameters('cosmosDbEndpoint')]"
-            },
-            {
-              "name": "Key",
-              "value": "[parameters('cosmosDbKey')]"
-            },
-            {
               "name": "CustomerCollectionId",
               "value": "customers"
             },
