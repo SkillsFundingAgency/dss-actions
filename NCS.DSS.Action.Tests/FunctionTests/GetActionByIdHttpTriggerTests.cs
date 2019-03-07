@@ -54,6 +54,8 @@ namespace NCS.DSS.Action.Tests.FunctionTests
 
             _httpRequestHelper.GetDssCorrelationId(_request).Returns(ValidDssCorrelationId);
             _httpRequestHelper.GetDssTouchpointId(_request).Returns("0000000001");
+            _resourceHelper.DoesActionPlanExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
+
         }
 
         [Test]
@@ -167,7 +169,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         {
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).Returns(true);
 
-            _getActionByIdHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult<Models.Action>(null).Result);
+            _getActionByIdHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult<Models.Action>(null).Result);
 
             _httpResponseMessageHelper
                 .NoContent(Arg.Any<Guid>()).Returns(x => new HttpResponseMessage(HttpStatusCode.NoContent));
@@ -187,7 +189,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).Returns(true);
             _resourceHelper.DoesInteractionExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
 
-            _getActionByIdHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult(_action).Result);
+            _getActionByIdHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult(_action).Result);
 
             _httpResponseMessageHelper
                 .Ok(Arg.Any<string>()).Returns(x => new HttpResponseMessage(HttpStatusCode.OK));
@@ -200,7 +202,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
         }
 
-        private async Task<HttpResponseMessage> RunFunction(string customerId, string interactionId, string ActionId, string actionplanId)
+        private async Task<HttpResponseMessage> RunFunction(string customerId, string interactionId, string actionId, string actionplanId)
         {
             return await GetActionByIdHttpTrigger.Function.GetActionByIdHttpTrigger.Run(
                 _request,
@@ -208,7 +210,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
                 customerId,
                 interactionId,
                 actionplanId,
-                ActionId,
+                actionId,
                 _resourceHelper,
                 _getActionByIdHttpTriggerService,
                 _loggerHelper,

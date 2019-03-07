@@ -14,9 +14,9 @@ namespace NCS.DSS.Action.GetActionByIdHttpTrigger.Service
             _documentDbProvider = documentDbProvider;
         }
 
-        public async Task<Models.Action> GetActionForCustomerAsync(Guid customerId, Guid actionId)
+        public async Task<Models.Action> GetActionForCustomerAsync(Guid customerId, Guid actionId, Guid actionPlanId)
         {
-            var action = await _documentDbProvider.GetActionForCustomerAsync(customerId, actionId);
+            var action = await _documentDbProvider.GetActionForCustomerAsync(customerId, actionId, actionPlanId);
 
             return action;
         }

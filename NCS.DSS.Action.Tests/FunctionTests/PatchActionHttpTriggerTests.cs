@@ -74,6 +74,8 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             _httpRequestHelper.GetDssApimUrl(_request).Returns("http://localhost:");
             _httpRequestHelper.GetResourceFromRequest<ActionPatch>(_request).Returns(Task.FromResult(_actionPatch).Result);
             _patchActionHttpTriggerService.PatchResource(_actionString, _actionPatch).Returns(_actionString);
+            _resourceHelper.DoesActionPlanExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
+
         }
 
         [Test]
@@ -152,7 +154,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         [Test]
         public async Task PatchActionHttpTrigger_ReturnsStatusCodeUnprocessableEntity_WhenActionHasFailedValidation()
         {
-            _patchActionHttpTriggerService.GetActionsForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult(_actionString).Result);
+            _patchActionHttpTriggerService.GetActionsForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult(_actionString).Result);
 
             var validationResults = new List<ValidationResult> { new ValidationResult("Please supply a valid Action Type") };
             _validate.ValidateResource(Arg.Any<ActionPatch>(), false).ReturnsForAnyArgs(validationResults);
@@ -222,7 +224,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
 
             _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).ReturnsForAnyArgs(true);
 
-            _patchActionHttpTriggerService.GetActionsForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult<string>(null).Result);
+            _patchActionHttpTriggerService.GetActionsForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult<string>(null).Result);
 
             _httpResponseMessageHelper
                 .NoContent(Arg.Any<Guid>()).Returns(x => new HttpResponseMessage(HttpStatusCode.NoContent));
@@ -238,7 +240,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         [Test]
         public async Task PatchActionHttpTrigger_ReturnsStatusCodeOK_WhenRequestIsValid()
         {
-            _patchActionHttpTriggerService.GetActionsForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult(_actionString).Result);
+            _patchActionHttpTriggerService.GetActionsForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult(_actionString).Result);
 
             _patchActionHttpTriggerService.UpdateCosmosAsync(Arg.Any<string>(), Arg.Any<Guid>()).Returns(Task.FromResult(_action).Result);
 
@@ -255,7 +257,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         [Test]
         public async Task PatchActionHttpTrigger_ReturnsStatusCodeNoContent_WhenActionPlanCannotBeFound()
         {
-            _patchActionHttpTriggerService.GetActionsForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult<string>(null).Result);
+            _patchActionHttpTriggerService.GetActionsForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult<string>(null).Result);
 
             _patchActionHttpTriggerService.UpdateCosmosAsync(Arg.Any<string>(), Arg.Any<Guid>()).Returns(Task.FromResult(_action).Result);
 

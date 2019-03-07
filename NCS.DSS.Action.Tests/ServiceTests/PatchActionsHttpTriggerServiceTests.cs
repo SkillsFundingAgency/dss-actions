@@ -25,7 +25,10 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         private string _json;
         private Models.Action _action;
         private ActionPatch _actionPatch;
+        private readonly Guid _customerId = Guid.Parse("58b43e3f-4a50-4900-9c82-a14682ee90fa");
         private readonly Guid _actionId = Guid.Parse("7E467BDB-213F-407A-B86A-1954053D3C24");
+        private readonly Guid _actionPlanId = Guid.Parse("12a16e3f-1c62-1660-3e81-b13122aa81aa");
+
 
         [SetUp]
         public void Setup()
@@ -49,38 +52,6 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             // Assert
             Assert.IsNull(result);
         }
-
-        //[Test]
-        //public void PatchActionHttpTriggerServiceTests_PatchResource_ReturnsNullWhenActionPatchIsNullOrEmpty()
-        //{
-        //    // Act
-        //    var result = _actionHttpTriggerService.PatchResource(_json, null).ReturnsNull();
-
-        //    // Assert
-        //    Assert.IsNull(result);
-        //}
-
-        //[Test]
-        //public async Task PatchActionHttpTriggerServiceTests_UpdateAsync_ReturnsNullWhenActionIsNullOrEmpty()
-        //{
-        //    // Act
-        //    var result = await _actionHttpTriggerService.UpdateCosmosAsync(null, _actionId);
-
-        //    // Assert
-        //    Assert.IsNull(result);
-        //}
-
-        //[Test]
-        //public async Task PatchActionHttpTriggerServiceTests_UpdateAsync_ReturnsNullWhenActionPatchServicePatchJsonIsNullOrEmpty()
-        //{
-        //    _actionPatchService.Patch(_json, _actionPatch).ReturnsNullForAnyArgs();
-
-        //    // Act
-        //    var result = await _actionHttpTriggerService.UpdateCosmosAsync(_action.ToString(), _actionId);
-
-        //    // Assert
-        //    Assert.IsNull(result);
-        //}
 
         [Test]
         public async Task PatchActionHttpTriggerServiceTests_UpdateAsync_ReturnsNullWhenResourceCannotBeUpdated()
@@ -145,10 +116,10 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         [Test]
         public async Task PatchActionHttpTriggerServiceTests_GetActionForCustomerAsync_ReturnsNullWhenResourceHasNotBeenFound()
         {
-            _documentDbProvider.GetActionForCustomerToUpdateAsync(_actionId, _actionId).ReturnsNull();
+            _documentDbProvider.GetActionForCustomerToUpdateAsync(_customerId, _actionId, _actionPlanId).ReturnsNull();
 
             // Act
-            var result = await _actionHttpTriggerService.GetActionsForCustomerAsync(_actionId, _actionId);
+            var result = await _actionHttpTriggerService.GetActionsForCustomerAsync(_customerId, _actionId, _actionPlanId);
 
             // Assert
             Assert.IsNull(result);
@@ -157,10 +128,10 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         [Test]
         public async Task PatchActionHttpTriggerServiceTests_GetActionForCustomerAsync_ReturnsResourceWhenResourceHasBeenFound()
         {
-            _documentDbProvider.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult(_action).Result);
+            _documentDbProvider.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult(_action).Result);
 
             // Act
-            var result = await _actionHttpTriggerService.GetActionsForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>());
+            var result = await _actionHttpTriggerService.GetActionsForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>());
 
             // Assert
             Assert.IsNotNull(result);

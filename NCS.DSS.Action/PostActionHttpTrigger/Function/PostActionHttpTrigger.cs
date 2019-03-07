@@ -144,6 +144,23 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
                 return httpResponseMessageHelper.Forbidden(customerGuid);
             }
 
+            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if interaction exists {0}", interactionGuid));
+            var doesInteractionExist = resourceHelper.DoesInteractionExistAndBelongToCustomer(interactionGuid, customerGuid);
+
+            if (!doesInteractionExist)
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Interaction does not exist {0}", interactionGuid));
+                return httpResponseMessageHelper.NoContent(interactionGuid);
+            }
+
+            var doesActionPlanExistAndBelongToCustomer = resourceHelper.DoesActionPlanExistAndBelongToCustomer(actionPlanGuid, interactionGuid, customerGuid);
+
+            if (!doesActionPlanExistAndBelongToCustomer)
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Action Plan does not exist {0}", actionPlanGuid));
+                return httpResponseMessageHelper.NoContent(actionPlanGuid);
+            }
+
             loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get Create Action Plan for customer {0}", customerGuid));
             var action = await actionsPostService.CreateAsync(actionRequest);
 

@@ -74,10 +74,10 @@ namespace NCS.DSS.Action.GetActionByIdHttpTrigger.Function
                 return httpResponseMessageHelper.BadRequest(interactionGuid);
             }
 
-            if (!Guid.TryParse(actionPlanId, out var actionplanGuid))
+            if (!Guid.TryParse(actionPlanId, out var actionPlanGuid))
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'actionplanId' to a Guid: {0}", actionplanGuid));
-                return httpResponseMessageHelper.BadRequest(actionplanGuid);
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'actionplanId' to a Guid: {0}", actionPlanGuid));
+                return httpResponseMessageHelper.BadRequest(actionPlanGuid);
             }
 
             if (!Guid.TryParse(actionId, out var actionGuid))
@@ -104,8 +104,16 @@ namespace NCS.DSS.Action.GetActionByIdHttpTrigger.Function
                 return httpResponseMessageHelper.NoContent(interactionGuid);
             }
 
+            var doesActionPlanExistAndBelongToCustomer = resourceHelper.DoesActionPlanExistAndBelongToCustomer(actionPlanGuid, interactionGuid, customerGuid);
+
+            if (!doesActionPlanExistAndBelongToCustomer)
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Action Plan does not exist {0}", actionPlanGuid));
+                return httpResponseMessageHelper.NoContent(actionPlanGuid);
+            }
+
             loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get action plan {0} for customer {1}", actionGuid, customerGuid));
-            var action = await actionGetByIdService.GetActionForCustomerAsync(customerGuid, actionGuid);
+            var action = await actionGetByIdService.GetActionForCustomerAsync(customerGuid, actionGuid, actionPlanGuid);
 
             loggerHelper.LogMethodExit(log);
 

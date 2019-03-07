@@ -45,9 +45,9 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
             return responseStatusCode == HttpStatusCode.OK ? (dynamic)response.Resource : null;
         }
 
-        public async Task<string> GetActionsForCustomerAsync(Guid customerId, Guid actionId)
+        public async Task<string> GetActionsForCustomerAsync(Guid customerId, Guid actionId, Guid actionPlanId)
         {
-            return await _documentDbProvider.GetActionForCustomerToUpdateAsync(customerId, actionId); ;
+            return await _documentDbProvider.GetActionForCustomerToUpdateAsync(customerId, actionId, actionPlanId);
         }
 
         public async Task SendToServiceBusQueueAsync(Models.Action action, Guid customerId, string reqUrl)

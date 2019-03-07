@@ -8,7 +8,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
     {
         string PatchResource(string actionJson, ActionPatch actionPatch);
         Task<Models.Action> UpdateCosmosAsync(string action, Guid actionId);
-        Task<string> GetActionsForCustomerAsync(Guid customerId, Guid actionId);
+        Task<string> GetActionsForCustomerAsync(Guid customerId, Guid actionId, Guid actionPlanId);
         Task SendToServiceBusQueueAsync(Models.Action action, Guid customerId, string reqUrl);
     }
 }

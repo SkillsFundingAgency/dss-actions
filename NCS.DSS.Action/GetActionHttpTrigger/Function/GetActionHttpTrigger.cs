@@ -67,6 +67,19 @@ namespace NCS.DSS.Action.GetActionHttpTrigger.Function
                 return httpResponseMessageHelper.BadRequest(customerGuid);
             }
 
+            if (!Guid.TryParse(interactionId, out var interactionGuid))
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'interactionId' to a Guid: {0}", interactionId));
+                return httpResponseMessageHelper.BadRequest(interactionGuid);
+            }
+
+            if (!Guid.TryParse(actionPlanId, out var actionPlanGuid))
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'actionplanId' to a Guid: {0}", actionPlanGuid));
+                return httpResponseMessageHelper.BadRequest(actionPlanGuid);
+            }
+
+
             loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if customer exists {0}", customerGuid));
             var doesCustomerExist = await resourceHelper.DoesCustomerExist(customerGuid);
 
@@ -76,9 +89,25 @@ namespace NCS.DSS.Action.GetActionHttpTrigger.Function
                 return httpResponseMessageHelper.NoContent(customerGuid);
             }
 
+            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if interaction exists {0}", interactionGuid));
+            var doesInteractionExist = resourceHelper.DoesInteractionExistAndBelongToCustomer(interactionGuid, customerGuid);
+
+            if (!doesInteractionExist)
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Interaction does not exist {0}", interactionGuid));
+                return httpResponseMessageHelper.NoContent(interactionGuid);
+            }
+
+            var doesActionPlanExistAndBelongToCustomer = resourceHelper.DoesActionPlanExistAndBelongToCustomer(actionPlanGuid, interactionGuid, customerGuid);
+
+            if (!doesActionPlanExistAndBelongToCustomer)
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Action Plan does not exist {0}", actionPlanGuid));
+                return httpResponseMessageHelper.NoContent(actionPlanGuid);
+            }
 
             loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get actions for customer {0}", customerGuid));
-            var actionPlans = await actionsGetService.GetActionsAsync(customerGuid);
+            var actionPlans = await actionsGetService.GetActionsAsync(customerGuid, actionPlanGuid);
 
             loggerHelper.LogMethodExit(log);
 
