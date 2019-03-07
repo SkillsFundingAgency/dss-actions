@@ -75,7 +75,7 @@
             },
             {
               "name": "ActionConnectionString",
-              "value": "[concat('AccountEndpoint=https://', parameters('cosmosDbEndpoint'), '.documents.azure.com:443/;AccountKey=', parameters('cosmosDbKey'), ';')]"
+              "value": "[concat('AccountEndpoint=', parameters('cosmosDbEndpoint'), '/;AccountKey=', parameters('cosmosDbKey'), ';')]"
             },
             {
               "name": "ChangeFeedQueueName",
