@@ -9,29 +9,45 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
 {
     public class PatchActionHttpTriggerService : IPatchActionHttpTriggerService
     {
-        public async Task<Models.Action> UpdateAsync(Models.Action action, ActionPatch actionPatch)
+        private readonly IActionPatchService _actionPatchService;
+        private readonly IDocumentDBProvider _documentDbProvider;
+
+        public PatchActionHttpTriggerService(IActionPatchService actionPatchService, IDocumentDBProvider documentDbProvider)
         {
-            if (action == null)
+            _actionPatchService = actionPatchService;
+            _documentDbProvider = documentDbProvider;
+        }
+
+        public string PatchResource(string actionJson, ActionPatch actionPatch)
+        {
+            if (string.IsNullOrEmpty(actionJson))
+                return null;
+
+            if (actionPatch == null)
                 return null;
 
             actionPatch.SetDefaultValues();
 
-            action.Patch(actionPatch);
+            var updatedAction = _actionPatchService.Patch(actionJson, actionPatch);
 
-            var documentDbProvider = new DocumentDBProvider();
-            var response = await documentDbProvider.UpdateActionAsync(action);
-
-            var responseStatusCode = response.StatusCode;
-
-            return responseStatusCode == HttpStatusCode.OK ? action : null;
+            return updatedAction;
         }
 
-        public async Task<Models.Action> GetActionForCustomerAsync(Guid customerId, Guid actionId)
+        public async Task<Models.Action> UpdateCosmosAsync(string action, Guid actionId)
         {
-            var documentDbProvider = new DocumentDBProvider();
-            var action = await documentDbProvider.GetActionForCustomerAsync(customerId, actionId);
+            if (action == null)
+                return null;
 
-            return action;
+            var response = await _documentDbProvider.UpdateActionAsync(action, actionId);
+
+            var responseStatusCode = response?.StatusCode;
+
+            return responseStatusCode == HttpStatusCode.OK ? (dynamic)response.Resource : null;
+        }
+
+        public async Task<string> GetActionsForCustomerAsync(Guid customerId, Guid actionId, Guid actionPlanId)
+        {
+            return await _documentDbProvider.GetActionForCustomerToUpdateAsync(customerId, actionId, actionPlanId);
         }
 
         public async Task SendToServiceBusQueueAsync(Models.Action action, Guid customerId, string reqUrl)

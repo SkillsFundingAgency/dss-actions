@@ -7,6 +7,7 @@ using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using NCS.DSS.Action.Cosmos.Client;
 using NCS.DSS.Action.Cosmos.Helper;
+using Newtonsoft.Json.Linq;
 
 namespace NCS.DSS.Action.Cosmos.Provider
 {
@@ -125,7 +126,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
             }
         }
 
-        public async Task<List<Models.Action>> GetActionsForCustomerAsync(Guid customerId)
+        public async Task<List<Models.Action>> GetActionsForCustomerAsync(Guid customerId, Guid actionPlanId)
         {
             var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
@@ -135,7 +136,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
                 return null;
 
             var actionsQuery = client.CreateDocumentQuery<Models.Action>(collectionUri)
-                .Where(so => so.CustomerId == customerId).AsDocumentQuery();
+                .Where(so => so.CustomerId == customerId && so.ActionPlanId == actionPlanId).AsDocumentQuery();
 
             var actions = new List<Models.Action>();
 
@@ -148,15 +149,17 @@ namespace NCS.DSS.Action.Cosmos.Provider
             return actions.Any() ? actions : null;
         }
 
-        public async Task<Models.Action> GetActionForCustomerAsync(Guid customerId, Guid actionId)
+        public async Task<Models.Action> GetActionForCustomerAsync(Guid customerId, Guid actionId, Guid actionPlanId)
         {
             var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
             var client = DocumentDBClient.CreateDocumentClient();
 
             var actionForCustomerQuery = client
-                ?.CreateDocumentQuery<Models.Action>(collectionUri, new FeedOptions { MaxItemCount = 1 })
-                .Where(x => x.CustomerId == customerId && x.ActionId == actionId)
+                ?.CreateDocumentQuery<Models.Action>(collectionUri, new FeedOptions {MaxItemCount = 1})
+                .Where(x => x.CustomerId == customerId &&
+                            x.ActionId == actionId && 
+                            x.ActionPlanId == actionPlanId)
                 .AsDocumentQuery();
 
             if (actionForCustomerQuery == null)
@@ -165,6 +168,25 @@ namespace NCS.DSS.Action.Cosmos.Provider
             var actions = await actionForCustomerQuery.ExecuteNextAsync<Models.Action>();
 
             return actions?.FirstOrDefault();
+        }
+
+        public async Task<string> GetActionForCustomerToUpdateAsync(Guid customerId, Guid actionId, Guid actionPlanId)
+        {
+            var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
+
+            var client = DocumentDBClient.CreateDocumentClient();
+
+            var actionForCustomerQuery = client
+                ?.CreateDocumentQuery<Models.Action>(collectionUri, new FeedOptions { MaxItemCount = 1 })
+                .Where(x => x.CustomerId == customerId && x.ActionId == actionId && x.ActionPlanId == actionPlanId)
+                .AsDocumentQuery();
+
+            if (actionForCustomerQuery == null)
+                return null;
+
+            var actions = await actionForCustomerQuery.ExecuteNextAsync();
+
+            return actions?.FirstOrDefault()?.ToString();
         }
 
         public async Task<ResourceResponse<Document>> CreateActionAsync(Models.Action action)
@@ -183,18 +205,24 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         }
 
-        public async Task<ResourceResponse<Document>> UpdateActionAsync(Models.Action action)
+        public async Task<ResourceResponse<Document>> UpdateActionAsync(string action, Guid actionId)
         {
-            var documentUri = DocumentDBHelper.CreateDocumentUri(action.ActionId.GetValueOrDefault());
+            if (string.IsNullOrEmpty(action))
+                return null;
+
+            var documentUri = DocumentDBHelper.CreateDocumentUri(actionId);
 
             var client = DocumentDBClient.CreateDocumentClient();
 
             if (client == null)
                 return null;
 
-            var response = await client.ReplaceDocumentAsync(documentUri, action);
+            var actionDocumentJObject = JObject.Parse(action);
+
+            var response = await client.ReplaceDocumentAsync(documentUri, actionDocumentJObject);
 
             return response;
         }
+
     }
 }

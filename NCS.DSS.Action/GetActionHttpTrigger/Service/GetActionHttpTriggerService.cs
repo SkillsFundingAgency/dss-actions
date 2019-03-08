@@ -7,10 +7,17 @@ namespace NCS.DSS.Action.GetActionHttpTrigger.Service
 {
     public class GetActionHttpTriggerService : IGetActionHttpTriggerService
     {
-        public async Task<List<Models.Action>> GetActionsAsync(Guid customerId)
+
+        private readonly IDocumentDBProvider _documentDbProvider;
+
+        public GetActionHttpTriggerService(IDocumentDBProvider documentDbProvider)
         {
-            var documentDbProvider = new DocumentDBProvider();
-            var actions = await documentDbProvider.GetActionsForCustomerAsync(customerId);
+            _documentDbProvider = documentDbProvider;
+        }
+
+        public async Task<List<Models.Action>> GetActionsAsync(Guid customerId, Guid actionPlanId)
+        {
+            var actions = await _documentDbProvider.GetActionsForCustomerAsync(customerId, actionPlanId);
 
             return actions;
         }

@@ -8,6 +8,7 @@ namespace NCS.DSS.Action.Validation
 {
     public class Validate : IValidate
     {
+
         public List<ValidationResult> ValidateResource(IAction resource, bool validateModelForPost)
         {
             var context = new ValidationContext(resource, null, null);
@@ -30,11 +31,25 @@ namespace NCS.DSS.Action.Validation
                     results.Add(new ValidationResult("Action Summary is a required field", new[] { "ActionSummary" }));
             }
 
-            if (actionResource.DateActionAgreed.HasValue && actionResource.DateActionAgreed.Value > DateTime.UtcNow)
-                results.Add(new ValidationResult("Date Action Agreed must be less the current date/time", new[] { "DateActionAgreed" }));
+            if (actionResource.DateActionAgreed.HasValue)
+            {
+                if (actionResource.DateActionAgreed.Value > DateTime.UtcNow)
+                    results.Add(new ValidationResult("Date Action Agreed must be less than or equal to the current date/time", new[] { "DateActionAgreed" }));
 
-            if (actionResource.DateActionActuallyCompleted.HasValue && actionResource.DateActionActuallyCompleted.Value > DateTime.UtcNow)
-                results.Add(new ValidationResult("Date Action Actually Completed must be less the current date/time", new[] { "DateActionActuallyCompleted" }));
+                if (actionResource.DateActionAimsToBeCompletedBy.HasValue && 
+                    !(actionResource.DateActionAimsToBeCompletedBy.Value >= actionResource.DateActionAgreed.Value))
+                    results.Add(new ValidationResult("Date Action Aims To Be Completed By must be greater than Date Action Agreed", new[] { "DateActionAimsToBeCompletedBy" }));
+
+                if (actionResource.DateActionActuallyCompleted.HasValue &&
+                    !(actionResource.DateActionActuallyCompleted.Value >= actionResource.DateActionAgreed.Value))
+                    results.Add(new ValidationResult("Date Action Actually Completed must be greater than Date Action Agreed", new[] { "DateActionActuallyCompleted" }));
+            }
+
+            if (actionResource.DateActionActuallyCompleted.HasValue)
+            {
+                if (actionResource.DateActionActuallyCompleted.Value > DateTime.UtcNow)
+                    results.Add(new ValidationResult("Date Action Actually Completed must be less the current date/time", new[] { "DateActionActuallyCompleted" }));
+            }
 
             if (actionResource.LastModifiedDate.HasValue && actionResource.LastModifiedDate.Value > DateTime.UtcNow)
                 results.Add(new ValidationResult("Last Modified Date must be less the current date/time", new[] { "LastModifiedDate" }));
