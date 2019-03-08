@@ -1,5 +1,4 @@
-﻿using System;
-using DFC.Common.Standard.Logging;
+﻿using DFC.Common.Standard.Logging;
 using DFC.Functions.DI.Standard;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
@@ -16,7 +15,6 @@ using NCS.DSS.Action.Ioc;
 using NCS.DSS.Action.PatchActionHttpTrigger.Service;
 using NCS.DSS.Action.PostActionHttpTrigger.Service;
 using NCS.DSS.Action.Validation;
-
 
 [assembly: WebJobsStartup(typeof(WebJobsExtensionStartup), "Web Jobs Extension Startup")]
 
@@ -38,10 +36,10 @@ namespace NCS.DSS.Action.Ioc
 
             builder.Services.AddScoped<IActionPatchService, ActionPatchService>();
             builder.Services.AddScoped<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();
-            builder.Services.AddScoped<IGetActionsHttpTriggerService, GetActionsHttpTriggerService>();
-            builder.Services.AddScoped<IGetActionsByIdHttpTriggerService, GetActionsByIdHttpTriggerService>();
-            builder.Services.AddScoped<IPostActionsHttpTriggerService, PostActionsHttpTriggerService>();
-            builder.Services.AddScoped<IPatchActionsHttpTriggerService, PatchActionsHttpTriggerService>();
+            builder.Services.AddScoped<IGetActionHttpTriggerService, GetActionHttpTriggerService>();
+            builder.Services.AddScoped<IGetActionByIdHttpTriggerService, GetActionByIdHttpTriggerService>();
+            builder.Services.AddScoped<IPostActionHttpTriggerService, PostActionHttpTriggerService>();
+            builder.Services.AddScoped<IPatchActionHttpTriggerService, PatchActionHttpTriggerService>();
             builder.Services.AddScoped<IActionChangeFeedTriggerService, ActionChangeFeedTriggerService>();
         }
     }
