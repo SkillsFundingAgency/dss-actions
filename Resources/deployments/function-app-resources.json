@@ -110,6 +110,14 @@
               "value": "actionplans"
             },
             {
+              "name": "LeaseCollectionName",
+              "value": "action-lease"
+            },
+            {
+              "name": "LeaseCollectionPrefix",
+              "value": "actionChangeFeedPrefix"
+            },
+            {
               "name": "ServiceBusConnectionString",
               "value": "[parameters('serviceBusConnectionString')]"
             },
