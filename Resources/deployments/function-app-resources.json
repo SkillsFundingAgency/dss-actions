@@ -74,6 +74,10 @@
               "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsName'))).InstrumentationKey]"
             },
             {
+              "name": "ActionConnectionString",
+              "value": "[concat('AccountEndpoint=', parameters('cosmosDbEndpoint'), '/;AccountKey=', parameters('cosmosDbKey'), ';')]"
+            },
+            {
               "name": "CollectionId",
               "value": "[parameters('cosmosDbCollectionId')]"
             },
@@ -108,6 +112,10 @@
             {
               "name": "ServiceBusConnectionString",
               "value": "[parameters('serviceBusConnectionString')]"
+            },
+            {
+              "name": "ChangeFeedQueueName",
+              "value": "dss.changefeedqueue"
             },
             {
               "name": "QueueName",
