@@ -1,5 +1,4 @@
-﻿using System;
-using DFC.Common.Standard.Logging;
+﻿using DFC.Common.Standard.Logging;
 using DFC.Functions.DI.Standard;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
@@ -7,6 +6,7 @@ using DFC.Swagger.Standard;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using NCS.DSS.Action.ActionChangeFeedTrigger.Service;
 using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.Cosmos.Provider;
 using NCS.DSS.Action.GetActionByIdHttpTrigger.Service;
@@ -15,7 +15,6 @@ using NCS.DSS.Action.Ioc;
 using NCS.DSS.Action.PatchActionHttpTrigger.Service;
 using NCS.DSS.Action.PostActionHttpTrigger.Service;
 using NCS.DSS.Action.Validation;
-
 
 [assembly: WebJobsStartup(typeof(WebJobsExtensionStartup), "Web Jobs Extension Startup")]
 
@@ -41,6 +40,7 @@ namespace NCS.DSS.Action.Ioc
             builder.Services.AddScoped<IGetActionByIdHttpTriggerService, GetActionByIdHttpTriggerService>();
             builder.Services.AddScoped<IPostActionHttpTriggerService, PostActionHttpTriggerService>();
             builder.Services.AddScoped<IPatchActionHttpTriggerService, PatchActionHttpTriggerService>();
+            builder.Services.AddScoped<IActionChangeFeedTriggerService, ActionChangeFeedTriggerService>();
         }
     }
 }
