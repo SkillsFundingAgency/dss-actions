@@ -31,7 +31,11 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
         [Response(HttpStatusCode = 422, Description = "Action validation error(s)", ShowSchema = false)]
-        [Display(Name = "Post", Description = "Ability to create a new Action for a customer.")]
+        [Display(Name = "Post", Description = "Ability to create a new Action for a customer. <br>" +
+                                              "<br> <b>Validation Rules:</b> <br>" +
+                                              "<br><b>DateActionAgreed:</b> DateActionAgreed >= DateTime.Now <br>" +
+                                              "<br><b>DateActionAimsToBeCompletedBy:</b> DateActionAimsToBeCompletedBy >= DateActionAgreed <br>" +
+                                              "<br><b>DateActionActuallyCompleted:</b> DateActionActuallyCompleted >= DateActionAgreed <br>")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/")]HttpRequest req, ILogger log, string customerId, string interactionId, string actionPlanId,
                     [Inject]IResourceHelper resourceHelper,
                     [Inject]IPostActionHttpTriggerService actionsPostService,

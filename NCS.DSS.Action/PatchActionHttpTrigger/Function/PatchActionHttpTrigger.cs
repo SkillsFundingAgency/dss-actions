@@ -32,7 +32,11 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
         [Response(HttpStatusCode = 422, Description = "Action validation error(s)", ShowSchema = false)]
-        [Display(Name = "Patch", Description = "Ability to modify/update a customers Action record.")]
+        [Display(Name = "Patch", Description = "Ability to modify/update a customers Action record <br>" +
+                                               "<br> <b>Validation Rules:</b> <br>" +
+                                               "<br><b>DateActionAgreed:</b> DateActionAgreed >= DateTime.Now <br>" +
+                                               "<br><b>DateActionAimsToBeCompletedBy:</b> DateActionAimsToBeCompletedBy >= DateActionAgreed <br>" +
+                                               "<br><b>DateActionActuallyCompleted:</b> DateActionActuallyCompleted >= DateActionAgreed <br>")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/{actionId}")]HttpRequest req, ILogger log, string customerId, string interactionId, string actionPlanId, string actionId,
             [Inject]IResourceHelper resourceHelper,
             [Inject]IPatchActionHttpTriggerService actionsPatchService,
