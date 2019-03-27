@@ -27,18 +27,24 @@ namespace NCS.DSS.Action.Models
 
         [Required]
         [DataType(DataType.DateTime)]
-        [Display(Description = "Date the action plan was agreed with the customer.")]
+        [Display(Description = "Date the action plan was agreed with the customer. " +
+                               "Validation Rules: " +
+                               "DateActionAgreed >= DateTime.Now")]
         [Example(Description = "2018-06-21T07:20:00")]
         public DateTime? DateActionAgreed { get; set; }
 
         [Required]
         [DataType(DataType.DateTime)]
-        [Display(Description = "Date the action should be completed, with by the customer or the adviser.")]
+        [Display(Description = "Date the action should be completed, with by the customer or the adviser. " +
+                               "Validation Rules: " +
+                               "DateActionAimsToBeCompletedBy >= DateActionAgreed")]
         [Example(Description = "2018-06-27T09:00:00")]
         public DateTime? DateActionAimsToBeCompletedBy { get; set; }
 
         [DataType(DataType.DateTime)]
-        [Display(Description = "Date the action was completed by the customer or the adviser.")]
+        [Display(Description = "Date the action was completed by the customer or the adviser. " +
+                               "Validation Rules: " +
+                               "DateActionActuallyCompleted >= DateActionAgreed")]
         [Example(Description = "2018-06-24T14:38:00")]
         public DateTime? DateActionActuallyCompleted { get; set; }
 
