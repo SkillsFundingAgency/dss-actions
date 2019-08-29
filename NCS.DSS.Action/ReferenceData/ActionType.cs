@@ -45,6 +45,12 @@ namespace NCS.DSS.Action.ReferenceData
         [Description("Use Social Media")]
         UseSocialMedia = 14,
 
+        [Description("Discovery Your Skills And Careers")]
+        DiscoveryYourSkillsAndCareers = 15,
+
+        [Description("Find A Course")]
+        FindACourse = 16,
+
         Other = 99
     }
 }
