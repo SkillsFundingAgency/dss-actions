@@ -11,11 +11,13 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
     {
         private readonly IActionPatchService _actionPatchService;
         private readonly IDocumentDBProvider _documentDbProvider;
-
-        public PatchActionHttpTriggerService(IActionPatchService actionPatchService, IDocumentDBProvider documentDbProvider)
+        private readonly IServiceBusClient _serviceBusClient;
+        
+        public PatchActionHttpTriggerService(IActionPatchService actionPatchService, IDocumentDBProvider documentDbProvider, IServiceBusClient serviceBusClient)
         {
             _actionPatchService = actionPatchService;
             _documentDbProvider = documentDbProvider;
+            _serviceBusClient = serviceBusClient;
         }
 
         public string PatchResource(string actionJson, ActionPatch actionPatch)
@@ -52,7 +54,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
 
         public async Task SendToServiceBusQueueAsync(Models.Action action, Guid customerId, string reqUrl)
         {
-            await ServiceBusClient.SendPatchMessageAsync(action, customerId, reqUrl);
+            await _serviceBusClient.SendPatchMessageAsync(action, customerId, reqUrl);
         }
     }
 }
