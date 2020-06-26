@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DFC.Common.Standard.CosmosDocumentClient;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
-using NCS.DSS.Action.Cosmos.Client;
 using NCS.DSS.Action.Cosmos.Helper;
 using Newtonsoft.Json.Linq;
 
@@ -13,11 +13,26 @@ namespace NCS.DSS.Action.Cosmos.Provider
 {
     public class DocumentDBProvider : IDocumentDBProvider
     {
+
+        private readonly ICosmosDocumentClient _cosmosDocumentClient;
+
+        private string _customerJson;
+
+        public string GetCustomerJson()
+        {
+            return _customerJson;
+        }
+
+        public DocumentDBProvider(ICosmosDocumentClient cosmosDocumentClient)
+        {
+            _cosmosDocumentClient = cosmosDocumentClient;
+        }
+
         public async Task<bool> DoesCustomerResourceExist(Guid customerId)
         {
             var documentUri = DocumentDBHelper.CreateCustomerDocumentUri(customerId);
 
-            var client = DocumentDBClient.CreateDocumentClient();
+            var client = _cosmosDocumentClient.GetDocumentClient();
 
             if (client == null)
                 return false;
@@ -25,7 +40,10 @@ namespace NCS.DSS.Action.Cosmos.Provider
             {
                 var response = await client.ReadDocumentAsync(documentUri);
                 if (response.Resource != null)
+                {
+                    _customerJson = response.Resource.ToString();
                     return true;
+                }
             }
             catch (DocumentClientException)
             {
@@ -39,7 +57,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
         {
             var collectionUri = DocumentDBHelper.CreateInteractionDocumentCollectionUri();
 
-            var client = DocumentDBClient.CreateDocumentClient();
+            var client = _cosmosDocumentClient.GetDocumentClient();
 
             if (client == null)
                 return false;
@@ -72,7 +90,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
         {
             var collectionUri = DocumentDBHelper.CreateActionPlanDocumentCollectionUri();
 
-            var client = DocumentDBClient.CreateDocumentClient();
+            var client = _cosmosDocumentClient.GetDocumentClient();
 
             if (client == null)
                 return false;
@@ -102,35 +120,12 @@ namespace NCS.DSS.Action.Cosmos.Provider
             }
 
         }
-
-        public async Task<bool> DoesCustomerHaveATerminationDate(Guid customerId)
-        {
-            var documentUri = DocumentDBHelper.CreateCustomerDocumentUri(customerId);
-
-            var client = DocumentDBClient.CreateDocumentClient();
-
-            if (client == null)
-                return false;
-
-            try
-            {
-                var response = await client.ReadDocumentAsync(documentUri);
-
-                var dateOfTermination = response.Resource?.GetPropertyValue<DateTime?>("DateOfTermination");
-
-                return dateOfTermination.HasValue;
-            }
-            catch (DocumentClientException)
-            {
-                return false;
-            }
-        }
-
+        
         public async Task<List<Models.Action>> GetActionsForCustomerAsync(Guid customerId, Guid actionPlanId)
         {
             var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = DocumentDBClient.CreateDocumentClient();
+            var client = _cosmosDocumentClient.GetDocumentClient();
 
             if (client == null)
                 return null;
@@ -153,7 +148,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
         {
             var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = DocumentDBClient.CreateDocumentClient();
+            var client = _cosmosDocumentClient.GetDocumentClient();
 
             var actionForCustomerQuery = client
                 ?.CreateDocumentQuery<Models.Action>(collectionUri, new FeedOptions {MaxItemCount = 1})
@@ -174,7 +169,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
         {
             var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = DocumentDBClient.CreateDocumentClient();
+            var client = _cosmosDocumentClient.GetDocumentClient();
 
             var actionForCustomerQuery = client
                 ?.CreateDocumentQuery<Models.Action>(collectionUri, new FeedOptions { MaxItemCount = 1 })
@@ -194,7 +189,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
             var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
 
-            var client = DocumentDBClient.CreateDocumentClient();
+            var client = _cosmosDocumentClient.GetDocumentClient();
 
             if (client == null)
                 return null;
@@ -212,7 +207,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
             var documentUri = DocumentDBHelper.CreateDocumentUri(actionId);
 
-            var client = DocumentDBClient.CreateDocumentClient();
+            var client = _cosmosDocumentClient.GetDocumentClient();
 
             if (client == null)
                 return null;
