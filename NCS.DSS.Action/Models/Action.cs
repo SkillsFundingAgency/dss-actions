@@ -43,7 +43,7 @@ namespace NCS.DSS.Action.Models
         [Example(Description = "this is some text")]
         public string ActionSummary { get; set; }
 
-        [StringLength(255)]
+        [StringLength(255)] 
         [Display(Description = "Details of any signposting to external parties.")]
         [Example(Description = "this is some text")]
         public string SignpostedTo { get; set; }
