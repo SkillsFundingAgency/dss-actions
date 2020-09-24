@@ -5,12 +5,12 @@ namespace NCS.DSS.Action.Models
 {
     public interface IAction
     {
+        string SubcontractorId { get; set; }
         DateTime? DateActionAgreed { get; set; }
         DateTime? DateActionAimsToBeCompletedBy { get; set; }
         DateTime? DateActionActuallyCompleted { get; set; }
         string ActionSummary { get; set; }
         string SignpostedTo { get; set; }
-        SignpostedToCategory? SignpostedToCategory { get; set; }
         ActionType? ActionType { get; set; }
         ActionStatus? ActionStatus { get; set; }
         PersonResponsible? PersonResponsible { get; set; }

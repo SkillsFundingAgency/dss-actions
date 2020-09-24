@@ -8,12 +8,10 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Service
     public class PostActionHttpTriggerService : IPostActionHttpTriggerService
     {
         private readonly IDocumentDBProvider _documentDbProvider;
-        private readonly IServiceBusClient _serviceBusClient;
 
-        public PostActionHttpTriggerService(IDocumentDBProvider documentDbProvider, IServiceBusClient serviceBusClient)
+        public PostActionHttpTriggerService(IDocumentDBProvider documentDbProvider)
         {
             _documentDbProvider = documentDbProvider;
-            _serviceBusClient = serviceBusClient;
         }
 
         public async Task<Models.Action> CreateAsync(Models.Action action)
@@ -30,7 +28,7 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Service
 
         public async Task SendToServiceBusQueueAsync(Models.Action action, string reqUrl)
         {
-            await _serviceBusClient.SendPostMessageAsync(action, reqUrl);
+            await ServiceBusClient.SendPostMessageAsync(action, reqUrl);
         }
     }
 }
