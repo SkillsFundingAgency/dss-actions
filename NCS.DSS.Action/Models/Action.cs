@@ -17,11 +17,6 @@ namespace NCS.DSS.Action.Models
         [Example(Description = "2730af9c-fc34-4c2b-a905-c4b584b0f379")]
         public Guid? CustomerId { get; set; }
 
-        [StringLength(50)]
-        [Display(Description = "Identifier supplied by the touchpoint to indicate their subcontractor")]
-        [Example(Description = "01234567899876543210")]
-        public string SubcontractorId { get; set; }
-
         [Display(Description = "Unique identifier of the customer action plan.")]
         [Example(Description = "a79ba4cc-5da5-4eb0-8913-eb5e69f90ab8")]
         public Guid? ActionPlanId { get; set; }
@@ -53,6 +48,10 @@ namespace NCS.DSS.Action.Models
         [Display(Description = "Details of any signposting to external parties.")]
         [Example(Description = "ASIST Team (Apprenticeships)")]
         public string SignpostedTo { get; set; }
+
+        [Display(Description = "SignpostedToCategory reference data.")]
+        [Example(Description = "1")]
+        public SignpostedToCategory? SignpostedToCategory { get; set; }
 
         [Required]
         [Display(Description = "ActionType reference data.")]
@@ -90,13 +89,12 @@ namespace NCS.DSS.Action.Models
                 ActionStatus = ReferenceData.ActionStatus.NotStarted;
         }
 
-        public void SetIds(Guid customerId, Guid actionPlanId, string touchpointId, string subcontractorId)
+        public void SetIds(Guid customerId, Guid actionPlanId, string touchpointId)
         {
             ActionId = Guid.NewGuid();
             CustomerId = customerId;
             ActionPlanId = actionPlanId;
             LastModifiedTouchpointId = touchpointId;
-            SubcontractorId = subcontractorId;
             CreatedBy = touchpointId;
         }
 

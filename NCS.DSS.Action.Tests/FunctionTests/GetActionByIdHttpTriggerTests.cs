@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DFC.Common.Standard.GuidHelper;
 using DFC.Common.Standard.Logging;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
@@ -11,11 +12,10 @@ using Microsoft.Extensions.Logging;
 using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.GetActionByIdHttpTrigger.Service;
 using NSubstitute;
-using NUnit.Framework;
+using Xunit;
 
 namespace NCS.DSS.Action.Tests.FunctionTests
 {
-    [TestFixture]
     public class GetActionByIdHttpTriggerTests
     {
 
@@ -26,19 +26,22 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         private const string InValidId = "1111111-2222-3333-4444-555555555555";
         private const string ValidActionId = "d5369b9a-6959-4bd3-92fc-1583e72b7e51";
 
+        private readonly Guid _customerId = Guid.Parse("1dd4d206-131a-44fd-8e2d-18b88b383f72");
+        private readonly Guid _interactionId = Guid.Parse("d800eae2-d594-4eb5-8b23-cf9a39b70f6b");
+        private readonly Guid _actionPlanId = Guid.Parse("25cf54a1-f0bb-4590-8c38-191c5329f450");
+        private readonly Guid _actionId = Guid.Parse("0f0ce9cd-5f0e-41f7-84e7-6532e01691ae");
+        
+        private readonly ILogger _log;
+        private readonly HttpRequest _request;
+        private readonly IResourceHelper _resourceHelper;
+        private readonly IGetActionByIdHttpTriggerService _getActionByIdHttpTriggerService;
+        private readonly IHttpRequestHelper _httpRequestHelper;
+        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
+        private readonly Models.Action _action;
+        private readonly IGuidHelper _guidHelper;
+        private readonly GetActionByIdHttpTrigger.Function.GetActionByIdHttpTrigger _getActionByIdHttpTrigger;
 
-        private ILogger _log;
-        private HttpRequest _request;
-        private IResourceHelper _resourceHelper;
-        private IGetActionByIdHttpTriggerService _getActionByIdHttpTriggerService;
-        private ILoggerHelper _loggerHelper;
-        private IHttpRequestHelper _httpRequestHelper;
-        private IHttpResponseMessageHelper _httpResponseMessageHelper;
-        private IJsonHelper _jsonHelper;
-        private Models.Action _action;
-
-        [SetUp]
-        public void Setup()
+        public GetActionByIdHttpTriggerTests()
         {
             _action = Substitute.For<Models.Action>();
 
@@ -46,177 +49,176 @@ namespace NCS.DSS.Action.Tests.FunctionTests
 
             _log = Substitute.For<ILogger>();
             _resourceHelper = Substitute.For<IResourceHelper>();
-            _loggerHelper = Substitute.For<ILoggerHelper>();
             _httpRequestHelper = Substitute.For<IHttpRequestHelper>();
             _httpResponseMessageHelper = Substitute.For<IHttpResponseMessageHelper>();
-            _jsonHelper = Substitute.For<IJsonHelper>();
+
+            var loggerHelper = Substitute.For<ILoggerHelper>();
+            var jsonHelper = Substitute.For<IJsonHelper>();
+            _guidHelper = Substitute.For<IGuidHelper>();
+
             _getActionByIdHttpTriggerService = Substitute.For<IGetActionByIdHttpTriggerService>();
+
+            _getActionByIdHttpTrigger = Substitute.For<GetActionByIdHttpTrigger.Function.GetActionByIdHttpTrigger>(
+                _resourceHelper,
+                _getActionByIdHttpTriggerService,
+                loggerHelper,
+                _httpRequestHelper,
+                _httpResponseMessageHelper,
+                jsonHelper,
+                _guidHelper
+                );
 
             _httpRequestHelper.GetDssCorrelationId(_request).Returns(ValidDssCorrelationId);
             _httpRequestHelper.GetDssTouchpointId(_request).Returns("0000000001");
-            _resourceHelper.DoesActionPlanExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
+            _resourceHelper.DoesActionPlanExistAndBelongToCustomer(_actionPlanId, _interactionId, _customerId).Returns(true);
 
+            _resourceHelper.DoesCustomerExist(_customerId).Returns(true);
+            _guidHelper.ValidateGuid(ValidCustomerId).Returns(_customerId);
+            _guidHelper.ValidateGuid(ValidInteractionId).Returns(_interactionId);
+            _guidHelper.ValidateGuid(ValidActionPlanId).Returns(_actionPlanId);
+            _guidHelper.ValidateGuid(ValidActionId).Returns(_actionId);
+            _resourceHelper.DoesInteractionExistAndBelongToCustomer(_interactionId, _customerId).Returns(true);
+            _getActionByIdHttpTriggerService.GetActionForCustomerAsync(_customerId, _actionId, _actionPlanId).Returns(Task.FromResult(_action).Result);
+
+            SetUpHttpResponseMessageHelper();
         }
 
-        [Test]
+        [Fact]
         public async Task GetActionsByIdHttpTrigger_ReturnsStatusCodeBadRequest_WhenDssCorrelationIdIsInvalid()
         {
             _httpRequestHelper.GetDssCorrelationId(_request).Returns(InValidId);
-
-            _httpResponseMessageHelper
-                .BadRequest(Arg.Any<Guid>()).Returns(x => new HttpResponseMessage(HttpStatusCode.BadRequest));
 
             // Act
             var result = await RunFunction(InValidId, ValidInteractionId,  ValidActionId, ValidActionPlanId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.IsType<HttpResponseMessage>(result);
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
         }
 
-        [Test]
+        [Fact]
         public async Task GetActionsByIdHttpTrigger_ReturnsStatusCodeBadRequest_WhenTouchpointIdIsNotProvided()
         {
             _httpRequestHelper.GetDssTouchpointId(_request).Returns((string)null);
 
-            _httpResponseMessageHelper.BadRequest().Returns(x => new HttpResponseMessage(HttpStatusCode.BadRequest));
-
-
             // Act
             var result = await RunFunction(InValidId, ValidInteractionId, ValidActionId, ValidActionPlanId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.IsType<HttpResponseMessage>(result);
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
         }
 
-        [Test]
+        [Fact]
         public async Task GetActionsByIdHttpTrigger_ReturnsStatusCodeBadRequest_WhenCustomerIdIsInvalid()
         {
-            _httpResponseMessageHelper
-                .BadRequest(Arg.Any<Guid>()).Returns(x => new HttpResponseMessage(HttpStatusCode.BadRequest));
-
             // Act
             var result = await RunFunction(InValidId, ValidInteractionId, ValidActionId, ValidActionPlanId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.IsType<HttpResponseMessage>(result);
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
         }
 
-        [Test]
+        [Fact]
         public async Task GetActionsByIdHttpTrigger_ReturnsStatusCodeBadRequest_WhenInteractionIdIsInvalid()
         {
-            _httpResponseMessageHelper
-                .BadRequest(Arg.Any<Guid>()).Returns(x => new HttpResponseMessage(HttpStatusCode.BadRequest));
-
             // Act
             var result = await RunFunction(ValidCustomerId, InValidId, ValidActionId, ValidActionPlanId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.IsType<HttpResponseMessage>(result);
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
         }
 
-        [Test]
+        [Fact]
         public async Task GetActionsByIdHttpTrigger_ReturnsStatusCodeBadRequest_WhenActionIdIsInvalid()
         {
-            _httpResponseMessageHelper
-                .BadRequest(Arg.Any<Guid>()).Returns(x => new HttpResponseMessage(HttpStatusCode.BadRequest));
-
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, InValidId, ValidActionPlanId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.IsType<HttpResponseMessage>(result);
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
         }
 
-        [Test]
+        [Fact]
         public async Task GetActionsByIdHttpTrigger_ReturnsStatusCodeNoContent_WhenCustomerDoesNotExist()
         {
-            _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).ReturnsForAnyArgs(false);
-
-            _httpResponseMessageHelper
-                .NoContent(Arg.Any<Guid>()).Returns(x => new HttpResponseMessage(HttpStatusCode.NoContent));
+            _resourceHelper.DoesCustomerExist(_customerId).ReturnsForAnyArgs(false);
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionId, ValidActionPlanId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.NoContent, result.StatusCode);
+            Assert.IsType<HttpResponseMessage>(result);
+            Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
         }
 
-        [Test]
+        [Fact]
         public async Task GetActionsByIdHttpTrigger_ReturnsStatusCodeNoContent_WhenInteractionDoesNotExist()
         {
-            _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).Returns(true);
-
-            _httpResponseMessageHelper
-                .NoContent(Arg.Any<Guid>()).Returns(x => new HttpResponseMessage(HttpStatusCode.NoContent));
+            _resourceHelper.DoesInteractionExistAndBelongToCustomer(_interactionId, _customerId).Returns(false);
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionId, ValidActionPlanId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.NoContent, result.StatusCode);
+            Assert.IsType<HttpResponseMessage>(result);
+            Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
         }
 
-        [Test]
+        [Fact]
         public async Task GetActionsByIdHttpTrigger_ReturnsStatusCodeNoContent_WhenActionDoesNotExist()
         {
-            _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).Returns(true);
-
-            _getActionByIdHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult<Models.Action>(null).Result);
-
-            _httpResponseMessageHelper
-                .NoContent(Arg.Any<Guid>()).Returns(x => new HttpResponseMessage(HttpStatusCode.NoContent));
+            _getActionByIdHttpTriggerService.GetActionForCustomerAsync(_customerId, _actionId, _actionPlanId).Returns(Task.FromResult<Models.Action>(null).Result);
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionId, ValidActionPlanId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.NoContent, result.StatusCode);
+            Assert.IsType<HttpResponseMessage>(result);
+            Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
         }
 
-        [Test]
+        [Fact]
         public async Task GetActionsByIdHttpTrigger_ReturnsStatusCodeOk_WhenActionExists()
         {
-            
-            _resourceHelper.DoesCustomerExist(Arg.Any<Guid>()).Returns(true);
-            _resourceHelper.DoesInteractionExistAndBelongToCustomer(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
-
-            _getActionByIdHttpTriggerService.GetActionForCustomerAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(Task.FromResult(_action).Result);
-
-            _httpResponseMessageHelper
-                .Ok(Arg.Any<string>()).Returns(x => new HttpResponseMessage(HttpStatusCode.OK));
-
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionId, ValidActionPlanId);
        
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+            Assert.IsType<HttpResponseMessage>(result);
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
         }
 
-        private async Task<HttpResponseMessage> RunFunction(string customerId, string interactionId, string actionId, string actionplanId)
+        private async Task<HttpResponseMessage> RunFunction(string customerId, string interactionId, string actionId, string actionPlanId)
         {
-            return await GetActionByIdHttpTrigger.Function.GetActionByIdHttpTrigger.Run(
+            return await _getActionByIdHttpTrigger.Run(
                 _request,
                 _log,
                 customerId,
                 interactionId,
-                actionplanId,
-                actionId,
-                _resourceHelper,
-                _getActionByIdHttpTriggerService,
-                _loggerHelper,
-                _httpRequestHelper,
-                _httpResponseMessageHelper,
-                _jsonHelper).ConfigureAwait(false);
+                actionPlanId,
+                actionId).ConfigureAwait(false);
+        }
+
+        private void SetUpHttpResponseMessageHelper()
+        {
+            _httpResponseMessageHelper.BadRequest().Returns(x => new HttpResponseMessage(HttpStatusCode.BadRequest));
+
+            _httpResponseMessageHelper
+                .BadRequest(Arg.Any<string>()).Returns(x => new HttpResponseMessage(HttpStatusCode.BadRequest));
+
+            _httpResponseMessageHelper
+                .BadRequest(Arg.Any<Guid>()).Returns(x => new HttpResponseMessage(HttpStatusCode.BadRequest));
+
+            _httpResponseMessageHelper
+                .NoContent(Arg.Any<Guid>()).Returns(x => new HttpResponseMessage(HttpStatusCode.NoContent));
+
+            _httpResponseMessageHelper
+                .Ok(Arg.Any<string>()).Returns(x => new HttpResponseMessage(HttpStatusCode.OK));
+
         }
     }
 }

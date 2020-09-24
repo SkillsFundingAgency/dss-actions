@@ -8,41 +8,43 @@ using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using NCS.DSS.Action.Cosmos.Provider;
 using NCS.DSS.Action.PostActionHttpTrigger.Service;
+using NCS.DSS.Action.ServiceBus;
 using Newtonsoft.Json;
 using NSubstitute;
-using NUnit.Framework;
+using Xunit;
 
 namespace NCS.DSS.Action.Tests.ServiceTests
 {
-    [TestFixture]
     public class PostActionHttpTriggerServiceTests
     {
-        private IPostActionHttpTriggerService _actionHttpTriggerService;
-        private IDocumentDBProvider _documentDbProvider;
-        private string _json;
-        private Models.Action _action;
-        private readonly Guid _actionId = Guid.Parse("7E467BDB-213F-407A-B86A-1954053D3C24");
+        private readonly IPostActionHttpTriggerService _actionHttpTriggerService;
+        private readonly IDocumentDBProvider _documentDbProvider;
+        private readonly IServiceBusClient _serviceBusClient;
 
-        [SetUp]
-        public void Setup()
+        private readonly string _json;
+        private readonly Models.Action _action;
+
+        public PostActionHttpTriggerServiceTests()
         {
             _documentDbProvider = Substitute.For<IDocumentDBProvider>();
-            _actionHttpTriggerService = Substitute.For<PostActionHttpTriggerService>(_documentDbProvider);
+            _serviceBusClient = Substitute.For<IServiceBusClient>();
+
+            _actionHttpTriggerService = Substitute.For<PostActionHttpTriggerService>(_documentDbProvider, _serviceBusClient);
             _action = Substitute.For<Models.Action>();
             _json = JsonConvert.SerializeObject(_action);
         }
 
-        [Test]
+        [Fact]
         public async Task PostActionHttpTriggerServiceTests_CreateAsync_ReturnsNullWhenActionJsonIsNull()
         {
             // Act
-            var result = await _actionHttpTriggerService.CreateAsync(Arg.Any<Models.Action>());
+            var result = await _actionHttpTriggerService.CreateAsync(null);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.Null(result);
         }
 
-        [Test]
+        [Fact]
         public async Task PostActionHttpTriggerServiceTests_CreateAsync_ReturnsResource()
         {
             const string documentServiceResponseClass = "Microsoft.Azure.Documents.DocumentServiceResponse, Microsoft.Azure.DocumentDB.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35";
@@ -67,14 +69,14 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
             responseField?.SetValue(resourceResponse, documentServiceResponse);
 
-            _documentDbProvider.CreateActionAsync(Arg.Any<Models.Action>()).Returns(Task.FromResult(resourceResponse).Result);
+            _documentDbProvider.CreateActionAsync(_action).Returns(Task.FromResult(resourceResponse).Result);
 
             // Act
             var result = await _actionHttpTriggerService.CreateAsync(_action);
 
             // Assert
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOf<Models.Action>(result);
+            Assert.NotNull(result);
+            Assert.IsType<Models.Action>(result);
 
         }
     }

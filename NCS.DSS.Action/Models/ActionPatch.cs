@@ -34,6 +34,10 @@ namespace NCS.DSS.Action.Models
         [Example(Description = "ASIST Team (Apprenticeships)")]
         public string SignpostedTo { get; set; }
 
+        [Display(Description = "SignpostedToCategory reference data.")]
+        [Example(Description = "1")]
+        public SignpostedToCategory? SignpostedToCategory { get; set; }
+
         [Display(Description = "ActionType reference data.")]
         [Example(Description = "1")]
         public ActionType? ActionType { get; set; }
@@ -56,21 +60,15 @@ namespace NCS.DSS.Action.Models
         [Example(Description = "0000000001")]
         public string LastModifiedTouchpointId { get; set; }
 
-        [StringLength(50)]
-        [Display(Description = "Identifier supplied by the touchpoint to indicate their subcontractor")]
-        [Example(Description = "01234567899876543210")]
-        public string SubcontractorId { get; set; }
-
         public void SetDefaultValues()
         {
             if (!LastModifiedDate.HasValue)
                 LastModifiedDate = DateTime.UtcNow;
         }
 
-        public void SetIds(string touchpointId, string subcontractorId)
+        public void SetIds(string touchpointId)
         {
             LastModifiedTouchpointId = touchpointId;
-            SubcontractorId = subcontractorId;
         }
     }
 }
