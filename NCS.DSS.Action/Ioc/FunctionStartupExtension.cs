@@ -1,10 +1,10 @@
-﻿using DFC.Common.Standard.Logging;
-using DFC.Functions.DI.Standard;
+﻿using DFC.Common.Standard.CosmosDocumentClient;
+using DFC.Common.Standard.GuidHelper;
+using DFC.Common.Standard.Logging;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using DFC.Swagger.Standard;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Hosting;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.Cosmos.Provider;
@@ -13,18 +13,18 @@ using NCS.DSS.Action.GetActionHttpTrigger.Service;
 using NCS.DSS.Action.Ioc;
 using NCS.DSS.Action.PatchActionHttpTrigger.Service;
 using NCS.DSS.Action.PostActionHttpTrigger.Service;
+using NCS.DSS.Action.ServiceBus;
 using NCS.DSS.Action.Validation;
 
-[assembly: WebJobsStartup(typeof(WebJobsExtensionStartup), "Web Jobs Extension Startup")]
+
+[assembly: FunctionsStartup(typeof(FunctionStartupExtension))]
 
 namespace NCS.DSS.Action.Ioc
 {
-    public class WebJobsExtensionStartup : IWebJobsStartup
+    public class FunctionStartupExtension : FunctionsStartup
     {
-        public void Configure(IWebJobsBuilder builder)
+        public override void Configure(IFunctionsHostBuilder builder)
         {
-            builder.AddDependencyInjection();
-
             builder.Services.AddSingleton<IResourceHelper, ResourceHelper>();
             builder.Services.AddSingleton<IValidate, Validate>();
             builder.Services.AddSingleton<ILoggerHelper, LoggerHelper>();
@@ -32,6 +32,9 @@ namespace NCS.DSS.Action.Ioc
             builder.Services.AddSingleton<IHttpResponseMessageHelper, HttpResponseMessageHelper>();
             builder.Services.AddSingleton<IJsonHelper, JsonHelper>();
             builder.Services.AddSingleton<IDocumentDBProvider, DocumentDBProvider>();
+            builder.Services.AddSingleton<ICosmosDocumentClient, CosmosDocumentClient>();
+            builder.Services.AddSingleton<IServiceBusClient, ServiceBusClient>();
+            builder.Services.AddSingleton<IGuidHelper, GuidHelper>();
 
             builder.Services.AddScoped<IActionPatchService, ActionPatchService>();
             builder.Services.AddScoped<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();

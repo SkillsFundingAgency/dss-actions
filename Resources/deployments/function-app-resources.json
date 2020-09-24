@@ -76,7 +76,7 @@
               "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsName'))).InstrumentationKey]"
             },
             {
-              "name": "ActionConnectionString",
+              "name": "CosmosDBConnectionString",
               "value": "[concat('AccountEndpoint=', parameters('cosmosDbEndpoint'), '/;AccountKey=', parameters('cosmosDbKey'), ';')]"
             },
             {

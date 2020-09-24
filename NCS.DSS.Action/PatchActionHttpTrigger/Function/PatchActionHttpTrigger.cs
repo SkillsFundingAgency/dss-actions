@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DFC.Common.Standard.GuidHelper;
 using DFC.Common.Standard.Logging;
 using DFC.Functions.DI.Standard.Attributes;
 using DFC.HTTP.Standard;
@@ -22,8 +23,29 @@ using Newtonsoft.Json;
 
 namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
 {
-    public static class PatchActionHttpTrigger
+    public class PatchActionHttpTrigger
     {
+        private readonly IResourceHelper _resourceHelper;
+        private readonly IPatchActionHttpTriggerService _actionsPatchService;
+        private readonly ILoggerHelper _loggerHelper;
+        private readonly IValidate _validate;
+        private readonly IHttpRequestHelper _httpRequestHelper;
+        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
+        private readonly IJsonHelper _jsonHelper;
+        private readonly IGuidHelper _guidHelper;
+
+        public PatchActionHttpTrigger(IResourceHelper resourceHelper, IPatchActionHttpTriggerService actionsPatchService, ILoggerHelper loggerHelper, IValidate validate, IHttpRequestHelper httpRequestHelper, IHttpResponseMessageHelper httpResponseMessageHelper, IJsonHelper jsonHelper, IGuidHelper guidHelper)
+        {
+            _resourceHelper = resourceHelper;
+            _actionsPatchService = actionsPatchService;
+            _loggerHelper = loggerHelper;
+            _validate = validate;
+            _httpRequestHelper = httpRequestHelper;
+            _httpResponseMessageHelper = httpResponseMessageHelper;
+            _jsonHelper = jsonHelper;
+            _guidHelper = guidHelper;
+        }
+
         [FunctionName("Patch")]
         [ProducesResponseType(typeof(Models.Action), 200)]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Action Updated", ShowSchema = true)]
@@ -37,146 +59,137 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
                                                "<br><b>DateActionAgreed:</b> DateActionAgreed >= DateTime.Now <br>" +
                                                "<br><b>DateActionAimsToBeCompletedBy:</b> DateActionAimsToBeCompletedBy >= DateActionAgreed <br>" +
                                                "<br><b>DateActionActuallyCompleted:</b> DateActionActuallyCompleted >= DateActionAgreed <br>")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/{actionId}")]HttpRequest req, ILogger log, string customerId, string interactionId, string actionPlanId, string actionId,
-            [Inject]IResourceHelper resourceHelper,
-            [Inject]IPatchActionHttpTriggerService actionsPatchService,
-            [Inject]IValidate validate,
-            [Inject]ILoggerHelper loggerHelper,
-            [Inject]IHttpRequestHelper httpRequestHelper,
-            [Inject]IHttpResponseMessageHelper httpResponseMessageHelper,
-            [Inject]IJsonHelper jsonHelper)
+        public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/{actionId}")]
+            HttpRequest req, ILogger log, string customerId, string interactionId, string actionPlanId, string actionId)
         {
 
-            loggerHelper.LogMethodEnter(log);
+            _loggerHelper.LogMethodEnter(log);
 
-            var correlationId = httpRequestHelper.GetDssCorrelationId(req);
-            if (string.IsNullOrEmpty(correlationId))
-                log.LogInformation("Unable to locate 'DssCorrelationId' in request header");
+            var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
 
-            if (!Guid.TryParse(correlationId, out var correlationGuid))
-            {
-                log.LogInformation("Unable to parse 'DssCorrelationId' to a Guid");
-                correlationGuid = Guid.NewGuid();
-            }
+            var correlationGuid = _guidHelper.ValidateGuid(correlationId);
 
-            var touchpointId = httpRequestHelper.GetDssTouchpointId(req);
+            if (correlationGuid == Guid.Empty)
+                correlationGuid = _guidHelper.GenerateGuid();
+
+            var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'TouchpointId' in request header");
-                return httpResponseMessageHelper.BadRequest();
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'TouchpointId' in request header");
+                return _httpResponseMessageHelper.BadRequest();
             }
 
-            var apimUrl = httpRequestHelper.GetDssApimUrl(req);
+            var apimUrl = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(apimUrl))
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'apimurl' in request header");
-                return httpResponseMessageHelper.BadRequest();
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'apimurl' in request header");
+                return _httpResponseMessageHelper.BadRequest();
             }
 
-            var subcontractorId = httpRequestHelper.GetDssSubcontractorId(req);
-            if (string.IsNullOrEmpty(subcontractorId))
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubcontractorId' in request header");
-
-            loggerHelper.LogInformationMessage(log, correlationGuid,
+            _loggerHelper.LogInformationMessage(log, correlationGuid,
                 string.Format("Patch Actions C# HTTP trigger function  processed a request. By Touchpoint: {0}",
                     touchpointId));
 
-            if (!Guid.TryParse(customerId, out var customerGuid))
+            var customerGuid = _guidHelper.ValidateGuid(customerId);
+            if (customerGuid == Guid.Empty)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'customerId' to a Guid: {0}", customerId));
-                return httpResponseMessageHelper.BadRequest(customerGuid);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'customerId' to a Guid: {0}", customerId));
+                return _httpResponseMessageHelper.BadRequest(customerId);
             }
 
-            if (!Guid.TryParse(interactionId, out var interactionGuid))
+            var interactionGuid = _guidHelper.ValidateGuid(interactionId);
+            if (interactionGuid == Guid.Empty)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'interactionId' to a Guid: {0}", interactionId));
-                return httpResponseMessageHelper.BadRequest(interactionGuid);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'interactionId' to a Guid: {0}", interactionId));
+                return _httpResponseMessageHelper.BadRequest(interactionGuid);
             }
 
-            if (!Guid.TryParse(actionPlanId, out var actionPlanGuid))
+            var actionPlanGuid = _guidHelper.ValidateGuid(actionPlanId);
+            if (actionPlanGuid == Guid.Empty)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'actionPlanId' to a Guid: {0}", actionPlanId));
-                return httpResponseMessageHelper.BadRequest(actionPlanGuid);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'actionplanId' to a Guid: {0}", actionPlanGuid));
+                return _httpResponseMessageHelper.BadRequest(actionPlanGuid);
             }
 
-            if (!Guid.TryParse(actionId, out var actionGuid))
+            var actionGuid = _guidHelper.ValidateGuid(actionId);
+            if (actionGuid == Guid.Empty)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'actionId' to a Guid: {0}", actionGuid));
-                return httpResponseMessageHelper.BadRequest(actionGuid);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'actionId' to a Guid: {0}", actionGuid));
+                return _httpResponseMessageHelper.BadRequest(actionGuid);
             }
 
             ActionPatch actionPatchRequest;
 
             try
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to get resource from body of the request");
-                actionPatchRequest = await httpRequestHelper.GetResourceFromRequest<ActionPatch>(req);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to get resource from body of the request");
+                actionPatchRequest = await _httpRequestHelper.GetResourceFromRequest<ActionPatch>(req);
             }
             catch (JsonException ex)
             {
-                loggerHelper.LogError(log, correlationGuid, "Unable to retrieve body from req", ex);
-                return httpResponseMessageHelper.UnprocessableEntity(ex);
+                _loggerHelper.LogError(log, correlationGuid, "Unable to retrieve body from req", ex);
+                return _httpResponseMessageHelper.UnprocessableEntity(ex);
             }
 
             if (actionPatchRequest == null)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Action patch request is null");
-                return httpResponseMessageHelper.UnprocessableEntity(req);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Action patch request is null");
+                return _httpResponseMessageHelper.UnprocessableEntity(req);
             }
 
-            loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to set id's for action patch");
-            actionPatchRequest.SetIds(touchpointId, subcontractorId);
+            _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to set id's for action patch");
+            actionPatchRequest.SetIds(touchpointId);
 
-            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if customer exists {0}", customerGuid));
-            var doesCustomerExist = await resourceHelper.DoesCustomerExist(customerGuid);
+            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if customer exists {0}", customerGuid));
+            var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer does not exist {0}", customerGuid));
-                return httpResponseMessageHelper.NoContent(customerGuid);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer does not exist {0}", customerGuid));
+                return _httpResponseMessageHelper.NoContent(customerGuid);
             }
 
-            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if this is a read only customer {0}", customerGuid));
-            var isCustomerReadOnly = await resourceHelper.IsCustomerReadOnly(customerGuid);
+            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if this is a read only customer {0}", customerGuid));
+            var isCustomerReadOnly = _resourceHelper.IsCustomerReadOnly();
 
             if (isCustomerReadOnly)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer is read only {0}", customerGuid));
-                return httpResponseMessageHelper.Forbidden(customerGuid);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer is read only {0}", customerGuid));
+                return _httpResponseMessageHelper.Forbidden(customerGuid);
             }
 
-            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if interaction exists {0}", interactionGuid));
-            var doesInteractionExist = resourceHelper.DoesInteractionExistAndBelongToCustomer(interactionGuid, customerGuid);
+            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if interaction exists {0}", interactionGuid));
+            var doesInteractionExist = _resourceHelper.DoesInteractionExistAndBelongToCustomer(interactionGuid, customerGuid);
 
             if (!doesInteractionExist)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Interaction does not exist {0}", interactionGuid));
-                return httpResponseMessageHelper.NoContent(interactionGuid);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Interaction does not exist {0}", interactionGuid));
+                return _httpResponseMessageHelper.NoContent(interactionGuid);
             }
 
-            var doesActionPlanExistAndBelongToCustomer = resourceHelper.DoesActionPlanExistAndBelongToCustomer(actionPlanGuid, interactionGuid, customerGuid);
+            var doesActionPlanExistAndBelongToCustomer = _resourceHelper.DoesActionPlanExistAndBelongToCustomer(actionPlanGuid, interactionGuid, customerGuid);
 
             if (!doesActionPlanExistAndBelongToCustomer)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Action Plan does not exist {0}", actionPlanGuid));
-                return httpResponseMessageHelper.NoContent(actionPlanGuid);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Action Plan does not exist {0}", actionPlanGuid));
+                return _httpResponseMessageHelper.NoContent(actionPlanGuid);
             }
 
-            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get action {0} for customer {1}", actionGuid, customerGuid));
-            var actionForCustomer = await actionsPatchService.GetActionsForCustomerAsync(customerGuid, actionGuid, actionPlanGuid);
+            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get action {0} for customer {1}", actionGuid, customerGuid));
+            var actionForCustomer = await _actionsPatchService.GetActionsForCustomerAsync(customerGuid, actionGuid, actionPlanGuid);
 
             if (actionForCustomer == null)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Action does not exist {0}", actionGuid));
-                return httpResponseMessageHelper.NoContent(actionGuid);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Action does not exist {0}", actionGuid));
+                return _httpResponseMessageHelper.NoContent(actionGuid);
             }
 
-            var patchedAction = actionsPatchService.PatchResource(actionForCustomer, actionPatchRequest);
+            var patchedAction = _actionsPatchService.PatchResource(actionForCustomer, actionPatchRequest);
 
             if (patchedAction == null)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Action does not exist {0}", actionGuid));
-                return httpResponseMessageHelper.NoContent(actionGuid);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Action does not exist {0}", actionGuid));
+                return _httpResponseMessageHelper.NoContent(actionGuid);
             }
 
             Models.Action actionValidationObject;
@@ -187,40 +200,40 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
             }
             catch (JsonException ex)
             {
-                loggerHelper.LogError(log, correlationGuid, "Unable to retrieve body from req", ex);
+                _loggerHelper.LogError(log, correlationGuid, "Unable to retrieve body from req", ex);
                 throw;
             }
 
             if (actionValidationObject == null)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, "Action Validation Object is null");
-                return httpResponseMessageHelper.UnprocessableEntity(req);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Action Validation Object is null");
+                return _httpResponseMessageHelper.UnprocessableEntity(req);
             }
 
-            loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to validate resource");
-            var errors = validate.ValidateResource(actionValidationObject, false);
+            _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to validate resource");
+            var errors = _validate.ValidateResource(actionValidationObject, false);
 
             if (errors != null && errors.Any())
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, "validation errors with resource");
-                return httpResponseMessageHelper.UnprocessableEntity(errors);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "validation errors with resource");
+                return _httpResponseMessageHelper.UnprocessableEntity(errors);
             }
 
 
-            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to update action {0}", actionGuid));
-            var updatedAction = await actionsPatchService.UpdateCosmosAsync(patchedAction, actionGuid);
+            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to update action {0}", actionGuid));
+            var updatedAction = await _actionsPatchService.UpdateCosmosAsync(patchedAction, actionGuid);
 
             if (updatedAction != null)
             {
-                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("attempting to send to service bus {0}", actionGuid));
-                await actionsPatchService.SendToServiceBusQueueAsync(updatedAction, customerGuid, apimUrl);
+                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("attempting to send to service bus {0}", actionGuid));
+                await _actionsPatchService.SendToServiceBusQueueAsync(updatedAction, customerGuid, apimUrl);
             }
 
-            loggerHelper.LogMethodExit(log);
+            _loggerHelper.LogMethodExit(log);
 
             return updatedAction == null ?
-                httpResponseMessageHelper.BadRequest(actionGuid) :
-                httpResponseMessageHelper.Ok(jsonHelper.SerializeObjectAndRenameIdProperty(updatedAction, "id", "ActionId"));
+                _httpResponseMessageHelper.BadRequest(actionGuid) :
+                _httpResponseMessageHelper.Ok(_jsonHelper.SerializeObjectAndRenameIdProperty(updatedAction, "id", "ActionId"));
         }
     }
 }
