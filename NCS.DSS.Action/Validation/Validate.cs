@@ -63,9 +63,6 @@ namespace NCS.DSS.Action.Validation
             if (actionResource.PersonResponsible.HasValue && !Enum.IsDefined(typeof(PersonResponsible), actionResource.PersonResponsible.Value))
                 results.Add(new ValidationResult("Please supply a valid Person Responsible", new[] { "PersonResponsible" }));
 
-            if (actionResource.SignpostedToCategory.HasValue && !Enum.IsDefined(typeof(SignpostedToCategory), actionResource.SignpostedToCategory.Value))
-                results.Add(new ValidationResult("Please supply a valid Signposted To Category", new[] { "SignpostedToCategory" }));
-
         }
 
     }

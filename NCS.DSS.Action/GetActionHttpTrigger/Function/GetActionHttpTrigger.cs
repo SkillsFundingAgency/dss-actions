@@ -5,7 +5,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
-using DFC.Common.Standard.GuidHelper;
 using DFC.Common.Standard.Logging;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Action.Cosmos.Helper;
@@ -20,28 +19,8 @@ using Microsoft.AspNetCore.Http;
 
 namespace NCS.DSS.Action.GetActionHttpTrigger.Function
 {
-    public class GetActionHttpTrigger
+    public static class GetActionHttpTrigger
     {
-
-        private readonly IResourceHelper _resourceHelper;
-        private readonly IGetActionHttpTriggerService _actionsGetService;
-        private readonly ILoggerHelper _loggerHelper;
-        private readonly IHttpRequestHelper _httpRequestHelper;
-        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
-        private readonly IJsonHelper _jsonHelper;
-        private readonly IGuidHelper _guidHelper;
-
-        public GetActionHttpTrigger(IResourceHelper resourceHelper, IGetActionHttpTriggerService actionsGetService, ILoggerHelper loggerHelper, IHttpRequestHelper httpRequestHelper, IHttpResponseMessageHelper httpResponseMessageHelper, IJsonHelper jsonHelper, IGuidHelper guidHelper)
-        {
-            _resourceHelper = resourceHelper;
-            _actionsGetService = actionsGetService;
-            _loggerHelper = loggerHelper;
-            _httpRequestHelper = httpRequestHelper;
-            _httpResponseMessageHelper = httpResponseMessageHelper;
-            _jsonHelper = jsonHelper;
-            _guidHelper = guidHelper;
-        }
-
         [FunctionName("Get")]
         [ProducesResponseType(typeof(Models.Action), 200)]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Action found", ShowSchema = true)]
@@ -50,83 +29,91 @@ namespace NCS.DSS.Action.GetActionHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
         [Display(Name = "Get", Description = "Ability to return all Action for the given Interactions.")]
-        public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/")]
-            HttpRequest req, ILogger log, string customerId, string interactionId, string actionPlanId)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/")]HttpRequest req, ILogger log, string customerId, string interactionId, string actionPlanId,
+             [Inject]IResourceHelper resourceHelper,
+            [Inject]IGetActionHttpTriggerService actionsGetService,
+            [Inject]ILoggerHelper loggerHelper,
+            [Inject]IHttpRequestHelper httpRequestHelper,
+            [Inject]IHttpResponseMessageHelper httpResponseMessageHelper,
+            [Inject]IJsonHelper jsonHelper)
         {
 
-            var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
+            loggerHelper.LogMethodEnter(log);
 
-            var correlationGuid = _guidHelper.ValidateGuid(correlationId);
+            var correlationId = httpRequestHelper.GetDssCorrelationId(req);
+            if (string.IsNullOrEmpty(correlationId))
+                log.LogInformation("Unable to locate 'DssCorrelationId' in request header");
 
-            if (correlationGuid == Guid.Empty)
-                correlationGuid = _guidHelper.GenerateGuid();
-
-            var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
-            if (string.IsNullOrEmpty(touchpointId))
+            if (!Guid.TryParse(correlationId, out var correlationGuid))
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'TouchpointId' in request header");
-                return _httpResponseMessageHelper.BadRequest();
+                log.LogInformation("Unable to parse 'DssCorrelationId' to a Guid");
+                correlationGuid = Guid.NewGuid();
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid,
+            var touchpointId = httpRequestHelper.GetDssTouchpointId(req);
+            if (string.IsNullOrEmpty(touchpointId))
+            {
+                loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'TouchpointId' in request header");
+                return httpResponseMessageHelper.BadRequest();
+            }
+
+            loggerHelper.LogInformationMessage(log, correlationGuid,
                 string.Format("Get Action C# HTTP trigger function  processed a request. By Touchpoint: {0}",
                     touchpointId));
 
-            var customerGuid = _guidHelper.ValidateGuid(customerId);
-            if (customerGuid == Guid.Empty)
+            if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'customerId' to a Guid: {0}", customerId));
-                return _httpResponseMessageHelper.BadRequest(customerId);
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'customerId' to a Guid: {0}", customerId));
+                return httpResponseMessageHelper.BadRequest(customerGuid);
             }
 
-            var interactionGuid = _guidHelper.ValidateGuid(interactionId);
-            if (interactionGuid == Guid.Empty)
+            if (!Guid.TryParse(interactionId, out var interactionGuid))
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'interactionId' to a Guid: {0}", interactionId));
-                return _httpResponseMessageHelper.BadRequest(interactionGuid);
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'interactionId' to a Guid: {0}", interactionId));
+                return httpResponseMessageHelper.BadRequest(interactionGuid);
             }
 
-            var actionPlanGuid = _guidHelper.ValidateGuid(actionPlanId);
-            if (actionPlanGuid == Guid.Empty)
+            if (!Guid.TryParse(actionPlanId, out var actionPlanGuid))
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'actionplanId' to a Guid: {0}", actionPlanGuid));
-                return _httpResponseMessageHelper.BadRequest(actionPlanGuid);
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'actionplanId' to a Guid: {0}", actionPlanGuid));
+                return httpResponseMessageHelper.BadRequest(actionPlanGuid);
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if customer exists {0}", customerGuid));
-            var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
+
+            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if customer exists {0}", customerGuid));
+            var doesCustomerExist = await resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer does not exist {0}", customerGuid));
-                return _httpResponseMessageHelper.NoContent(customerGuid);
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer does not exist {0}", customerGuid));
+                return httpResponseMessageHelper.NoContent(customerGuid);
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if interaction exists {0}", interactionGuid));
-            var doesInteractionExist = _resourceHelper.DoesInteractionExistAndBelongToCustomer(interactionGuid, customerGuid);
+            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if interaction exists {0}", interactionGuid));
+            var doesInteractionExist = resourceHelper.DoesInteractionExistAndBelongToCustomer(interactionGuid, customerGuid);
 
             if (!doesInteractionExist)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Interaction does not exist {0}", interactionGuid));
-                return _httpResponseMessageHelper.NoContent(interactionGuid);
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Interaction does not exist {0}", interactionGuid));
+                return httpResponseMessageHelper.NoContent(interactionGuid);
             }
 
-            var doesActionPlanExistAndBelongToCustomer = _resourceHelper.DoesActionPlanExistAndBelongToCustomer(actionPlanGuid, interactionGuid, customerGuid);
+            var doesActionPlanExistAndBelongToCustomer = resourceHelper.DoesActionPlanExistAndBelongToCustomer(actionPlanGuid, interactionGuid, customerGuid);
 
             if (!doesActionPlanExistAndBelongToCustomer)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Action Plan does not exist {0}", actionPlanGuid));
-                return _httpResponseMessageHelper.NoContent(actionPlanGuid);
+                loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Action Plan does not exist {0}", actionPlanGuid));
+                return httpResponseMessageHelper.NoContent(actionPlanGuid);
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get actions for customer {0}", customerGuid));
-            var actionPlans = await _actionsGetService.GetActionsAsync(customerGuid, actionPlanGuid);
+            loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get actions for customer {0}", customerGuid));
+            var actionPlans = await actionsGetService.GetActionsAsync(customerGuid, actionPlanGuid);
 
-            _loggerHelper.LogMethodExit(log);
+            loggerHelper.LogMethodExit(log);
 
             return actionPlans == null ?
-                _httpResponseMessageHelper.NoContent(customerGuid) :
-                _httpResponseMessageHelper.Ok(_jsonHelper.SerializeObjectsAndRenameIdProperty(actionPlans, "id", "ActionId"));
+                httpResponseMessageHelper.NoContent(customerGuid) :
+                httpResponseMessageHelper.Ok(jsonHelper.SerializeObjectsAndRenameIdProperty(actionPlans, "id", "ActionId"));
         }
     }
 }

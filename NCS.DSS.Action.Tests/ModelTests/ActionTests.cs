@@ -1,25 +1,26 @@
 ﻿using System;
 using NCS.DSS.Action.ReferenceData;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 
 namespace NCS.DSS.Action.Tests.ModelTests
 {
+    [TestFixture]
     public class ActionTests
     {
 
-        [Fact]
+        [Test]
         public void ActionTests_PopulatesDefaultValues_WhenSetDefaultValuesIsCalled()
         {
             var action = new Action.Models.Action();
             action.SetDefaultValues();
 
             // Assert
-            Assert.NotNull(action.LastModifiedDate);
-            Assert.Equal(ActionStatus.NotStarted, action.ActionStatus);
+            Assert.IsNotNull(action.LastModifiedDate);
+            Assert.AreEqual(ActionStatus.NotStarted, action.ActionStatus);
         }
 
-        [Fact]
+        [Test]
         public void ActionTests_CheckLastModifiedDateDoesNotGetPopulated_WhenSetDefaultValuesIsCalled()
         {
             var action = new Action.Models.Action { LastModifiedDate = DateTime.MaxValue };
@@ -27,50 +28,53 @@ namespace NCS.DSS.Action.Tests.ModelTests
             action.SetDefaultValues();
 
             // Assert
-            Assert.Equal(DateTime.MaxValue, action.LastModifiedDate);
+            Assert.AreEqual(DateTime.MaxValue, action.LastModifiedDate);
         }
 
-        [Fact]
+        [Test]
         public void ActionTests_CheckActionIdIsSet_WhenSetIdsIsCalled()
         {
             var action = new Action.Models.Action();
-            action.SetIds(Guid.NewGuid(), Guid.NewGuid(), "0123456789");
+
+            action.SetIds(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>());
 
             // Assert
-            Assert.NotEqual(Guid.Empty, action.ActionPlanId);
+            Assert.AreNotSame(Guid.Empty, action.ActionPlanId);
         }
 
-        [Fact]
+        [Test]
         public void ActionTests_CheckCustomerIdIsSet_WhenSetIdsIsCalled()
         {
             var action = new Action.Models.Action();
 
-            action.SetIds(Guid.NewGuid(), Guid.NewGuid(), "0123456789");
+            var customerId = Guid.NewGuid();
+            action.SetIds(customerId, Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>());
 
             // Assert
-            Assert.NotEqual(Guid.Empty, action.CustomerId);
+            Assert.AreEqual(customerId, action.CustomerId);
         }
 
-        [Fact]
+        [Test]
         public void ActionTests_CheckActionPlanIdIsSet_WhenSetIdsIsCalled()
         {
             var action = new Action.Models.Action();
 
-            action.SetIds(Guid.NewGuid(), Guid.NewGuid(), "0123456789");
+            var actionId = Guid.NewGuid();
+            action.SetIds(Arg.Any<Guid>(), actionId, Arg.Any<string>(), Arg.Any<string>());
 
             // Assert
-            Assert.NotEqual(Guid.Empty, action.ActionPlanId);
+            Assert.AreEqual(actionId, action.ActionPlanId);
         }
 
-        [Fact]
+        [Test]
         public void ActionTests_CheckLastModifiedTouchpointIdIsSet_WhenSetIdsIsCalled()
         {
             var action = new Action.Models.Action();
 
-            action.SetIds(Guid.NewGuid(), Guid.NewGuid(), "0000000000");
+            action.SetIds(Arg.Any<Guid>(), Arg.Any<Guid>(), "0000000000", Arg.Any<string>());
 
             // Assert
-            Assert.Equal("0000000000", action.LastModifiedTouchpointId);
+            Assert.AreEqual("0000000000", action.LastModifiedTouchpointId);
         }
 
     }

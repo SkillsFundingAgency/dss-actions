@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DFC.JSON.Standard;
 using NCS.DSS.Action.Cosmos.Provider;
 
 namespace NCS.DSS.Action.Cosmos.Helper
@@ -9,31 +8,22 @@ namespace NCS.DSS.Action.Cosmos.Helper
     {
 
         private readonly IDocumentDBProvider _documentDbProvider;
-        private readonly IJsonHelper _jsonHelper;
 
-        public ResourceHelper(IDocumentDBProvider documentDbProvider, IJsonHelper jsonHelper)
+        public ResourceHelper(IDocumentDBProvider documentDbProvider)
         {
             _documentDbProvider = documentDbProvider;
-            _jsonHelper = jsonHelper;
         }
 
         public async Task<bool> DoesCustomerExist(Guid customerId)
         {
-            return await _documentDbProvider.DoesCustomerResourceExist(customerId);
+            return await _documentDbProvider.DoesCustomerResourceExist(customerId); ;
         }
 
-        public bool IsCustomerReadOnly()
+        public async Task<bool> IsCustomerReadOnly(Guid customerId)
         {
-            var customerJson = _documentDbProvider.GetCustomerJson();
-
-            if (string.IsNullOrWhiteSpace(customerJson))
-                return false;
-
-            var dateOfTermination = _jsonHelper.GetValue(customerJson, "DateOfTermination");
-
-            return !string.IsNullOrWhiteSpace(dateOfTermination);
+            return await _documentDbProvider.DoesCustomerHaveATerminationDate(customerId);
         }
-        
+
         public bool DoesInteractionExistAndBelongToCustomer(Guid interactionId, Guid customerGuid)
         {
             return _documentDbProvider.DoesInteractionResourceExistAndBelongToCustomer(interactionId, customerGuid);

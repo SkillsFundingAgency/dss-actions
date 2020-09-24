@@ -20,6 +20,14 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
 
             var obj = JObject.Parse(actionJson);
 
+            if (!string.IsNullOrEmpty(actionPatch.SubcontractorId))
+            {
+                if (obj["SubcontractorId"] == null)
+                    _jsonHelper.CreatePropertyOnJObject(obj, "SubcontractorId", actionPatch.SubcontractorId);
+                else
+                    _jsonHelper.UpdatePropertyValue(obj["SubcontractorId"], actionPatch.SubcontractorId);
+            }
+
             if (actionPatch.DateActionAgreed.HasValue)
                 _jsonHelper.UpdatePropertyValue(obj["DateActionAgreed"], actionPatch.DateActionAgreed);
 
@@ -34,14 +42,6 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
 
             if (!string.IsNullOrEmpty(actionPatch.SignpostedTo))
                 _jsonHelper.UpdatePropertyValue(obj["SignpostedTo"], actionPatch.SignpostedTo);
-
-            if (actionPatch.SignpostedToCategory.HasValue)
-            {
-                if (obj["SignpostedToCategory"] == null)
-                    _jsonHelper.CreatePropertyOnJObject(obj, "SignpostedToCategory", actionPatch.SignpostedToCategory);
-                else
-                    _jsonHelper.UpdatePropertyValue(obj["SignpostedToCategory"], actionPatch.SignpostedToCategory);
-            }
 
             if (actionPatch.ActionType.HasValue)
                 _jsonHelper.UpdatePropertyValue(obj["ActionType"], actionPatch.ActionType);

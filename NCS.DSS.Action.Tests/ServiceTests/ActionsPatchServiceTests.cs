@@ -4,19 +4,21 @@ using NCS.DSS.Action.Models;
 using NCS.DSS.Action.PatchActionHttpTrigger.Service;
 using Newtonsoft.Json;
 using NSubstitute;
-using Xunit;
+using NUnit.Framework;
 
 namespace NCS.DSS.Action.Tests.ServiceTests
 {
-
+    [TestFixture]
     public class ActionPatchServiceTests
     {
-        private readonly IJsonHelper _jsonHelper;
-        private readonly IActionPatchService _actionPatchService;
-        private readonly ActionPatch _actionPatch;
-        private readonly string _json;
+        private IJsonHelper _jsonHelper;
+        private IActionPatchService _actionPatchService;
+        private ActionPatch _actionPatch;
+        private string _json;
 
-        public ActionPatchServiceTests()
+
+        [SetUp]
+        public void Setup()
         {
             _jsonHelper = Substitute.For<JsonHelper>();
             _actionPatchService = Substitute.For<ActionPatchService>(_jsonHelper);
@@ -25,16 +27,16 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             _json = JsonConvert.SerializeObject(_actionPatch);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_ReturnsNull_WhenActionPatchIsNull()
         {
-            var result = _actionPatchService.Patch(string.Empty, _actionPatch);
+            var result = _actionPatchService.Patch(string.Empty, Arg.Any<ActionPatch>());
 
             // Assert
-            Assert.Null(result);
+            Assert.IsNull(result);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckDateActionAgreedIsUpdated_WhenPatchIsCalled()
         {
             var actionPatch = new ActionPatch() { DateActionAgreed = DateTime.MaxValue };
@@ -44,11 +46,11 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
 
             // Assert
-            Assert.Equal(DateTime.MaxValue, action.DateActionAgreed);
+            Assert.AreEqual(DateTime.MaxValue, action.DateActionAgreed);
         }
 
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckDateActionAimsToBeCompletedByIsUpdated_WhenPatchIsCalled()
         {
             var actionPatch = new ActionPatch { DateActionAimsToBeCompletedBy = DateTime.MaxValue };
@@ -58,10 +60,10 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
 
             // Assert
-            Assert.Equal(DateTime.MaxValue, action.DateActionAimsToBeCompletedBy);
+            Assert.AreEqual(DateTime.MaxValue, action.DateActionAimsToBeCompletedBy);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckDateActionActuallyCompletedIsUpdated_WhenPatchIsCalled()
         {
             var actionPatch = new ActionPatch { DateActionActuallyCompleted = DateTime.MaxValue };
@@ -71,10 +73,10 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
 
             // Assert
-            Assert.Equal(DateTime.MaxValue, action.DateActionActuallyCompleted);
+            Assert.AreEqual(DateTime.MaxValue, action.DateActionActuallyCompleted);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckActionSummaryIsUpdated_WhenPatchIsCalled()
         {
             var actionPatch = new ActionPatch { ActionSummary = "TestActionSummary" };
@@ -84,10 +86,10 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
 
             // Assert
-            Assert.Equal("TestActionSummary", action.ActionSummary);
+            Assert.AreEqual("TestActionSummary", action.ActionSummary);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckSignpostedToMethodIsUpdated_WhenPatchIsCalled()
         {
             var actionPatch = new ActionPatch { SignpostedTo = "SignpostedToTest" };
@@ -97,23 +99,10 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
 
             // Assert
-            Assert.Equal("SignpostedToTest", action.SignpostedTo);
+            Assert.AreEqual("SignpostedToTest", action.SignpostedTo);
         }
 
-        [Fact]
-        public void ActionPatchServiceTests_CheckSignpostedCategoryIsUpdated_WhenPatchIsCalled()
-        {
-            var actionPatch = new ActionPatch { SignpostedToCategory = DSS.Action.ReferenceData.SignpostedToCategory.Other };
-
-            var patchedActionPlan = _actionPatchService.Patch(_json, actionPatch);
-
-            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-
-            // Assert
-            Assert.Equal(DSS.Action.ReferenceData.SignpostedToCategory.Other, action.SignpostedToCategory);
-        }
-
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckActionTypeIsUpdated_WhenPatchIsCalled()
         {
             var actionPatch = new ActionPatch { ActionType = DSS.Action.ReferenceData.ActionType.ApplyForApprenticeship };
@@ -123,10 +112,10 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
 
             // Assert
-            Assert.Equal(DSS.Action.ReferenceData.ActionType.ApplyForApprenticeship, action.ActionType);
+            Assert.AreEqual(DSS.Action.ReferenceData.ActionType.ApplyForApprenticeship, action.ActionType);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckActionStatusIsUpdated_WhenPatchIsCalled()
         {
             var actionPatch = new ActionPatch { ActionStatus = DSS.Action.ReferenceData.ActionStatus.InProgress };
@@ -136,10 +125,10 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
 
             // Assert
-            Assert.Equal(DSS.Action.ReferenceData.ActionStatus.InProgress, action.ActionStatus);
+            Assert.AreEqual(DSS.Action.ReferenceData.ActionStatus.InProgress, action.ActionStatus);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckPersonResponsibleIsUpdated_WhenPatchIsCalled()
         {
             var actionPatch = new ActionPatch { PersonResponsible = DSS.Action.ReferenceData.PersonResponsible.Adviser };
@@ -149,10 +138,10 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
 
             // Assert
-            Assert.Equal(DSS.Action.ReferenceData.PersonResponsible.Adviser, action.PersonResponsible);
+            Assert.AreEqual(DSS.Action.ReferenceData.PersonResponsible.Adviser, action.PersonResponsible);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckLastModifiedDateIsUpdated_WhenPatchIsCalled()
         {
             var actionPatch = new ActionPatch { LastModifiedDate = DateTime.MaxValue };
@@ -162,10 +151,10 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
 
             // Assert
-            Assert.Equal(DateTime.MaxValue, action.LastModifiedDate);
+            Assert.AreEqual(DateTime.MaxValue, action.LastModifiedDate);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckLastModifiedTouchpointIdIsUpdated_WhenPatchIsCalled()
         {
             var actionPatch = new ActionPatch { LastModifiedTouchpointId = "0000000111" };
@@ -175,7 +164,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
 
             // Assert
-            Assert.Equal("0000000111", action.LastModifiedTouchpointId);
+            Assert.AreEqual("0000000111", action.LastModifiedTouchpointId);
         }
 
     }
