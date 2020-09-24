@@ -34,7 +34,7 @@ namespace NCS.DSS.Action.Tests.ModelTests
         public void ActionTests_CheckActionIdIsSet_WhenSetIdsIsCalled()
         {
             var action = new Action.Models.Action();
-            action.SetIds(Guid.NewGuid(), Guid.NewGuid(), "0123456789");
+            action.SetIds(Guid.NewGuid(), Guid.NewGuid(), "0123456789", );
 
             // Assert
             Assert.NotEqual(Guid.Empty, action.ActionPlanId);

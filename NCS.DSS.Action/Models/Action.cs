@@ -77,6 +77,12 @@ namespace NCS.DSS.Action.Models
         [Example(Description = "0000000001")]
         public string LastModifiedTouchpointId { get; set; }
 
+        [StringLength(50)]
+        [Display(Description = "Identifier supplied by the touchpoint to indicate their subcontractor")]
+        [Example(Description = "01234567899876543210")]
+        public string SubcontractorId { get; set; }
+
+
         [JsonIgnoreOnSerialize]
         public string CreatedBy { get; set; }
 
@@ -89,12 +95,13 @@ namespace NCS.DSS.Action.Models
                 ActionStatus = ReferenceData.ActionStatus.NotStarted;
         }
 
-        public void SetIds(Guid customerId, Guid actionPlanId, string touchpointId)
+        public void SetIds(Guid customerId, Guid actionPlanId, string touchpointId, string subcontractorId)
         {
             ActionId = Guid.NewGuid();
             CustomerId = customerId;
             ActionPlanId = actionPlanId;
             LastModifiedTouchpointId = touchpointId;
+            SubcontractorId = subcontractorId;
             CreatedBy = touchpointId;
         }
 

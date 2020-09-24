@@ -86,6 +86,10 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
                 return _httpResponseMessageHelper.BadRequest();
             }
 
+            var subcontractorId = _httpRequestHelper.GetDssSubcontractorId(req);
+            if (string.IsNullOrEmpty(subcontractorId))
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubcontractorId' in request header");
+
             _loggerHelper.LogInformationMessage(log, correlationGuid,
                 string.Format("Patch Actions C# HTTP trigger function  processed a request. By Touchpoint: {0}",
                     touchpointId));
@@ -138,7 +142,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
             }
 
             _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to set id's for action patch");
-            actionPatchRequest.SetIds(touchpointId);
+            actionPatchRequest.SetIds(touchpointId, subcontractorId);
 
             _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if customer exists {0}", customerGuid));
             var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);

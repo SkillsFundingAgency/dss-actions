@@ -111,6 +111,10 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
                 return _httpResponseMessageHelper.BadRequest(actionPlanGuid);
             }
 
+            var subcontractorId = _httpRequestHelper.GetDssSubcontractorId(req);
+            if (string.IsNullOrEmpty(subcontractorId))
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubcontractorId' in request header");
+
             Models.Action actionRequest;
 
             try
@@ -131,7 +135,7 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
             }
 
             _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to set id's for action");
-            actionRequest.SetIds(customerGuid, actionPlanGuid, touchpointId);
+            actionRequest.SetIds(customerGuid, actionPlanGuid, touchpointId, subcontractorId);
 
             _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to validate resource");
             var errors = _validate.ValidateResource(actionRequest, true);

@@ -20,6 +20,14 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
 
             var obj = JObject.Parse(actionJson);
 
+            if (!string.IsNullOrEmpty(actionPatch.SubcontractorId))
+            {
+                if (obj["SubcontractorId"] == null)
+                    _jsonHelper.CreatePropertyOnJObject(obj, "SubcontractorId", actionPatch.SubcontractorId);
+                else
+                    _jsonHelper.UpdatePropertyValue(obj["SubcontractorId"], actionPatch.SubcontractorId);
+            }
+
             if (actionPatch.DateActionAgreed.HasValue)
                 _jsonHelper.UpdatePropertyValue(obj["DateActionAgreed"], actionPatch.DateActionAgreed);
 
