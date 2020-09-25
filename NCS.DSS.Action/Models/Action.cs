@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 using NCS.DSS.Action.Annotations;
 using NCS.DSS.Action.ReferenceData;
 
@@ -92,6 +93,9 @@ namespace NCS.DSS.Action.Models
         [Example(Description = "0000000001")]
         public string LastModifiedTouchpointId { get; set; }
 
+        [IgnoreDataMember]
+        public string CreatedBy { get; set; }
+
         public void SetDefaultValues()
         {
             if (!LastModifiedDate.HasValue)
@@ -99,6 +103,8 @@ namespace NCS.DSS.Action.Models
 
             if (ActionStatus == null)
                 ActionStatus = ReferenceData.ActionStatus.NotStarted;
+
+            CreatedBy = LastModifiedTouchpointId;
         }
 
         public void SetIds(Guid customerId, Guid actionPlanId, string touchpointId)
