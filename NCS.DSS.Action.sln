@@ -5,8 +5,8 @@ VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCS.DSS.Action", "NCS.DSS.Action\NCS.DSS.Action.csproj", "{C1DBC9D3-1C03-4386-B9A3-A11ADAC7181B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCS.DSS.Action.Tests", "NCS.DSS.Action.Tests\NCS.DSS.Action.Tests.csproj", "{FD7D68CD-D53A-4891-A62C-537FD2424EA1}"
-EndProject
+# Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCS.DSS.Action.Tests", "NCS.DSS.Action.Tests\NCS.DSS.Action.Tests.csproj", "{FD7D68CD-D53A-4891-A62C-537FD2424EA1}"
+# EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
