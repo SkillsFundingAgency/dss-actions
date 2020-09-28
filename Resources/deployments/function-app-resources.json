@@ -23,13 +23,13 @@
     "functionAppName": {
       "type": "string"
     },
-    "serviceBusAccessKey": {
+    "storageAccountName": {
       "type": "string"
     },
-    "serviceBusAccessKeyName": {
+    "storageAccountKey": {
       "type": "string"
     },
-    "serviceBusBaseAddress": {
+    "serviceBusConnectionString": {
       "type": "string"
     },
     "serviceBusQueueName": {
@@ -37,7 +37,8 @@
     }
   },
   "variables": {
-    "appInsightsName": "[concat('dss-', toLower(parameters('configEnvironmentName')), '-', split(parameters('functionAppName'), '-')[2], '-ai')]"
+    "appInsightsName": "[concat('dss-', toLower(parameters('configEnvironmentName')), '-', split(parameters('functionAppName'), '-')[2], '-ai')]",
+    "storageAccountConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=', parameters('storageAccountKey'), ';EndpointSuffix=core.windows.net')]"
   },
   "resources": [
     {
@@ -71,20 +72,20 @@
               "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsName'))).InstrumentationKey]"
             },
             {
+              "name": "AzureWebJobsStorage",
+              "value": "[variables('storageAccountConnectionString')]"
+            },
+            {
+              "name": "CosmosDBConnectionString",
+              "value": "[concat('AccountEndpoint=', parameters('cosmosDbEndpoint'), '/;AccountKey=', parameters('cosmosDbKey'), ';')]"
+            },
+            {
               "name": "CollectionId",
               "value": "[parameters('cosmosDbCollectionId')]"
             },
             {
               "name": "DatabaseId",
               "value": "[parameters('cosmosDbDatabaseId')]"
-            },
-            {
-              "name": "Endpoint",
-              "value": "[parameters('cosmosDbEndpoint')]"
-            },
-            {
-              "name": "Key",
-              "value": "[parameters('cosmosDbKey')]"
             },
             {
               "name": "CustomerCollectionId",
@@ -111,16 +112,8 @@
               "value": "actionplans"
             },
             {
-              "name": "KeyName",
-              "value": "[parameters('serviceBusAccessKeyName')]"
-            },
-            {
-              "name": "AccessKey",
-              "value": "[parameters('serviceBusAccessKey')]"
-            },
-            {
-              "name": "BaseAddress",
-              "value": "[parameters('serviceBusBaseAddress')]"
+              "name": "ServiceBusConnectionString",
+              "value": "[parameters('serviceBusConnectionString')]"
             },
             {
               "name": "QueueName",
