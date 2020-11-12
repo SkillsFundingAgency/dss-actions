@@ -1,181 +1,191 @@
-﻿using System;
-using DFC.JSON.Standard;
+﻿using DFC.JSON.Standard;
 using NCS.DSS.Action.Models;
 using NCS.DSS.Action.PatchActionHttpTrigger.Service;
 using Newtonsoft.Json;
-using NSubstitute;
-using Xunit;
+using NUnit.Framework;
+using System;
 
 namespace NCS.DSS.Action.Tests.ServiceTests
 {
-
+    [TestFixture]
     public class ActionPatchServiceTests
     {
-        private readonly IJsonHelper _jsonHelper;
-        private readonly IActionPatchService _actionPatchService;
-        private readonly ActionPatch _actionPatch;
+        private IJsonHelper _jsonHelper;
+        private IActionPatchService _actionPatchService;
+        private ActionPatch _actionPatch;
         private readonly string _json;
 
         public ActionPatchServiceTests()
         {
-            _jsonHelper = Substitute.For<JsonHelper>();
-            _actionPatchService = Substitute.For<ActionPatchService>(_jsonHelper);
-            _actionPatch = Substitute.For<ActionPatch>();
-
+            _jsonHelper = new JsonHelper();
+            _actionPatchService = new ActionPatchService(_jsonHelper);
+            _actionPatch = new ActionPatch();
             _json = JsonConvert.SerializeObject(_actionPatch);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_ReturnsNull_WhenActionPatchIsNull()
         {
+            // Act
             var result = _actionPatchService.Patch(string.Empty, _actionPatch);
 
             // Assert
             Assert.Null(result);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckDateActionAgreedIsUpdated_WhenPatchIsCalled()
         {
+            // Arrange
             var actionPatch = new ActionPatch() { DateActionAgreed = DateTime.MaxValue };
 
+            // Act
             var patchedActionPlan = _actionPatchService.Patch(_json, actionPatch);
 
-            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-
             // Assert
-            Assert.Equal(DateTime.MaxValue, action.DateActionAgreed);
+            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
+            Assert.AreEqual(DateTime.MaxValue, action.DateActionAgreed);
         }
 
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckDateActionAimsToBeCompletedByIsUpdated_WhenPatchIsCalled()
         {
+            // Arrange
             var actionPatch = new ActionPatch { DateActionAimsToBeCompletedBy = DateTime.MaxValue };
 
+            // Act
             var patchedActionPlan = _actionPatchService.Patch(_json, actionPatch);
 
-            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-
             // Assert
-            Assert.Equal(DateTime.MaxValue, action.DateActionAimsToBeCompletedBy);
+            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
+            Assert.AreEqual(DateTime.MaxValue, action.DateActionAimsToBeCompletedBy);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckDateActionActuallyCompletedIsUpdated_WhenPatchIsCalled()
         {
+            // Arrange
             var actionPatch = new ActionPatch { DateActionActuallyCompleted = DateTime.MaxValue };
 
+            // Act
             var patchedActionPlan = _actionPatchService.Patch(_json, actionPatch);
 
-            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-
             // Assert
-            Assert.Equal(DateTime.MaxValue, action.DateActionActuallyCompleted);
+            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
+            Assert.AreEqual(DateTime.MaxValue, action.DateActionActuallyCompleted);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckActionSummaryIsUpdated_WhenPatchIsCalled()
         {
+            // Arrange
             var actionPatch = new ActionPatch { ActionSummary = "TestActionSummary" };
 
+            // Act
             var patchedActionPlan = _actionPatchService.Patch(_json, actionPatch);
 
-            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-
             // Assert
-            Assert.Equal("TestActionSummary", action.ActionSummary);
+            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
+            Assert.AreEqual("TestActionSummary", action.ActionSummary);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckSignpostedToMethodIsUpdated_WhenPatchIsCalled()
         {
+            // Arrange
             var actionPatch = new ActionPatch { SignpostedTo = "SignpostedToTest" };
 
+            // Act
             var patchedActionPlan = _actionPatchService.Patch(_json, actionPatch);
 
-            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-
             // Assert
-            Assert.Equal("SignpostedToTest", action.SignpostedTo);
+            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
+            Assert.AreEqual("SignpostedToTest", action.SignpostedTo);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckSignpostedCategoryIsUpdated_WhenPatchIsCalled()
         {
+            // Arrange
             var actionPatch = new ActionPatch { SignpostedToCategory = DSS.Action.ReferenceData.SignpostedToCategory.Other };
 
+            // Act
             var patchedActionPlan = _actionPatchService.Patch(_json, actionPatch);
 
-            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-
             // Assert
-            Assert.Equal(DSS.Action.ReferenceData.SignpostedToCategory.Other, action.SignpostedToCategory);
+            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
+            Assert.AreEqual(DSS.Action.ReferenceData.SignpostedToCategory.Other, action.SignpostedToCategory);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckActionTypeIsUpdated_WhenPatchIsCalled()
         {
+            // Arrange
             var actionPatch = new ActionPatch { ActionType = DSS.Action.ReferenceData.ActionType.ApplyForApprenticeship };
 
+            // Act
             var patchedActionPlan = _actionPatchService.Patch(_json, actionPatch);
 
-            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-
             // Assert
-            Assert.Equal(DSS.Action.ReferenceData.ActionType.ApplyForApprenticeship, action.ActionType);
+            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
+            Assert.AreEqual(DSS.Action.ReferenceData.ActionType.ApplyForApprenticeship, action.ActionType);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckActionStatusIsUpdated_WhenPatchIsCalled()
         {
+            // Arrange
             var actionPatch = new ActionPatch { ActionStatus = DSS.Action.ReferenceData.ActionStatus.InProgress };
 
+            // Act
             var patchedActionPlan = _actionPatchService.Patch(_json, actionPatch);
 
-            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-
             // Assert
-            Assert.Equal(DSS.Action.ReferenceData.ActionStatus.InProgress, action.ActionStatus);
+            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
+            Assert.AreEqual(DSS.Action.ReferenceData.ActionStatus.InProgress, action.ActionStatus);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckPersonResponsibleIsUpdated_WhenPatchIsCalled()
         {
+            // Arrange
             var actionPatch = new ActionPatch { PersonResponsible = DSS.Action.ReferenceData.PersonResponsible.Adviser };
 
+            // Act
             var patchedActionPlan = _actionPatchService.Patch(_json, actionPatch);
 
-            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-
             // Assert
-            Assert.Equal(DSS.Action.ReferenceData.PersonResponsible.Adviser, action.PersonResponsible);
+            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
+            Assert.AreEqual(DSS.Action.ReferenceData.PersonResponsible.Adviser, action.PersonResponsible);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckLastModifiedDateIsUpdated_WhenPatchIsCalled()
         {
+            // Arrange
             var actionPatch = new ActionPatch { LastModifiedDate = DateTime.MaxValue };
 
+            // Act
             var patchedActionPlan = _actionPatchService.Patch(_json, actionPatch);
 
-            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-
             // Assert
-            Assert.Equal(DateTime.MaxValue, action.LastModifiedDate);
+            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
+            Assert.AreEqual(DateTime.MaxValue, action.LastModifiedDate);
         }
 
-        [Fact]
+        [Test]
         public void ActionPatchServiceTests_CheckLastModifiedTouchpointIdIsUpdated_WhenPatchIsCalled()
         {
+            // Arrange
             var actionPatch = new ActionPatch { LastModifiedTouchpointId = "0000000111" };
 
+            // Act
             var patchedActionPlan = _actionPatchService.Patch(_json, actionPatch);
 
-            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-
             // Assert
-            Assert.Equal("0000000111", action.LastModifiedTouchpointId);
+            var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
+            Assert.AreEqual("0000000111", action.LastModifiedTouchpointId);
         }
 
     }
