@@ -6,25 +6,24 @@ using DFC.JSON.Standard;
 using DFC.Swagger.Standard;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using NCS.DSS.Action;
 using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.Cosmos.Provider;
 using NCS.DSS.Action.GetActionByIdHttpTrigger.Service;
 using NCS.DSS.Action.GetActionHttpTrigger.Service;
-using NCS.DSS.Action.Ioc;
 using NCS.DSS.Action.PatchActionHttpTrigger.Service;
 using NCS.DSS.Action.PostActionHttpTrigger.Service;
 using NCS.DSS.Action.ServiceBus;
 using NCS.DSS.Action.Validation;
 
-
-[assembly: FunctionsStartup(typeof(FunctionStartupExtension))]
-
-namespace NCS.DSS.Action.Ioc
+[assembly: FunctionsStartup(typeof(Startup))]
+namespace NCS.DSS.Action
 {
-    public class FunctionStartupExtension : FunctionsStartup
+    public class Startup : FunctionsStartup
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
+            builder.Services.AddLogging();
             builder.Services.AddSingleton<IResourceHelper, ResourceHelper>();
             builder.Services.AddSingleton<IValidate, Validate>();
             builder.Services.AddSingleton<ILoggerHelper, LoggerHelper>();

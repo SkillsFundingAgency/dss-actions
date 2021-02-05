@@ -1,18 +1,20 @@
-﻿using System;
+﻿using NCS.DSS.Action.ReferenceData;
+using NCS.DSS.Action.Validation;
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using NCS.DSS.Action.ReferenceData;
-using NCS.DSS.Action.Validation;
-using Xunit;
 
 namespace NCS.DSS.Action.Tests.ValidationTests
 {
+    [TestFixture]
     public class ValidateTests
     {
 
-        [Fact]
+        [Test]
         public void ValidateTests_ReturnValidationResult_WhenDateActionAgreedIsNotSuppliedForPost()
         {
+            // Arrange
             var action = new Models.Action
             {
                 DateActionAimsToBeCompletedBy = DateTime.UtcNow,
@@ -23,15 +25,16 @@ namespace NCS.DSS.Action.Tests.ValidationTests
 
             var validation = new Validate();
 
+
+            // Act
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.IsType<List<ValidationResult>>(result);
+            Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.NotNull(result);
-            Assert.Single(result);
         }
 
-        [Fact]
+        [Test]
         public void ValidateTests_ReturnValidationResult_WhenDateActionAimsToBeCompletedByIsNotSuppliedForPost()
         {
             var action = new Models.Action
@@ -47,14 +50,14 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.IsType<List<ValidationResult>>(result);
+            Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.NotNull(result);
-             Assert.Single(result);
         }
 
-        [Fact]
+        [Test]
         public void ValidateTests_ReturnValidationResult_WhenActionSummaryIsNotSuppliedForPost()
         {
+            // Arrange
             var action = new Models.Action
             {
                 DateActionAgreed = DateTime.UtcNow,
@@ -62,18 +65,17 @@ namespace NCS.DSS.Action.Tests.ValidationTests
                 ActionType = ActionType.Other,
                 PersonResponsible = PersonResponsible.Customer
             };
-
             var validation = new Validate();
 
+            // Act
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.IsType<List<ValidationResult>>(result);
+            Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.NotNull(result);
-            Assert.Equal(2, result.Count);
         }
 
-        [Fact]
+        [Test]
         public void ValidateTests_ReturnValidationResult_WhenActionTypeIsNotSuppliedForPost()
         {
             var action = new Models.Action
@@ -83,20 +85,20 @@ namespace NCS.DSS.Action.Tests.ValidationTests
                 ActionSummary = "Summary",
                 PersonResponsible = PersonResponsible.Customer
             };
-
             var validation = new Validate();
 
+            // Act
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.IsType<List<ValidationResult>>(result);
+            Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.NotNull(result);
-            Assert.Single(result);
         }
 
-        [Fact]
+        [Test]
         public void ValidateTests_ReturnValidationResult_WhenPersonResponsibleIsNotSuppliedForPost()
         {
+            // Arrange
             var action = new Models.Action
             {
                 DateActionAgreed = DateTime.UtcNow,
@@ -104,20 +106,20 @@ namespace NCS.DSS.Action.Tests.ValidationTests
                 ActionSummary = "Summary",
                 ActionType = ActionType.Other
             };
-
             var validation = new Validate();
 
+            // Act
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.IsType<List<ValidationResult>>(result);
+            Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.NotNull(result);
-            Assert.Single(result);
         }
 
-        [Fact]
+        [Test]
         public void ValidateTests_ReturnValidationResult_WhenActionSummaryIsEmptyForPost()
         {
+            // Arrange
             var action = new Models.Action
             {
                 DateActionAgreed = DateTime.UtcNow,
@@ -125,20 +127,21 @@ namespace NCS.DSS.Action.Tests.ValidationTests
                 ActionType = ActionType.Other,
                 PersonResponsible = PersonResponsible.Customer
             };
-
             var validation = new Validate();
 
+            // Act
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.IsType<List<ValidationResult>>(result);
+            Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.NotNull(result);
-            Assert.Equal(2, result.Count);
+            Assert.AreEqual(2, result.Count);
         }
 
-        [Fact]
+        [Test]
         public void ValidateTests_ReturnValidationResult_WhenDateActionAgreedIsInTheFuture()
         {
+            // Arrange
             var action = new Models.Action
             {
                 DateActionAgreed = DateTime.Today.AddDays(1),
@@ -147,20 +150,21 @@ namespace NCS.DSS.Action.Tests.ValidationTests
                 ActionType = ActionType.Other,
                 PersonResponsible = PersonResponsible.Customer
             };
-
             var validation = new Validate();
 
+            // Act
             var result = validation.ValidateResource(action, false);
 
             // Assert
-            Assert.IsType<List<ValidationResult>>(result);
+            Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.NotNull(result);
-            Assert.Equal(2, result.Count);
+            Assert.AreEqual(2, result.Count);
         }
 
-        [Fact]
+        [Test]
         public void ValidateTests_ReturnValidationResult_WhenDateActionActuallyCompletedIsInTheFuture()
         {
+            // Arrange
             var action = new Models.Action
             {
                 DateActionAgreed = DateTime.UtcNow,
@@ -170,20 +174,20 @@ namespace NCS.DSS.Action.Tests.ValidationTests
                 PersonResponsible = PersonResponsible.Customer,
                 DateActionActuallyCompleted = DateTime.MaxValue
             };
-
             var validation = new Validate();
 
+            // Act
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.IsType<List<ValidationResult>>(result);
-            Assert.NotNull(result);
-            Assert.Single(result);
+            Assert.IsInstanceOf<List<ValidationResult>>(result);
+            Assert.NotNull(result);;
         }
 
-        [Fact]
+        [Test]
         public void ValidateTests_ReturnValidationResult_WhenLastModifiedDateIsInTheFuture()
         {
+            // Arrange
             var action = new Models.Action
             {
                 DateActionAgreed = DateTime.UtcNow,
@@ -193,20 +197,20 @@ namespace NCS.DSS.Action.Tests.ValidationTests
                 PersonResponsible = PersonResponsible.Customer,
                 LastModifiedDate = DateTime.MaxValue
             };
-
             var validation = new Validate();
 
+            // Act
             var result = validation.ValidateResource(action, false);
 
             // Assert
-            Assert.IsType<List<ValidationResult>>(result);
+            Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.NotNull(result);
-            Assert.Single(result);
         }
 
-        [Fact]
+        [Test]
         public void ValidateTests_ReturnValidationResult_WhenActionTypeIsNotValid()
         {
+            // Arrange
             var action = new Models.Action
             {
                 DateActionAgreed = DateTime.UtcNow,
@@ -215,20 +219,20 @@ namespace NCS.DSS.Action.Tests.ValidationTests
                 ActionType = (ActionType)100,
                 PersonResponsible = PersonResponsible.Customer
             };
-
             var validation = new Validate();
 
+            // Act
             var result = validation.ValidateResource(action, false);
 
             // Assert
-            Assert.IsType<List<ValidationResult>>(result);
+            Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.NotNull(result);
-            Assert.Single(result);
         }
 
-        [Fact]
+        [Test]
         public void ValidateTests_ReturnValidationResult_WhenActionStatusIsNotValid()
         {
+            // Arrange
             var action = new Models.Action
             {
                 DateActionAgreed = DateTime.UtcNow,
@@ -238,20 +242,20 @@ namespace NCS.DSS.Action.Tests.ValidationTests
                 PersonResponsible = PersonResponsible.Customer,
                 ActionStatus = (ActionStatus)100
             };
-
             var validation = new Validate();
 
+            // Act
             var result = validation.ValidateResource(action, false);
 
             // Assert
-            Assert.IsType<List<ValidationResult>>(result);
+            Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.NotNull(result);
-            Assert.Single(result);
         }
 
-        [Fact]
+        [Test]
         public void ValidateTests_ReturnValidationResult_WhenPersonResponsibleIsNotValid()
         {
+            // Arrange
             var action = new Models.Action
             {
                 DateActionAgreed = DateTime.UtcNow,
@@ -260,15 +264,14 @@ namespace NCS.DSS.Action.Tests.ValidationTests
                 ActionType = ActionType.Other,
                 PersonResponsible = (PersonResponsible)100
             };
-
             var validation = new Validate();
 
+            // Act
             var result = validation.ValidateResource(action, false);
 
             // Assert
-            Assert.IsType<List<ValidationResult>>(result);
+            Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.NotNull(result);
-            Assert.Single(result);
         }
 
     }
