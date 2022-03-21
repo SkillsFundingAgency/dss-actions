@@ -69,6 +69,17 @@ namespace NCS.DSS.Action.GetActionByIdHttpTrigger.Function
                 string.Format("Get Action Plan By Id C# HTTP trigger function  processed a request. By Touchpoint: {0}",
                     touchpointId));
 
+            var subcontractorId = _httpRequestHelper.GetDssSubcontractorId(req);
+            if (string.IsNullOrEmpty(subcontractorId))
+            {
+                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'SubcontractorId' in request header");
+                return _httpResponseMessageHelper.BadRequest();
+            }
+
+            _loggerHelper.LogInformationMessage(log, correlationGuid,
+                string.Format("Get Action Plan By Id C# HTTP trigger function  processed a request. By Touchpoint: {0}",
+                    subcontractorId));
+
             var customerGuid = _guidHelper.ValidateGuid(customerId);
             if (customerGuid == Guid.Empty)
             {
