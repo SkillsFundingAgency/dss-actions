@@ -68,6 +68,21 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         {
             // Arrange
             _httpRequestHelper.Setup(x=>x.GetDssTouchpointId(_request)).Returns((string)null);
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns("9999999999");
+
+            // Act
+            var result = await RunFunction(InValidId, ValidInteractionId, ValidActionId, ValidActionPlanId);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
+        [Test]
+        public async Task GetActionsByIdHttpTrigger_ReturnsStatusCodeBadRequest_WhenSubcontractorIdIsNotProvided()
+        {
+            // Arrange
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("9999999999");
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns((string)null);
 
             // Act
             var result = await RunFunction(InValidId, ValidInteractionId, ValidActionId, ValidActionPlanId);
@@ -81,6 +96,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         {
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns("9999999999");
 
             // Act
             var result = await RunFunction(InValidId, ValidInteractionId, ValidActionId, ValidActionPlanId);
@@ -94,6 +110,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         {
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns("9999999999");
 
             // Act
             var result = await RunFunction(ValidCustomerId, InValidId, ValidActionId, ValidActionPlanId);
@@ -107,6 +124,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         {
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns("9999999999");
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, InValidId, ValidActionPlanId);
@@ -120,6 +138,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         {
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns("9999999999");
             _resourceHelper.Setup(x=>x.DoesCustomerExist(_customerId)).Returns(Task.FromResult(false));
 
             // Act
@@ -134,6 +153,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         {
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns("9999999999");
             _resourceHelper.Setup(x => x.DoesCustomerExist(_customerId)).Returns(Task.FromResult(true));
             _resourceHelper.Setup(x=>x.DoesInteractionExistAndBelongToCustomer(_interactionId, _customerId)).Returns(false);
 
@@ -149,6 +169,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         {
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns("9999999999");
             _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _getActionByIdHttpTriggerService.Setup(x=>x.GetActionForCustomerAsync(_customerId, _actionId, _actionPlanId)).Returns(Task.FromResult<Models.Action>(null));
 
@@ -164,6 +185,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         {
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns("9999999999");
             _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _getActionByIdHttpTriggerService.Setup(x => x.GetActionForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult<Models.Action>(_action));
             _resourceHelper.Setup(x => x.DoesInteractionExistAndBelongToCustomer(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(true);
