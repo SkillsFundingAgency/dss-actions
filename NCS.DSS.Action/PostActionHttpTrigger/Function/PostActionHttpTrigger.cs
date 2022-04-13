@@ -85,16 +85,15 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
                 return _httpResponseMessageHelper.BadRequest();
             }
 
+            _loggerHelper.LogInformationMessage(log, correlationGuid,
+                string.Format($"Post Actions C# HTTP trigger function  processed a request. By Touchpoint {touchpointId} and subcontractorId {subcontractorId}"));
+
             var apimUrl = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(apimUrl))
             {
                 _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'apimurl' in request header");
                 return _httpResponseMessageHelper.BadRequest();
             }
-
-            _loggerHelper.LogInformationMessage(log, correlationGuid,
-                string.Format("Post Actions C# HTTP trigger function  processed a request. By Touchpoint: {0}",
-                    touchpointId));
 
             var customerGuid = _guidHelper.ValidateGuid(customerId);
             if (customerGuid == Guid.Empty)

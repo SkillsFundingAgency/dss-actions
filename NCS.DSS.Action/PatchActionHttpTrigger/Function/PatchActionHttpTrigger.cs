@@ -85,6 +85,9 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
                 return _httpResponseMessageHelper.BadRequest();
             }
 
+            _loggerHelper.LogInformationMessage(log, correlationGuid,
+                string.Format($"Patch Actions C# HTTP trigger function processed a request. By Touchpoint {touchpointId} and subcontractorId {subcontractorId}"));
+
             var apimUrl = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(apimUrl))
             {
@@ -92,9 +95,6 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
                 return _httpResponseMessageHelper.BadRequest();
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid,
-                string.Format("Patch Actions C# HTTP trigger function  processed a request. By Touchpoint: {0}",
-                    touchpointId));
 
             var customerGuid = _guidHelper.ValidateGuid(customerId);
             if (customerGuid == Guid.Empty)

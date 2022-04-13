@@ -20,7 +20,8 @@ namespace NCS.DSS.Action.ServiceBus
                 LastModifiedDate = action.LastModifiedDate,
                 URL = reqUrl + "/" + action.ActionId,
                 IsNewCustomer = false,
-                TouchpointId = action.LastModifiedTouchpointId
+                TouchpointId = action.LastModifiedTouchpointId,
+                SubcontractorId = action.SubcontractorId
             };
 
             await SendMessageToQueue(messageModel);
@@ -36,7 +37,8 @@ namespace NCS.DSS.Action.ServiceBus
                 LastModifiedDate = action.LastModifiedDate,
                 URL = reqUrl,
                 IsNewCustomer = false,
-                TouchpointId = action.LastModifiedTouchpointId
+                TouchpointId = action.LastModifiedTouchpointId,
+                SubcontractorId = action.SubcontractorId
             };
 
             await SendMessageToQueue(messageModel);
@@ -65,6 +67,7 @@ namespace NCS.DSS.Action.ServiceBus
         public string URL { get; set; }
         public bool IsNewCustomer { get; set; }
         public string TouchpointId { get; set; }
+        public string SubcontractorId { get; set; }
     }
 
 }

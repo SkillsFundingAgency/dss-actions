@@ -79,6 +79,7 @@ namespace NCS.DSS.Action.Models
 
         [JsonIgnoreOnSerialize]
         public string CreatedBy { get; set; }
+        public string SubcontractorId { get; internal set; }
 
         public void SetDefaultValues()
         {
