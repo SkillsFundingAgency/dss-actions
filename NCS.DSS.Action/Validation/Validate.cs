@@ -66,7 +66,8 @@ namespace NCS.DSS.Action.Validation
             if (actionResource.SignpostedToCategory.HasValue && !Enum.IsDefined(typeof(SignpostedToCategory), actionResource.SignpostedToCategory.Value))
                 results.Add(new ValidationResult("Please supply a valid Signposted To Category", new[] { "SignpostedToCategory" }));
 
+            if (!actionResource.SignpostedToCategory.HasValue)
+                results.Add(new ValidationResult("Signposted To is a required field", new[] { "SignpostedToCategory" }));
         }
-
     }
 }
