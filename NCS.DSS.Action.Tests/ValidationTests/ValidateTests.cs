@@ -133,9 +133,8 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.NotNull(result);
-            Assert.AreEqual(2, result.Count);
+                                                                                                                                                                                                                                                                                                                                                                                          Assert.NotNull(result);
+            Assert.AreEqual(4, result.Count);
         }
 
         [Test]
@@ -144,12 +143,12 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             // Arrange
             var action = new Models.Action
             {
-                DateActionAgreed = DateTime.Today.AddDays(1),
-                DateActionAimsToBeCompletedBy = DateTime.Today.AddDays(-2),
+                DateActionAgreed = DateTime.Today,
+                DateActionAimsToBeCompletedBy = DateTime.Today.AddDays(2),
                 ActionSummary = "Summary",
                 ActionType = ActionType.Other,
                 PersonResponsible = PersonResponsible.Customer
-            };
+            };                                   
             var validation = new Validate();
 
             // Act
@@ -181,7 +180,7 @@ namespace NCS.DSS.Action.Tests.ValidationTests
 
             // Assert
             Assert.IsInstanceOf<List<ValidationResult>>(result);
-            Assert.NotNull(result);;
+            Assert.NotNull(result); ;
         }
 
         [Test]

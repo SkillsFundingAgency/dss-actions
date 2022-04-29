@@ -32,15 +32,12 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
             if (!string.IsNullOrEmpty(actionPatch.ActionSummary))
                 _jsonHelper.UpdatePropertyValue(obj["ActionSummary"], actionPatch.ActionSummary);
 
-            if (!string.IsNullOrEmpty(actionPatch.SignpostedTo))
-                _jsonHelper.UpdatePropertyValue(obj["SignpostedTo"], actionPatch.SignpostedTo);
-
-            if (actionPatch.SignpostedToCategory.HasValue)
+            if (actionPatch.SignpostedTo.HasValue)
             {
-                if (obj["SignpostedToCategory"] == null)
-                    _jsonHelper.CreatePropertyOnJObject(obj, "SignpostedToCategory", actionPatch.SignpostedToCategory);
+                if (obj["SignpostedTo"] == null)
+                    _jsonHelper.CreatePropertyOnJObject(obj, "SignpostedTo", actionPatch.SignpostedTo);
                 else
-                    _jsonHelper.UpdatePropertyValue(obj["SignpostedToCategory"], actionPatch.SignpostedToCategory);
+                    _jsonHelper.UpdatePropertyValue(obj["SignpostedTo"], actionPatch.SignpostedTo);
             }
 
             if (actionPatch.ActionType.HasValue)

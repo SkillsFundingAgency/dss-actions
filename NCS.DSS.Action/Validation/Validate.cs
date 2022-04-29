@@ -63,11 +63,11 @@ namespace NCS.DSS.Action.Validation
             if (actionResource.PersonResponsible.HasValue && !Enum.IsDefined(typeof(PersonResponsible), actionResource.PersonResponsible.Value))
                 results.Add(new ValidationResult("Please supply a valid Person Responsible", new[] { "PersonResponsible" }));
 
-            if (actionResource.SignpostedToCategory.HasValue && !Enum.IsDefined(typeof(SignpostedToCategory), actionResource.SignpostedToCategory.Value))
-                results.Add(new ValidationResult("Please supply a valid Signposted To Category", new[] { "SignpostedToCategory" }));
+            if (actionResource.SignpostedTo.HasValue && !Enum.IsDefined(typeof(SignpostedTo), actionResource.SignpostedTo.Value))
+                results.Add(new ValidationResult("Please supply a valid Signposted To Category", new[] { "SignpostedTo" }));
 
-            if (!actionResource.SignpostedToCategory.HasValue)
-                results.Add(new ValidationResult("Signposted To is a required field", new[] { "SignpostedToCategory" }));
+            if (!actionResource.SignpostedTo.HasValue)
+                results.Add(new ValidationResult("Signposted To is a required field", new[] { "SignpostedTo" }));
         }
     }
 }

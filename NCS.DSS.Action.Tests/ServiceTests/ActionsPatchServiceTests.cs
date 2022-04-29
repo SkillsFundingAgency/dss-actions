@@ -1,6 +1,7 @@
 ﻿using DFC.JSON.Standard;
 using NCS.DSS.Action.Models;
 using NCS.DSS.Action.PatchActionHttpTrigger.Service;
+using NCS.DSS.Action.ReferenceData;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
@@ -94,28 +95,28 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         public void ActionPatchServiceTests_CheckSignpostedToMethodIsUpdated_WhenPatchIsCalled()
         {
             // Arrange
-            var actionPatch = new ActionPatch { SignpostedTo = "SignpostedToTest" };
+            var actionPatch = new ActionPatch { SignpostedTo = SignpostedTo.College };
 
             // Act
             var patchedActionPlan = _actionPatchService.Patch(_json, actionPatch);
 
             // Assert
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-            Assert.AreEqual("SignpostedToTest", action.SignpostedTo);
+            Assert.AreEqual(SignpostedTo.College, action.SignpostedTo);
         }
 
         [Test]
         public void ActionPatchServiceTests_CheckSignpostedCategoryIsUpdated_WhenPatchIsCalled()
         {
             // Arrange
-            var actionPatch = new ActionPatch { SignpostedToCategory = DSS.Action.ReferenceData.SignpostedToCategory.Other };
+            var actionPatch = new ActionPatch { SignpostedTo = DSS.Action.ReferenceData.SignpostedTo.Other };
 
             // Act
             var patchedActionPlan = _actionPatchService.Patch(_json, actionPatch);
 
             // Assert
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-            Assert.AreEqual(DSS.Action.ReferenceData.SignpostedToCategory.Other, action.SignpostedToCategory);
+            Assert.AreEqual(DSS.Action.ReferenceData.SignpostedTo.Other, action.SignpostedTo);
         }
 
         [Test]

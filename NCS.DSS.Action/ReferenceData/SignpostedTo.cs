@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace NCS.DSS.Action.ReferenceData
 {
-    public enum SignpostedToCategory
+    public enum SignpostedTo
     {
 
         [Description("Charity National")]

@@ -29,14 +29,11 @@ namespace NCS.DSS.Action.Models
         [Example(Description = "this is some text")]
         public string ActionSummary { get; set; }
 
+        [Required]
         [StringLength(255)]
         [Display(Description = "Details of any signposting to external parties.")]
         [Example(Description = "ASIST Team (Apprenticeships)")]
-        public string SignpostedTo { get; set; }
-
-        [Display(Description = "SignpostedToCategory reference data.")]
-        [Example(Description = "1")]
-        public SignpostedToCategory? SignpostedToCategory { get; set; }
+        public SignpostedTo? SignpostedTo { get; set; }
 
         [Display(Description = "ActionType reference data.")]
         [Example(Description = "1")]
