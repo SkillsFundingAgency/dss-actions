@@ -88,6 +88,20 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         }
 
         [Test]
+        public async Task GetActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenDsSubcontractorIdIsInvalid()
+        {
+            // Arrange
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
+            _httpRequestHelper.Setup(x => x.GetDssSubcontractorId(_request)).Returns<string>(null);
+
+            // Act
+            var result = await RunFunction(InValidId, ValidInteractionId, ValidActionPlanId);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
+        [Test]
         public async Task GetActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenCustomerIdIsInvalid()
         {
             // Arrange
