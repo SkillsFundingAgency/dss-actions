@@ -49,6 +49,7 @@ namespace NCS.DSS.Action.Models
         [Example(Description = "ASIST Team (Apprenticeships)")]
         public string SignpostedTo { get; set; }
 
+        [Required]
         [Display(Description = "SignpostedToCategory reference data.")]
         [Example(Description = "1")]
         public SignpostedToCategory? SignpostedToCategory { get; set; }
