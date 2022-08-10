@@ -33,6 +33,9 @@ namespace NCS.DSS.Action.ReferenceData
         [Description("Community Centres")]
         CommunityCentres = 13,
 
+        [Description("Not Applicable")]
+        NotApplicable = 98,
+
         Other = 99
     }
 }
