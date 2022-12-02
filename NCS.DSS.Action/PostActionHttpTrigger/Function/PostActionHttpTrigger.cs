@@ -66,105 +66,88 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
 
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
 
-            var correlationGuid = _guidHelper.ValidateGuid(correlationId);
-
-            if (correlationGuid == Guid.Empty)
-                correlationGuid = _guidHelper.GenerateGuid();
 
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'TouchpointId' in request header");
+                log.LogInformation("Unable to locate 'TouchpointId' in request header");
                 return _httpResponseMessageHelper.BadRequest();
             }
 
             var apimUrl = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(apimUrl))
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Unable to locate 'apimurl' in request header");
+                log.LogInformation("Unable to locate 'apimurl' in request header");
                 return _httpResponseMessageHelper.BadRequest();
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid,
+            log.LogInformation(
                 string.Format("Post Actions C# HTTP trigger function  processed a request. By Touchpoint: {0}",
                     touchpointId));
 
-            var customerGuid = _guidHelper.ValidateGuid(customerId);
-            if (customerGuid == Guid.Empty)
-            {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'customerId' to a Guid: {0}", customerId));
-                return _httpResponseMessageHelper.BadRequest(customerId);
-            }
+            if (!Guid.TryParse(customerId, out var customerGuid))
+                return _httpResponseMessageHelper.BadRequest(customerGuid);
 
-            var interactionGuid = _guidHelper.ValidateGuid(interactionId);
-            if (interactionGuid == Guid.Empty)
-            {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'interactionId' to a Guid: {0}", interactionId));
+
+            if (!Guid.TryParse(interactionId, out var interactionGuid))
                 return _httpResponseMessageHelper.BadRequest(interactionGuid);
-            }
 
-            var actionPlanGuid = _guidHelper.ValidateGuid(actionPlanId);
-            if (actionPlanGuid == Guid.Empty)
-            {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Unable to parse 'actionplanId' to a Guid: {0}", actionPlanGuid));
+            if (!Guid.TryParse(actionPlanId, out var actionPlanGuid))
                 return _httpResponseMessageHelper.BadRequest(actionPlanGuid);
-            }
-
             Models.Action actionRequest;
 
             try
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to get resource from body of the request");
+                log.LogInformation("Attempt to get resource from body of the request");
                 actionRequest = await _httpRequestHelper.GetResourceFromRequest<Models.Action>(req);
             }
             catch (JsonException ex)
             {
-                _loggerHelper.LogError(log, correlationGuid, "Unable to retrieve body from req", ex);
+                log.LogInformation("Unable to retrieve body from req", ex);
                 return _httpResponseMessageHelper.UnprocessableEntity(ex);
             }
 
             if (actionRequest == null)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "Action request is null");
+                log.LogInformation("Action request is null");
                 return _httpResponseMessageHelper.UnprocessableEntity(req);
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to set id's for action");
+            log.LogInformation("Attempt to set id's for action");
             actionRequest.SetIds(customerGuid, actionPlanGuid, touchpointId);
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, "Attempt to validate resource");
+            log.LogInformation("Attempt to validate resource");
             var errors = _validate.ValidateResource(actionRequest, true);
 
             if (errors != null && errors.Any())
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, "validation errors with resource");
+                log.LogInformation("validation errors with resource");
                 return _httpResponseMessageHelper.UnprocessableEntity(errors);
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if customer exists {0}", customerGuid));
+          
             var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer does not exist {0}", customerGuid));
-                return _httpResponseMessageHelper.NoContent(customerGuid);
+                  return _httpResponseMessageHelper.NoContent(customerGuid);
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if this is a read only customer {0}", customerGuid));
+            //_loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if this is a read only customer {0}", customerGuid));
             var isCustomerReadOnly =  _resourceHelper.IsCustomerReadOnly();
 
             if (isCustomerReadOnly)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer is read only {0}", customerGuid));
+               // _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer is read only {0}", customerGuid));
                 return _httpResponseMessageHelper.Forbidden(customerGuid);
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if interaction exists {0}", interactionGuid));
+            //_loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if interaction exists {0}", interactionGuid));
             var doesInteractionExist = _resourceHelper.DoesInteractionExistAndBelongToCustomer(interactionGuid, customerGuid);
 
             if (!doesInteractionExist)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Interaction does not exist {0}", interactionGuid));
+                //_loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Interaction does not exist {0}", interactionGuid));
                 return _httpResponseMessageHelper.NoContent(interactionGuid);
             }
 
@@ -172,16 +155,16 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
 
             if (!doesActionPlanExistAndBelongToCustomer)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Action Plan does not exist {0}", actionPlanGuid));
+                //_loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Action Plan does not exist {0}", actionPlanGuid));
                 return _httpResponseMessageHelper.NoContent(actionPlanGuid);
             }
 
-            _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get Create Action Plan for customer {0}", customerGuid));
+            //_loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get Create Action Plan for customer {0}", customerGuid));
             var action = await _actionsPostService.CreateAsync(actionRequest);
 
             if (action != null)
             {
-                _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("attempting to send to service bus {0}", action.ActionId));
+                //_loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("attempting to send to service bus {0}", action.ActionId));
                 await _actionsPostService.SendToServiceBusQueueAsync(action, apimUrl);
             }
 
