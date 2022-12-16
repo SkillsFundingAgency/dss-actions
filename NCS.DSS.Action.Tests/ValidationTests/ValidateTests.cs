@@ -35,6 +35,30 @@ namespace NCS.DSS.Action.Tests.ValidationTests
         }
 
         [Test]
+        public void ValidateTests_ReturnValidationResult_WhenSignPostedToCategoryIsNotSuppliedForPost()
+        {
+            // Arrange
+            var action = new Models.Action
+            {
+                DateActionAgreed = DateTime.UtcNow,
+                DateActionAimsToBeCompletedBy = DateTime.UtcNow,
+                ActionSummary = "Summary",
+                ActionType = ActionType.Other,
+                PersonResponsible = PersonResponsible.Customer
+            };
+
+            var validation = new Validate();
+
+
+            // Act
+            var result = validation.ValidateResource(action, true);
+
+            // Assert
+            Assert.IsInstanceOf<List<ValidationResult>>(result);
+            Assert.NotNull(result);
+        }
+
+        [Test]
         public void ValidateTests_ReturnValidationResult_WhenDateActionAimsToBeCompletedByIsNotSuppliedForPost()
         {
             var action = new Models.Action
@@ -135,7 +159,7 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             // Assert
             Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.NotNull(result);
-            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual(3, result.Count);
         }
 
         [Test]
@@ -158,7 +182,7 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             // Assert
             Assert.IsInstanceOf<List<ValidationResult>>(result);
             Assert.NotNull(result);
-            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual(3, result.Count);
         }
 
         [Test]

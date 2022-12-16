@@ -2,7 +2,6 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
 	  <AzureFunctionsVersion>v4</AzureFunctionsVersion>
-	  <RuntimeFrameworkVersion>3.1</RuntimeFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="DFC.Common.Standard" Version="0.1.4" />
@@ -10,7 +9,7 @@
     <PackageReference Include="DFC.JSON.Standard" Version="0.1.4" />
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.31.2" />
     <PackageReference Include="Microsoft.Azure.Functions.Analyzers" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.CosmosDB" Version="3.0.10" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.CosmosDB" Version="4.0.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="DFC.Swagger.Standard" Version="0.1.27" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="5.8.1" />
