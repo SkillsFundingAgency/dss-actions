@@ -53,11 +53,6 @@ namespace NCS.DSS.Action.GetActionByIdHttpTrigger.Function
             
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
 
-            //var correlationGuid = _guidHelper.ValidateGuid(correlationId);
-
-            //if (correlationGuid == Guid.Empty)
-            //    correlationGuid = _guidHelper.GenerateGuid();
-
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
