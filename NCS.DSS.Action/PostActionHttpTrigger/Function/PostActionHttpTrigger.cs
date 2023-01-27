@@ -133,21 +133,21 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
                   return _httpResponseMessageHelper.NoContent(customerGuid);
             }
 
-            //_loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if this is a read only customer {0}", customerGuid));
+            log.LogError(string.Format("Attempting to see if this is a read only customer {0}", customerGuid));
             var isCustomerReadOnly =  _resourceHelper.IsCustomerReadOnly();
 
             if (isCustomerReadOnly)
             {
-               // _loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Customer is read only {0}", customerGuid));
+                log.LogError(string.Format("Customer is read only {0}", customerGuid));
                 return _httpResponseMessageHelper.Forbidden(customerGuid);
             }
 
-            //_loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to see if interaction exists {0}", interactionGuid));
+            log.LogError(string.Format("Attempting to see if interaction exists {0}", customerGuid));
             var doesInteractionExist = _resourceHelper.DoesInteractionExistAndBelongToCustomer(interactionGuid, customerGuid);
 
             if (!doesInteractionExist)
             {
-                //_loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Interaction does not exist {0}", interactionGuid));
+                log.LogError(string.Format("Interaction does not exist {0}", interactionGuid));
                 return _httpResponseMessageHelper.NoContent(interactionGuid);
             }
 
@@ -155,16 +155,16 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
 
             if (!doesActionPlanExistAndBelongToCustomer)
             {
-                //_loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Action Plan does not exist {0}", actionPlanGuid));
+                log.LogError(string.Format("Action Plan does not exist {0}", actionPlanGuid));
                 return _httpResponseMessageHelper.NoContent(actionPlanGuid);
             }
 
-            //_loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("Attempting to get Create Action Plan for customer {0}", customerGuid));
+            log.LogError(string.Format("Attempting to get Create Action Plan for customer {0}", customerGuid));
             var action = await _actionsPostService.CreateAsync(actionRequest);
 
             if (action != null)
             {
-                //_loggerHelper.LogInformationMessage(log, correlationGuid, string.Format("attempting to send to service bus {0}", action.ActionId));
+                log.LogError(string.Format("Attempting to send to service bus {0}", action.ActionId));
                 await _actionsPostService.SendToServiceBusQueueAsync(action, apimUrl);
             }
 
