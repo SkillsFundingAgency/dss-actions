@@ -8,6 +8,30 @@
         "environmentName": {
             "value": ""
         },
+        "cosmosDbCollectionId": {
+            "value": "__ApiResourceName__"
+        },
+        "cosmosDbDatabaseId": {
+            "value": "__ApiResourceName__"
+        },
+        "cosmosDbEndpoint": {
+            "value": "__CosmosDbEndpoint__"
+        },
+        "cosmosDbKey": {
+            "value": "__CosmosDbKey__"
+        },
+        "serviceBusAccessKey": {
+            "value": "__serviceBusAccessKey__"
+        },
+          "serviceBusAccessKeyName": {
+            "value": "__serviceBusAccessKeyName__"
+        },
+          "serviceBusBaseAddress": {
+            "value": "__serviceBusBaseAddress__"
+        },
+        "serviceBusQueueName": {
+        "value": "__serviceBusQueueName__"
+        },
         "functionAppNames": {
             "value": []
         },
