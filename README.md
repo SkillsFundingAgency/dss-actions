@@ -1,8 +1,11 @@
-# dss-actions
+# DSS Actions
+
+> [!NOTE]  
+> The latest version of this API is `v2`
 
 [![Build Status](https://sfa-gov-uk.visualstudio.com/CDS%202.0/_apis/build/status/Yaml/dss-actions?repoName=SkillsFundingAgency%2Fdss-actions&branchName=master-v2)](https://sfa-gov-uk.visualstudio.com/CDS%202.0/_build/latest?definitionId=1446&repoName=SkillsFundingAgency%2Fdss-actions&branchName=master-v2)
 
-Function app to provide api for maintaining actions.
+Function App to provide an API for maintaining an actions.
 
 ## Developer Setup
 
