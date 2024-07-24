@@ -40,7 +40,6 @@
     }
   },
   "variables": {
-  //  "appInsightsName": "[concat('dss-', toLower(parameters('configEnvironmentName')), '-', split(parameters('functionAppName'), '-')[2], '-ai')]",
      "FunctionAppInsightInstrumentationKey":"[parameters('appInsightsInstrumentationKey')]",
     "storageAccountConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=', parameters('storageAccountKey'), ';EndpointSuffix=core.windows.net')]"
   },
@@ -49,7 +48,6 @@
       "name": "[parameters('functionAppName')]",
       "type": "Microsoft.Web/sites",
       "apiVersion": "2016-08-01",
-    //  "dependsOn": [ "[variables('appInsightsName')]" ],
       "location": "[resourceGroup().location]",
       "kind": "functionapp",
       "properties": {
@@ -78,7 +76,6 @@
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-      //        "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsName'))).InstrumentationKey]"
               "value": "[variables('FunctionAppInsightInstrumentationKey')]"
             },
             {
@@ -129,19 +126,6 @@
         }
       }
     }
- //   {
- //     "apiVersion": "2015-05-01",
- //     "name": "[variables('appInsightsName')]",
- //     "type": "Microsoft.Insights/components",
- //     "location": "[resourceGroup().location]",
- //     "kind": "web",
- //     "tags": {
- //       "[concat('hidden-link:', resourceId('Microsoft.Web/sites', parameters('functionAppName')))]": "Resource"
- //     },
- //     "properties": {
- //       "Application_Type": "web"
- //     }
- //   }
   ],
   "outputs": {}
 }
