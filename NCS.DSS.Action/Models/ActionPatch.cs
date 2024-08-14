@@ -1,7 +1,7 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using DFC.Swagger.Standard.Annotations;
+﻿using DFC.Swagger.Standard.Annotations;
 using NCS.DSS.Action.ReferenceData;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace NCS.DSS.Action.Models
 {

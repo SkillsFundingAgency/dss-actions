@@ -60,7 +60,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
 
             if (!string.IsNullOrEmpty(actionPatch.LastModifiedTouchpointId))
                 _jsonHelper.UpdatePropertyValue(obj["LastModifiedTouchpointId"], actionPatch.LastModifiedTouchpointId);
-            
+
             return obj.ToString();
         }
     }

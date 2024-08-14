@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Azure.Documents;
+﻿using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using NCS.DSS.Action.Cosmos.Client;
 using NCS.DSS.Action.Cosmos.Helper;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace NCS.DSS.Action.Cosmos.Provider
 {
     public class DocumentDBProvider : IDocumentDBProvider
     {
 
-       
+
         private string _customerJson;
 
         public string GetCustomerJson()
@@ -114,7 +114,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
             }
 
         }
-        
+
         public async Task<List<Models.Action>> GetActionsForCustomerAsync(Guid customerId, Guid actionPlanId)
         {
             var collectionUri = DocumentDBHelper.CreateDocumentCollectionUri();
@@ -144,9 +144,9 @@ namespace NCS.DSS.Action.Cosmos.Provider
             var client = DocumentDBClient.CreateDocumentClient();
 
             var actionForCustomerQuery = client
-                ?.CreateDocumentQuery<Models.Action>(collectionUri, new FeedOptions {MaxItemCount = 1})
+                ?.CreateDocumentQuery<Models.Action>(collectionUri, new FeedOptions { MaxItemCount = 1 })
                 .Where(x => x.CustomerId == customerId &&
-                            x.ActionId == actionId && 
+                            x.ActionId == actionId &&
                             x.ActionPlanId == actionPlanId)
                 .AsDocumentQuery();
 

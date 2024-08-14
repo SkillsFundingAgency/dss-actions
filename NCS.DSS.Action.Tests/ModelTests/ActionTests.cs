@@ -17,8 +17,8 @@ namespace NCS.DSS.Action.Tests.ModelTests
             action.SetDefaultValues();
 
             // Assert
-            Assert.NotNull(action.LastModifiedDate);
-            Assert.AreEqual(ActionStatus.NotStarted, action.ActionStatus);
+            Assert.That(action.LastModifiedDate, Is.Not.Null);
+            Assert.That(ActionStatus.NotStarted, Is.EqualTo(action.ActionStatus));
         }
 
         [Test]
@@ -31,7 +31,7 @@ namespace NCS.DSS.Action.Tests.ModelTests
             action.SetDefaultValues();
 
             // Assert
-            Assert.AreEqual(DateTime.MaxValue, action.LastModifiedDate);
+            Assert.That(DateTime.MaxValue, Is.EqualTo(action.LastModifiedDate));
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace NCS.DSS.Action.Tests.ModelTests
             action.SetIds(Guid.NewGuid(), actionPlanId, "0123456789");
 
             // Assert
-            Assert.AreEqual(actionPlanId, action.ActionPlanId);
+            Assert.That(actionPlanId, Is.EqualTo(action.ActionPlanId));
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace NCS.DSS.Action.Tests.ModelTests
             action.SetIds(customerId, Guid.NewGuid(), "0123456789");
 
             // Assert
-            Assert.AreEqual(customerId, action.CustomerId);
+            Assert.That(customerId, Is.EqualTo(action.CustomerId));
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace NCS.DSS.Action.Tests.ModelTests
             action.SetIds(Guid.NewGuid(), Guid.NewGuid(), "0000000000");
 
             // Assert
-            Assert.AreEqual("0000000000", action.LastModifiedTouchpointId);
+            Assert.That("0000000000", Is.EqualTo(action.LastModifiedTouchpointId));
         }
 
     }

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using NCS.DSS.Action.Models;
+using System;
 using System.Threading.Tasks;
-using NCS.DSS.Action.Models;
 
 namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
 {

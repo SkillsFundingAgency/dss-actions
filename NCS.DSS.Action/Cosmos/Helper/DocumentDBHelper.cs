@@ -1,7 +1,6 @@
 ﻿
-using System;
-using System.Configuration;
 using Microsoft.Azure.Documents.Client;
+using System;
 
 namespace NCS.DSS.Action.Cosmos.Helper
 {
@@ -34,7 +33,7 @@ namespace NCS.DSS.Action.Cosmos.Helper
 
             return _documentCollectionUri;
         }
-        
+
         public static Uri CreateDocumentUri(Guid actionPlanId)
         {
             return UriFactory.CreateDocumentUri(DatabaseId, CollectionId, actionPlanId.ToString());
