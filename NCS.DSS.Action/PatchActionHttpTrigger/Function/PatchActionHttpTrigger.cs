@@ -14,6 +14,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
@@ -213,7 +214,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
 
             return updatedAction == null ?
                  new BadRequestObjectResult(actionGuid) :
-                new JsonResult(updatedAction) { StatusCode = (int)HttpStatusCode.OK };
+                new JsonResult(updatedAction, new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.OK };
         }
     }
 }

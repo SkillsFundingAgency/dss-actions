@@ -10,6 +10,7 @@ using NCS.DSS.Action.GetActionHttpTrigger.Service;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 
@@ -97,10 +98,18 @@ namespace NCS.DSS.Action.GetActionHttpTrigger.Function
             var actionPlans = await _actionsGetService.GetActionsAsync(customerGuid, actionPlanGuid);
 
             _loggerHelper.LogInformation("Exit from GetActionHttpTrigger");
-
-            return actionPlans == null ?
-                 new NoContentResult() :
-                new JsonResult(actionPlans) { StatusCode = (int)HttpStatusCode.OK };
+            if(actionPlans == null)
+            {
+                return new NoContentResult();
+            }
+            else if (actionPlans.Count == 1)
+            {
+                return new JsonResult(actionPlans[0], new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.OK };
+            }
+            else
+            {
+                return new JsonResult(actionPlans, new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.OK };
+            }                
         }
     }
 }
