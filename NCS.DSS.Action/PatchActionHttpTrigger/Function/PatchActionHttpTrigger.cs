@@ -9,7 +9,6 @@ using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.Models;
 using NCS.DSS.Action.PatchActionHttpTrigger.Service;
 using NCS.DSS.Action.Validation;
-using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -177,11 +176,11 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
 
             try
             {
-                actionValidationObject = JsonConvert.DeserializeObject<Models.Action>(patchedAction);
+                actionValidationObject = JsonSerializer.Deserialize<Models.Action>(patchedAction);
             }
-            catch (JsonException ex)
+            catch (Exception ex)
             {
-                _loggerHelper.LogError("Unable to retrieve body from req", ex);
+                _loggerHelper.LogError("Unable to retrieve body from req", _convertToDynamic.ExcludeProperty(ex, ["TargetSite","InnerException"]));
                 throw;
             }
 

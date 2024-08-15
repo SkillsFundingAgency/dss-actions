@@ -9,7 +9,6 @@ using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.Models;
 using NCS.DSS.Action.PostActionHttpTrigger.Service;
 using NCS.DSS.Action.Validation;
-using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -106,7 +105,7 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
                 _loggerHelper.LogInformation($"[{correlationId}] Attempt to get resource from body of the request");
                 actionRequest = await _httpRequestHelper.GetResourceFromRequest<Models.Action>(req);
             }
-            catch (JsonException ex)
+            catch (Exception ex)
             {
                 _loggerHelper.LogError($"[{correlationId}] Unable to retrieve body from req", ex);
                 return new UnprocessableEntityObjectResult(_convertToDynamic.ExcludeProperty(ex, ["TargetSite", "InnerException"]));
