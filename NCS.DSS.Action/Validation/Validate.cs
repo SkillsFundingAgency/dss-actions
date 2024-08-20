@@ -1,8 +1,8 @@
-﻿using System;
+﻿using NCS.DSS.Action.Models;
+using NCS.DSS.Action.ReferenceData;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using NCS.DSS.Action.Models;
-using NCS.DSS.Action.ReferenceData;
 
 namespace NCS.DSS.Action.Validation
 {
@@ -36,7 +36,7 @@ namespace NCS.DSS.Action.Validation
                 if (actionResource.DateActionAgreed.Value > DateTime.UtcNow)
                     results.Add(new ValidationResult("Date Action Agreed must be less than or equal to the current date/time", new[] { "DateActionAgreed" }));
 
-                if (actionResource.DateActionAimsToBeCompletedBy.HasValue && 
+                if (actionResource.DateActionAimsToBeCompletedBy.HasValue &&
                     !(actionResource.DateActionAimsToBeCompletedBy.Value >= actionResource.DateActionAgreed.Value))
                     results.Add(new ValidationResult("Date Action Aims To Be Completed By must be greater than Date Action Agreed", new[] { "DateActionAimsToBeCompletedBy" }));
 

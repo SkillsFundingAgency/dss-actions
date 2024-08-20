@@ -30,7 +30,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var result = _actionPatchService.Patch(string.Empty, _actionPatch);
 
             // Assert
-            Assert.Null(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -44,7 +44,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
             // Assert
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-            Assert.AreEqual(DateTime.MaxValue, action.DateActionAgreed);
+            Assert.That(DateTime.MaxValue, Is.EqualTo(action.DateActionAgreed));
         }
 
 
@@ -59,7 +59,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
             // Assert
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-            Assert.AreEqual(DateTime.MaxValue, action.DateActionAimsToBeCompletedBy);
+            Assert.That(DateTime.MaxValue, Is.EqualTo(action.DateActionAimsToBeCompletedBy));
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
             // Assert
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-            Assert.AreEqual(DateTime.MaxValue, action.DateActionActuallyCompleted);
+            Assert.That(DateTime.MaxValue, Is.EqualTo(action.DateActionActuallyCompleted));
         }
 
         [Test]
@@ -87,7 +87,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
             // Assert
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-            Assert.AreEqual("TestActionSummary", action.ActionSummary);
+            Assert.That("TestActionSummary", Is.EqualTo(action.ActionSummary));
         }
 
         [Test]
@@ -101,7 +101,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
             // Assert
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-            Assert.AreEqual("SignpostedToTest", action.SignpostedTo);
+            Assert.That("SignpostedToTest", Is.EqualTo(action.SignpostedTo));
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
             // Assert
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-            Assert.AreEqual(DSS.Action.ReferenceData.SignpostedToCategory.Other, action.SignpostedToCategory);
+            Assert.That(DSS.Action.ReferenceData.SignpostedToCategory.Other, Is.EqualTo(action.SignpostedToCategory));
         }
 
         [Test]
@@ -129,7 +129,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
             // Assert
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-            Assert.AreEqual(DSS.Action.ReferenceData.ActionType.ApplyForApprenticeship, action.ActionType);
+            Assert.That(DSS.Action.ReferenceData.ActionType.ApplyForApprenticeship, Is.EqualTo(action.ActionType));
         }
 
         [Test]
@@ -143,7 +143,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
             // Assert
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-            Assert.AreEqual(DSS.Action.ReferenceData.ActionStatus.InProgress, action.ActionStatus);
+            Assert.That(DSS.Action.ReferenceData.ActionStatus.InProgress, Is.EqualTo(action.ActionStatus));
         }
 
         [Test]
@@ -157,7 +157,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
             // Assert
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-            Assert.AreEqual(DSS.Action.ReferenceData.PersonResponsible.Adviser, action.PersonResponsible);
+            Assert.That(DSS.Action.ReferenceData.PersonResponsible.Adviser, Is.EqualTo(action.PersonResponsible));
         }
 
         [Test]
@@ -171,7 +171,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
             // Assert
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-            Assert.AreEqual(DateTime.MaxValue, action.LastModifiedDate);
+            Assert.That(DateTime.MaxValue, Is.EqualTo(action.LastModifiedDate));
         }
 
         [Test]
@@ -185,7 +185,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
             // Assert
             var action = JsonConvert.DeserializeObject<Action.Models.Action>(patchedActionPlan);
-            Assert.AreEqual("0000000111", action.LastModifiedTouchpointId);
+            Assert.That("0000000111", Is.EqualTo(action.LastModifiedTouchpointId));
         }
 
     }

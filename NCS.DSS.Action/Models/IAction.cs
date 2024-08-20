@@ -1,5 +1,5 @@
-﻿using System;
-using NCS.DSS.Action.ReferenceData;
+﻿using NCS.DSS.Action.ReferenceData;
+using System;
 
 namespace NCS.DSS.Action.Models
 {

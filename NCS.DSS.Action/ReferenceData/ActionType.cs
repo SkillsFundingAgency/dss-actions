@@ -23,7 +23,7 @@ namespace NCS.DSS.Action.ReferenceData
         CareersManagementWorkshop = 6,
 
         [Description("Apply For Apprenticeship")]
-         ApplyForApprenticeship = 7,
+        ApplyForApprenticeship = 7,
 
         [Description("Apply For Traineeship")]
         ApplyForTraineeship = 8,
@@ -37,7 +37,7 @@ namespace NCS.DSS.Action.ReferenceData
         UseNationalCareersServiceWebsite = 11,
 
         [Description("Use External Digital Services")]
-         UseExternalDigitalServices = 12,
+        UseExternalDigitalServices = 12,
 
         [Description("Book Follow Up Appointment")]
         BookFollowUpAppointment = 13,

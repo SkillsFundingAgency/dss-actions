@@ -50,33 +50,33 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var result = _actionHttpTriggerService.PatchResource(null, _actionPatch);
 
             // Assert
-            Assert.Null(result);
+            Assert.That(result,Is.Null);
         }
 
         [Test]
         public async Task PatchActionHttpTriggerServiceTests_UpdateAsync_ReturnsNullWhenResourceCannotBeUpdated()
         {
             // Arrange
-            _documentDbProvider.Setup(x=>x.UpdateActionAsync(_json, _actionId)).Returns<string>(null);
+            _documentDbProvider.Setup(x => x.UpdateActionAsync(_json, _actionId)).Returns<string>(null);
 
             // Act
             var result = await _actionHttpTriggerService.UpdateCosmosAsync(_action.ToString(), _actionId);
 
             // Assert
-            Assert.Null(result);
+            Assert.That(result,Is.Null);
         }
 
         [Test]
         public async Task PatchActionHttpTriggerServiceTests_UpdateAsync_ReturnsNullWhenResourceCannotBeFound()
         {
             // Arrange
-            _documentDbProvider.Setup(x=>x.CreateActionAsync(_action)).Returns(Task.FromResult(new ResourceResponse<Document>(null)));
+            _documentDbProvider.Setup(x => x.CreateActionAsync(_action)).Returns(Task.FromResult(new ResourceResponse<Document>(null)));
 
             // Act
             var result = await _actionHttpTriggerService.UpdateCosmosAsync(_action.ToString(), _actionId);
 
             // Assert
-            Assert.Null(result);
+            Assert.That(result,Is.Null);
         }
 
         [Test]
@@ -105,14 +105,14 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
             responseField?.SetValue(resourceResponse, documentServiceResponse);
 
-            _documentDbProvider.Setup(x=>x.UpdateActionAsync(_json, _actionId)).Returns(Task.FromResult(resourceResponse));
+            _documentDbProvider.Setup(x => x.UpdateActionAsync(_json, _actionId)).Returns(Task.FromResult(resourceResponse));
 
             // Act
             var result = await _actionHttpTriggerService.UpdateCosmosAsync(_json, _actionId);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsInstanceOf<Models.Action>(result);
+            Assert.That(result,Is.Not.Null);
+            Assert.That(result,Is.InstanceOf<Models.Action>());
 
         }
 
@@ -120,28 +120,28 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         public async Task PatchActionHttpTriggerServiceTests_GetActionForCustomerAsync_ReturnsNullWhenResourceHasNotBeenFound()
         {
             // Arrange
-            _documentDbProvider.Setup(x=>x.GetActionForCustomerToUpdateAsync(_customerId, _actionId, _actionPlanId)).Returns(Task.FromResult<string>(null));
+            _documentDbProvider.Setup(x => x.GetActionForCustomerToUpdateAsync(_customerId, _actionId, _actionPlanId)).Returns(Task.FromResult<string>(null));
 
             // Act
             var result = await _actionHttpTriggerService.GetActionsForCustomerAsync(_customerId, _actionId, _actionPlanId);
 
             // Assert
-            Assert.Null(result);
+            Assert.That(result,Is.Null);
         }
 
         [Test]
         public async Task PatchActionHttpTriggerServiceTests_GetActionForCustomerAsync_ReturnsResourceWhenResourceHasBeenFound()
         {
             // Arrange
-            _documentDbProvider.Setup(x=>x.GetActionForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult(_action));
+            _documentDbProvider.Setup(x => x.GetActionForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult(_action));
             _documentDbProvider.Setup(x => x.GetActionForCustomerToUpdateAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult("some string"));
 
             // Act
             var result = await _actionHttpTriggerService.GetActionsForCustomerAsync(_customerId, _actionId, _actionPlanId);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsInstanceOf<string>(result);
+            Assert.That(result,Is.Not.Null);
+            Assert.That(result,Is.InstanceOf<string>());
         }
     }
 }

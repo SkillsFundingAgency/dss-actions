@@ -1,6 +1,6 @@
-﻿using System;
+﻿using NCS.DSS.Action.Cosmos.Provider;
+using System;
 using System.Threading.Tasks;
-using NCS.DSS.Action.Cosmos.Provider;
 
 namespace NCS.DSS.Action.GetActionByIdHttpTrigger.Service
 {

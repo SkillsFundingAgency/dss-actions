@@ -1,9 +1,7 @@
 ﻿using DFC.Common.Standard.GuidHelper;
-using DFC.Common.Standard.Logging;
 using DFC.HTTP.Standard;
-using DFC.JSON.Standard;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NCS.DSS.Action.Cosmos.Helper;
@@ -16,9 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-
+using PatchActionHttpTriggerRun = NCS.DSS.Action.PatchActionHttpTrigger.Function.PatchActionHttpTrigger;
 namespace NCS.DSS.Action.Tests.FunctionTests
 {
     [TestFixture]
@@ -37,44 +34,39 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         private readonly Guid _actionId = Guid.Parse("05c85a2d-af4d-4beb-846b-b046a04e094a");
         private readonly string _apimUrl = "https://loocalhost:7001";
 
-        private readonly Mock<ILogger> _log;
         private readonly HttpRequest _request;
         private readonly Mock<IResourceHelper> _resourceHelper;
         private readonly IValidate _validate;
         private readonly Mock<IPatchActionHttpTriggerService> _patchActionHttpTriggerService;
         private readonly Mock<IHttpRequestHelper> _httpRequestHelper;
-        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
         private readonly Models.Action _action;
         private readonly ActionPatch _actionPatch;
         private readonly string _actionString = string.Empty;
-        private PatchActionHttpTrigger.Function.PatchActionHttpTrigger _patchActionHttpTrigger;
+        private PatchActionHttpTriggerRun _patchActionHttpTrigger;
         private readonly IGuidHelper _guidHelper;
-        private Mock<ILoggerHelper> _loggerHelper;
-        private IJsonHelper _jsonHelper;
+        private Mock<ILogger<PatchActionHttpTriggerRun>> _loggerHelper;
+        private IConvertToDynamic _convertToDynamic;
 
         public PatchActionHttpTriggerTests()
         {
             _action = new Models.Action();
             _actionPatch = new ActionPatch() { ActionType = ReferenceData.ActionType.ApplyForApprenticeship, DateActionAgreed = DateTime.Now, ActionStatus = ReferenceData.ActionStatus.InProgress };
-            _request = new DefaultHttpRequest(new DefaultHttpContext());
+            _request = (new DefaultHttpContext()).Request;
             _resourceHelper = new Mock<IResourceHelper>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
-            _httpResponseMessageHelper = new HttpResponseMessageHelper();
-            _loggerHelper = new Mock<ILoggerHelper>();
-            _jsonHelper = new JsonHelper();
+            _loggerHelper = new Mock<ILogger<PatchActionHttpTriggerRun>>();
+            _convertToDynamic = new ConvertToDynamic();
             _guidHelper = new GuidHelper();
 
-            _log = new Mock<ILogger>();
             _validate = new Validate();
             _patchActionHttpTriggerService = new Mock<IPatchActionHttpTriggerService>();
-            _patchActionHttpTrigger = new PatchActionHttpTrigger.Function.PatchActionHttpTrigger(
+            _patchActionHttpTrigger = new PatchActionHttpTriggerRun(
                 _resourceHelper.Object,
                 _patchActionHttpTriggerService.Object,
                 _loggerHelper.Object,
                 _validate,
                 _httpRequestHelper.Object,
-                _httpResponseMessageHelper,
-                _jsonHelper,
+                _convertToDynamic,
                 _guidHelper);
 
             _actionString = JsonConvert.SerializeObject(_action);
@@ -84,14 +76,13 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         public async Task PatchActionHttpTrigger_ReturnsStatusCodeBadRequest_WhenTouchpointIdIsNotProvided()
         {
             // Arrange
-            _httpRequestHelper.Setup(x=>x.GetDssTouchpointId(_request)).Returns((string)null);
+            _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns((string)null);
 
             // Act
             var result = await RunFunction(InValidId, ValidInteractionId, ValidActionPlanId, ValidActionId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestResult>());
         }
 
         [Test]
@@ -99,14 +90,13 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         {
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
-            _httpRequestHelper.Setup(x=>x.GetDssApimUrl(_request)).Returns((string)null);
+            _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns((string)null);
 
             // Act
             var result = await RunFunction(InValidId, ValidInteractionId, ValidActionPlanId, ValidActionId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestResult>());
         }
 
         [Test]
@@ -120,8 +110,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             var result = await RunFunction(InValidId, ValidInteractionId, ValidActionPlanId, ValidActionId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -135,8 +124,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId, InValidId, ValidActionPlanId, ValidActionId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
 
@@ -151,8 +139,7 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId, InValidId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<BadRequestObjectResult>());
         }
 
         [Test]
@@ -171,21 +158,19 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             var validationResults = new List<ValidationResult> { new ValidationResult("Please supply a valid Action Type") };
             var val = new Mock<IValidate>();
             val.Setup(x => x.ValidateResource(It.IsAny<IAction>(), It.IsAny<bool>())).Returns(validationResults);
-            _patchActionHttpTrigger = new PatchActionHttpTrigger.Function.PatchActionHttpTrigger(
+            _patchActionHttpTrigger = new PatchActionHttpTriggerRun(
                 _resourceHelper.Object,
                 _patchActionHttpTriggerService.Object,
                 _loggerHelper.Object,
                 val.Object,
                 _httpRequestHelper.Object,
-                _httpResponseMessageHelper,
-                _jsonHelper,
+                _convertToDynamic,
                 _guidHelper);
 
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId, ValidActionId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual((HttpStatusCode)422, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<UnprocessableEntityObjectResult>());
         }
 
         [Test]
@@ -194,14 +179,13 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns(_apimUrl);
-            _httpRequestHelper.Setup(x=>x.GetResourceFromRequest<ActionPatch>(_request)).Throws(new JsonException());
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<ActionPatch>(_request)).Throws(new JsonException());
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId, ValidActionId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual((HttpStatusCode)422, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<UnprocessableEntityObjectResult>());
         }
 
         [Test]
@@ -210,15 +194,14 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             // Arrange
             _httpRequestHelper.Setup(x => x.GetDssTouchpointId(_request)).Returns("0000000001");
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns(_apimUrl);
-            _httpRequestHelper.Setup(x=>x.GetResourceFromRequest<ActionPatch>(_request)).Returns(Task.FromResult(_actionPatch));
-            _resourceHelper.Setup(x=>x.DoesCustomerExist(_customerId)).Returns(Task.FromResult(false));
+            _httpRequestHelper.Setup(x => x.GetResourceFromRequest<ActionPatch>(_request)).Returns(Task.FromResult(_actionPatch));
+            _resourceHelper.Setup(x => x.DoesCustomerExist(_customerId)).Returns(Task.FromResult(false));
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId, ValidActionId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.NoContent, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<NoContentResult>());
         }
 
         [Test]
@@ -229,14 +212,13 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             _httpRequestHelper.Setup(x => x.GetDssApimUrl(_request)).Returns(_apimUrl);
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<ActionPatch>(_request)).Returns(Task.FromResult(_actionPatch));
             _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
-            _resourceHelper.Setup(x=>x.DoesInteractionExistAndBelongToCustomer(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(false);
+            _resourceHelper.Setup(x => x.DoesInteractionExistAndBelongToCustomer(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(false);
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId, ValidActionId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.NoContent, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<NoContentResult>());
         }
 
         [Test]
@@ -248,14 +230,13 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             _httpRequestHelper.Setup(x => x.GetResourceFromRequest<ActionPatch>(_request)).Returns(Task.FromResult(_actionPatch));
             _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _resourceHelper.Setup(x => x.DoesInteractionExistAndBelongToCustomer(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(false);
-            _patchActionHttpTriggerService.Setup(x=>x.GetActionsForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult<string>(null));
+            _patchActionHttpTriggerService.Setup(x => x.GetActionsForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult<string>(null));
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId, ValidActionId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.NoContent, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<NoContentResult>());
         }
 
         [Test]
@@ -268,26 +249,25 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             _resourceHelper.Setup(x => x.DoesCustomerExist(It.IsAny<Guid>())).Returns(Task.FromResult(true));
             _resourceHelper.Setup(x => x.DoesInteractionExistAndBelongToCustomer(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(true);
             _patchActionHttpTriggerService.Setup(x => x.GetActionsForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult<string>(_actionString));
-            _patchActionHttpTriggerService.Setup(x=>x.UpdateCosmosAsync(It.IsAny<string>(), It.IsAny<Guid>())).Returns(Task.FromResult(_action));
+            _patchActionHttpTriggerService.Setup(x => x.UpdateCosmosAsync(It.IsAny<string>(), It.IsAny<Guid>())).Returns(Task.FromResult(_action));
             _resourceHelper.Setup(x => x.DoesActionPlanExistAndBelongToCustomer(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(true);
             _patchActionHttpTriggerService.Setup(x => x.PatchResource(It.IsAny<string>(), It.IsAny<ActionPatch>())).Returns(_actionString);
             var val = new Mock<IValidate>();
-            _patchActionHttpTrigger = new PatchActionHttpTrigger.Function.PatchActionHttpTrigger(
+            _patchActionHttpTrigger = new PatchActionHttpTriggerRun(
                 _resourceHelper.Object,
                 _patchActionHttpTriggerService.Object,
                 _loggerHelper.Object,
                 val.Object,
                 _httpRequestHelper.Object,
-                _httpResponseMessageHelper,
-                _jsonHelper,
+                _convertToDynamic,
                 _guidHelper);
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId, ValidActionId);
-
+            var jsonResult = (JsonResult)result;
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<JsonResult>());
+            Assert.That(jsonResult.StatusCode, Is.EqualTo((int)HttpStatusCode.OK));
         }
 
         [Test]
@@ -302,22 +282,20 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             _patchActionHttpTriggerService.Setup(x => x.UpdateCosmosAsync(It.IsAny<string>(), It.IsAny<Guid>())).Returns(Task.FromResult(_action));
             _resourceHelper.Setup(x => x.DoesActionPlanExistAndBelongToCustomer(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(true);
             _patchActionHttpTriggerService.Setup(x => x.PatchResource(It.IsAny<string>(), It.IsAny<ActionPatch>())).Returns(_actionString);
-            _patchActionHttpTriggerService.Setup(x=>x.GetActionsForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult<string>(null));
+            _patchActionHttpTriggerService.Setup(x => x.GetActionsForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult<string>(null));
 
             // Act
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId, ValidActionId);
 
             // Assert
-            Assert.IsInstanceOf<HttpResponseMessage>(result);
-            Assert.AreEqual(HttpStatusCode.NoContent, result.StatusCode);
+            Assert.That(result, Is.InstanceOf<NoContentResult>());
         }
 
 
-        private async Task<HttpResponseMessage> RunFunction(string customerId, string interactionId, string actionPlanId, string actionId)
+        private async Task<IActionResult> RunFunction(string customerId, string interactionId, string actionPlanId, string actionId)
         {
             return await _patchActionHttpTrigger.Run(
                 _request,
-                _log.Object,
                 customerId,
                 interactionId,
                 actionPlanId,
