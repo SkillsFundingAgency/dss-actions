@@ -1,7 +1,4 @@
 ﻿using NCS.DSS.Action.Cosmos.Provider;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace NCS.DSS.Action.GetActionHttpTrigger.Service
 {

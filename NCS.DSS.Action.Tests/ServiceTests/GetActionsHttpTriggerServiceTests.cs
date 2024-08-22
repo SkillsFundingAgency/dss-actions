@@ -32,7 +32,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var result = await _actionHttpTriggerService.GetActionsAsync(_customerId, _actionPlanId);
 
             // Assert
-            Assert.That(result,Is.Null);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var result = await _actionHttpTriggerService.GetActionsAsync(_customerId, _actionPlanId);
 
             // Assert
-            Assert.That(result,Is.Not.Null);
+            Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<List<Models.Action>>());
         }
     }

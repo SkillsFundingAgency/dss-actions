@@ -9,12 +9,9 @@ using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.Models;
 using NCS.DSS.Action.PostActionHttpTrigger.Service;
 using NCS.DSS.Action.Validation;
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace NCS.DSS.Action.PostActionHttpTrigger.Function
 {

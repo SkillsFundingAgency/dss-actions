@@ -50,7 +50,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var result = _actionHttpTriggerService.PatchResource(null, _actionPatch);
 
             // Assert
-            Assert.That(result,Is.Null);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var result = await _actionHttpTriggerService.UpdateCosmosAsync(_action.ToString(), _actionId);
 
             // Assert
-            Assert.That(result,Is.Null);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var result = await _actionHttpTriggerService.UpdateCosmosAsync(_action.ToString(), _actionId);
 
             // Assert
-            Assert.That(result,Is.Null);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -111,8 +111,8 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var result = await _actionHttpTriggerService.UpdateCosmosAsync(_json, _actionId);
 
             // Assert
-            Assert.That(result,Is.Not.Null);
-            Assert.That(result,Is.InstanceOf<Models.Action>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<Models.Action>());
 
         }
 
@@ -126,7 +126,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var result = await _actionHttpTriggerService.GetActionsForCustomerAsync(_customerId, _actionId, _actionPlanId);
 
             // Assert
-            Assert.That(result,Is.Null);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -140,8 +140,8 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var result = await _actionHttpTriggerService.GetActionsForCustomerAsync(_customerId, _actionId, _actionPlanId);
 
             // Assert
-            Assert.That(result,Is.Not.Null);
-            Assert.That(result,Is.InstanceOf<string>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<string>());
         }
     }
 }

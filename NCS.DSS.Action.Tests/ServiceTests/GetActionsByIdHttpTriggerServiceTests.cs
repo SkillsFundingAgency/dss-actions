@@ -34,7 +34,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var result = await _actionHttpTriggerService.GetActionForCustomerAsync(_customerId, _actionId, _actionPlanId);
 
             // Assert
-            Assert.That(result,Is.Null);
+            Assert.That(result, Is.Null);
         }
     }
 }

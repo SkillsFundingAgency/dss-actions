@@ -1,7 +1,6 @@
 ﻿using DFC.JSON.Standard.Attributes;
 using DFC.Swagger.Standard.Annotations;
 using NCS.DSS.Action.ReferenceData;
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace NCS.DSS.Action.Models
