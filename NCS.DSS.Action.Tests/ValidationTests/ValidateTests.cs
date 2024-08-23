@@ -30,8 +30,8 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.That(result,Is.InstanceOf<List<ValidationResult>>());
-            Assert.That(result,Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
@@ -54,8 +54,8 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.That(result,Is.InstanceOf<List<ValidationResult>>());
-            Assert.That(result,Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
@@ -74,8 +74,8 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.That(result,Is.InstanceOf<List<ValidationResult>>());
-            Assert.That(result,Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
@@ -95,8 +95,8 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.That(result,Is.InstanceOf<List<ValidationResult>>());
-            Assert.That(result,Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
@@ -115,8 +115,8 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.That(result,Is.InstanceOf<List<ValidationResult>>());
-            Assert.That(result,Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
@@ -136,8 +136,8 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.That(result,Is.InstanceOf<List<ValidationResult>>());
-            Assert.That(result,Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
@@ -157,9 +157,9 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.That(result,Is.InstanceOf<List<ValidationResult>>());
-            Assert.That(result,Is.Not.Null);
-            Assert.That(result.Count,Is.EqualTo(3));
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(3));
         }
 
         [Test]
@@ -180,8 +180,8 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, false);
 
             // Assert
-            Assert.That(result,Is.InstanceOf<List<ValidationResult>>());
-            Assert.That(result,Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(3));
         }
 
@@ -204,8 +204,8 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, true);
 
             // Assert
-            Assert.That(result,Is.InstanceOf<List<ValidationResult>>());
-            Assert.That(result,Is.Not.Null); 
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
@@ -227,8 +227,8 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, false);
 
             // Assert
-            Assert.That(result,Is.InstanceOf<List<ValidationResult>>());
-            Assert.That(result,Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
@@ -249,8 +249,8 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, false);
 
             // Assert
-            Assert.That(result,Is.InstanceOf<List<ValidationResult>>());
-            Assert.That(result,Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
@@ -272,8 +272,8 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, false);
 
             // Assert
-            Assert.That(result,Is.InstanceOf<List<ValidationResult>>());
-            Assert.That(result,Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
         }
 
         [Test]
@@ -294,8 +294,8 @@ namespace NCS.DSS.Action.Tests.ValidationTests
             var result = validation.ValidateResource(action, false);
 
             // Assert
-            Assert.That(result,Is.InstanceOf<List<ValidationResult>>());
-            Assert.That(result,Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<List<ValidationResult>>());
+            Assert.That(result, Is.Not.Null);
         }
 
     }

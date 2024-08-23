@@ -1,7 +1,6 @@
 ﻿using NCS.DSS.Action.Cosmos.Provider;
 using NCS.DSS.Action.ServiceBus;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace NCS.DSS.Action.PostActionHttpTrigger.Service
 {

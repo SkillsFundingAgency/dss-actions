@@ -41,7 +41,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var result = await _actionHttpTriggerService.CreateAsync(null);
 
             // Assert
-            Assert.That(result,Is.Null);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -76,8 +76,8 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var result = await _actionHttpTriggerService.CreateAsync(_action);
 
             // Assert
-            Assert.That(result,Is.Not.Null);
-            Assert.That(result,Is.InstanceOf<Models.Action>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<Models.Action>());
 
         }
     }

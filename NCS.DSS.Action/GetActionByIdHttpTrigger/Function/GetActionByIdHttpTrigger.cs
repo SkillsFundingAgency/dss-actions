@@ -7,10 +7,8 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.GetActionByIdHttpTrigger.Service;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace NCS.DSS.Action.GetActionByIdHttpTrigger.Function
 {

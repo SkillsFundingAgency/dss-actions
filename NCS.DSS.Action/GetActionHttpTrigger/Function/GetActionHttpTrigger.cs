@@ -7,11 +7,9 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.GetActionHttpTrigger.Service;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 
 namespace NCS.DSS.Action.GetActionHttpTrigger.Function
@@ -98,7 +96,7 @@ namespace NCS.DSS.Action.GetActionHttpTrigger.Function
             var actionPlans = await _actionsGetService.GetActionsAsync(customerGuid, actionPlanGuid);
 
             _loggerHelper.LogInformation("Exit from GetActionHttpTrigger");
-            if(actionPlans == null)
+            if (actionPlans == null)
             {
                 return new NoContentResult();
             }
@@ -109,7 +107,7 @@ namespace NCS.DSS.Action.GetActionHttpTrigger.Function
             else
             {
                 return new JsonResult(actionPlans, new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.OK };
-            }                
+            }
         }
     }
 }

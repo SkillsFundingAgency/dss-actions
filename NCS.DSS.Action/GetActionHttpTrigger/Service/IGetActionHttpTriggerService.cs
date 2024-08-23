@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace NCS.DSS.Action.GetActionHttpTrigger.Service
+﻿namespace NCS.DSS.Action.GetActionHttpTrigger.Service
 {
     public interface IGetActionHttpTriggerService
     {

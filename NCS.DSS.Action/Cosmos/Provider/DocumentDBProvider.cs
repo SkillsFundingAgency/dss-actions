@@ -4,10 +4,6 @@ using Microsoft.Azure.Documents.Linq;
 using NCS.DSS.Action.Cosmos.Client;
 using NCS.DSS.Action.Cosmos.Helper;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NCS.DSS.Action.Cosmos.Provider
 {
