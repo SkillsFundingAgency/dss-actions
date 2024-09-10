@@ -28,13 +28,13 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         public async Task GetActionHttpTriggerServiceTests_GetActionForCustomerAsync_ReturnsNullWhenResourceCannotBeFound()
         {
             // Arrange
-            _documentDbProvider.Setup(x=>x.GetActionForCustomerAsync(_customerId, _actionId, _actionPlanId)).Returns(Task.FromResult<Models.Action>(null));
+            _documentDbProvider.Setup(x => x.GetActionForCustomerAsync(_customerId, _actionId, _actionPlanId)).Returns(Task.FromResult<Models.Action>(null));
 
             // Act
             var result = await _actionHttpTriggerService.GetActionForCustomerAsync(_customerId, _actionId, _actionPlanId);
 
             // Assert
-            Assert.Null(result);
+            Assert.That(result, Is.Null);
         }
     }
 }

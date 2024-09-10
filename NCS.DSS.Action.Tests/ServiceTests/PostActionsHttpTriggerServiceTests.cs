@@ -41,7 +41,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             var result = await _actionHttpTriggerService.CreateAsync(null);
 
             // Assert
-            Assert.Null(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -70,14 +70,14 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
             responseField?.SetValue(resourceResponse, documentServiceResponse);
 
-            _documentDbProvider.Setup(x=>x.CreateActionAsync(_action)).Returns(Task.FromResult(resourceResponse));
+            _documentDbProvider.Setup(x => x.CreateActionAsync(_action)).Returns(Task.FromResult(resourceResponse));
 
             // Act
             var result = await _actionHttpTriggerService.CreateAsync(_action);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsInstanceOf<Models.Action>(result);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<Models.Action>());
 
         }
     }

@@ -1,21 +1,15 @@
 using DFC.Common.Standard.GuidHelper;
-using DFC.Common.Standard.Logging;
 using DFC.HTTP.Standard;
-using DFC.JSON.Standard;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.GetActionHttpTrigger.Service;
-using NCS.DSS.Action.Models;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 
 namespace NCS.DSS.Action.GetActionHttpTrigger.Function
@@ -25,24 +19,20 @@ namespace NCS.DSS.Action.GetActionHttpTrigger.Function
 
         private readonly IResourceHelper _resourceHelper;
         private readonly IGetActionHttpTriggerService _actionsGetService;
-        private readonly ILoggerHelper _loggerHelper;
+        private readonly ILogger<GetActionHttpTrigger> _loggerHelper;
         private readonly IHttpRequestHelper _httpRequestHelper;
-        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
-        private readonly IJsonHelper _jsonHelper;
         private readonly IGuidHelper _guidHelper;
 
-        public GetActionHttpTrigger(IResourceHelper resourceHelper, IGetActionHttpTriggerService actionsGetService, ILoggerHelper loggerHelper, IHttpRequestHelper httpRequestHelper, IHttpResponseMessageHelper httpResponseMessageHelper, IJsonHelper jsonHelper, IGuidHelper guidHelper)
+        public GetActionHttpTrigger(IResourceHelper resourceHelper, IGetActionHttpTriggerService actionsGetService, ILogger<GetActionHttpTrigger> loggerHelper, IHttpRequestHelper httpRequestHelper, IGuidHelper guidHelper)
         {
             _resourceHelper = resourceHelper;
             _actionsGetService = actionsGetService;
             _loggerHelper = loggerHelper;
             _httpRequestHelper = httpRequestHelper;
-            _httpResponseMessageHelper = httpResponseMessageHelper;
-            _jsonHelper = jsonHelper;
             _guidHelper = guidHelper;
         }
 
-        [FunctionName("Get")]
+        [Function("Get")]
         [ProducesResponseType(typeof(Models.Action), 200)]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Action found", ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Action does not exist", ShowSchema = false)]
@@ -50,55 +40,74 @@ namespace NCS.DSS.Action.GetActionHttpTrigger.Function
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Forbidden, Description = "Insufficient access", ShowSchema = false)]
         [Display(Name = "Get", Description = "Ability to return all Action for the given Interactions.")]
-        public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/")]
-            HttpRequest req, ILogger log, string customerId, string interactionId, string actionPlanId)
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/")]
+            HttpRequest req, string customerId, string interactionId, string actionPlanId)
         {
 
+            _loggerHelper.LogInformation("Start GetActionHttpTrigger");
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
 
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                log.LogInformation("Unable to locate 'TouchpointId' in request header");
-                return _httpResponseMessageHelper.BadRequest();
+                _loggerHelper.LogWarning($"[{correlationId}] Unable to locate 'TouchpointId' in request header");
+                return new BadRequestResult();
             }
 
             if (!Guid.TryParse(customerId, out var customerGuid))
-                return _httpResponseMessageHelper.BadRequest(customerGuid);
+            {
+                _loggerHelper.LogWarning($"[{correlationId}] Invalid 'CustomerId' in request. CustomerId can't be parsed to Guid");
+                return new BadRequestObjectResult(customerGuid);
+            }
 
             if (!Guid.TryParse(interactionId, out var interactionGuid))
-                return _httpResponseMessageHelper.BadRequest(interactionGuid);
+            {
+                _loggerHelper.LogWarning($"[{correlationId}] Invalid 'interactionId' in request. interactionId can't be parsed to Guid");
+                return new BadRequestObjectResult(interactionGuid);
+            }
 
             if (!Guid.TryParse(actionPlanId, out var actionPlanGuid))
-                return _httpResponseMessageHelper.BadRequest(actionPlanGuid);
-
+            {
+                _loggerHelper.LogWarning($"[{correlationId}] Invalid 'actionPlanId' in request. actionPlanId can't be parsed to Guid");
+                return new BadRequestObjectResult(actionPlanGuid);
+            }
 
             var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
-
             if (!doesCustomerExist)
-                return _httpResponseMessageHelper.NoContent(customerGuid);
-
-
+            {
+                _loggerHelper.LogWarning($"[{correlationId}] Customer with [{customerGuid}] does not exist");
+                return new NoContentResult();
+            }
 
             var doesInteractionExist = _resourceHelper.DoesInteractionExistAndBelongToCustomer(interactionGuid, customerGuid);
-
             if (!doesInteractionExist)
-                return _httpResponseMessageHelper.NoContent(interactionGuid);
-
+            {
+                _loggerHelper.LogWarning($"[{correlationId}] Interaction with [{interactionGuid}] does not exist");
+                return new NoContentResult();
+            }
 
             var doesActionPlanExistAndBelongToCustomer = _resourceHelper.DoesActionPlanExistAndBelongToCustomer(actionPlanGuid, interactionGuid, customerGuid);
-
             if (!doesActionPlanExistAndBelongToCustomer)
-                return _httpResponseMessageHelper.NoContent(actionPlanGuid);
+            {
+                _loggerHelper.LogWarning($"[{correlationId}] Action Plan with [{actionPlanGuid}] does not exist");
+                return new NoContentResult();
+            }
 
-         
             var actionPlans = await _actionsGetService.GetActionsAsync(customerGuid, actionPlanGuid);
 
-            _loggerHelper.LogMethodExit(log);
-
-            return actionPlans == null ?
-                _httpResponseMessageHelper.NoContent(customerGuid) :
-                _httpResponseMessageHelper.Ok(_jsonHelper.SerializeObjectsAndRenameIdProperty(actionPlans, "id", "ActionId"));
+            _loggerHelper.LogInformation("Exit from GetActionHttpTrigger");
+            if (actionPlans == null)
+            {
+                return new NoContentResult();
+            }
+            else if (actionPlans.Count == 1)
+            {
+                return new JsonResult(actionPlans[0], new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.OK };
+            }
+            else
+            {
+                return new JsonResult(actionPlans, new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.OK };
+            }
         }
     }
 }

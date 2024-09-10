@@ -1,24 +1,17 @@
 using DFC.Common.Standard.GuidHelper;
-using DFC.Common.Standard.Logging;
 using DFC.HTTP.Standard;
-using DFC.JSON.Standard;
 using DFC.Swagger.Standard.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.Models;
 using NCS.DSS.Action.PatchActionHttpTrigger.Service;
 using NCS.DSS.Action.Validation;
-using Newtonsoft.Json;
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
 {
@@ -26,26 +19,24 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
     {
         private readonly IResourceHelper _resourceHelper;
         private readonly IPatchActionHttpTriggerService _actionsPatchService;
-        private readonly ILoggerHelper _loggerHelper;
+        private readonly ILogger<PatchActionHttpTrigger> _loggerHelper;
         private readonly IValidate _validate;
         private readonly IHttpRequestHelper _httpRequestHelper;
-        private readonly IHttpResponseMessageHelper _httpResponseMessageHelper;
-        private readonly IJsonHelper _jsonHelper;
+        private readonly IConvertToDynamic _convertToDynamic;
         private readonly IGuidHelper _guidHelper;
 
-        public PatchActionHttpTrigger(IResourceHelper resourceHelper, IPatchActionHttpTriggerService actionsPatchService, ILoggerHelper loggerHelper, IValidate validate, IHttpRequestHelper httpRequestHelper, IHttpResponseMessageHelper httpResponseMessageHelper, IJsonHelper jsonHelper, IGuidHelper guidHelper)
+        public PatchActionHttpTrigger(IResourceHelper resourceHelper, IPatchActionHttpTriggerService actionsPatchService, ILogger<PatchActionHttpTrigger> loggerHelper, IValidate validate, IHttpRequestHelper httpRequestHelper, IConvertToDynamic convertToDynamic, IGuidHelper guidHelper)
         {
             _resourceHelper = resourceHelper;
             _actionsPatchService = actionsPatchService;
             _loggerHelper = loggerHelper;
             _validate = validate;
             _httpRequestHelper = httpRequestHelper;
-            _httpResponseMessageHelper = httpResponseMessageHelper;
-            _jsonHelper = jsonHelper;
+            _convertToDynamic = convertToDynamic;
             _guidHelper = guidHelper;
         }
 
-        [FunctionName("Patch")]
+        [Function("Patch")]
         [ProducesResponseType(typeof(Models.Action), 200)]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "Action Updated", ShowSchema = true)]
         [Response(HttpStatusCode = (int)HttpStatusCode.NoContent, Description = "Action does not exist", ShowSchema = false)]
@@ -58,156 +49,168 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
                                                "<br><b>DateActionAgreed:</b> DateActionAgreed >= DateTime.Now <br>" +
                                                "<br><b>DateActionAimsToBeCompletedBy:</b> DateActionAimsToBeCompletedBy >= DateActionAgreed <br>" +
                                                "<br><b>DateActionActuallyCompleted:</b> DateActionActuallyCompleted >= DateActionAgreed <br>")]
-        public async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/{actionId}")]
-            HttpRequest req, ILogger log, string customerId, string interactionId, string actionPlanId, string actionId)
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/{actionId}")]
+            HttpRequest req, string customerId, string interactionId, string actionPlanId, string actionId)
         {
 
-            _loggerHelper.LogMethodEnter(log);
+            _loggerHelper.LogInformation("Start PatchActionHttpTrigger");
 
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
 
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                log.LogInformation("Unable to locate 'TouchpointId' in request header");
-                return _httpResponseMessageHelper.BadRequest();
+                _loggerHelper.LogWarning($"[{correlationId}] Unable to locate 'TouchpointId' in request header");
+                return new BadRequestResult();
             }
 
             var apimUrl = _httpRequestHelper.GetDssApimUrl(req);
             if (string.IsNullOrEmpty(apimUrl))
             {
-                log.LogInformation("Unable to locate 'apimurl' in request header");
-                return _httpResponseMessageHelper.BadRequest();
+                _loggerHelper.LogInformation($"[{correlationId}] Unable to locate 'apimurl' in request header");
+                return new BadRequestResult();
             }
 
             if (!Guid.TryParse(customerId, out var customerGuid))
-                return _httpResponseMessageHelper.BadRequest(customerGuid);
+            {
+                _loggerHelper.LogWarning($"[{correlationId}] Invalid 'CustomerId' in request. CustomerId can't be parsed to Guid");
+                return new BadRequestObjectResult(customerGuid);
+            }
 
             if (!Guid.TryParse(interactionId, out var interactionGuid))
-                return _httpResponseMessageHelper.BadRequest(interactionGuid);
+            {
+                _loggerHelper.LogWarning($"[{correlationId}] Invalid 'interactionId' in request. interactionId can't be parsed to Guid");
+                return new BadRequestObjectResult(interactionGuid);
+            }
 
             if (!Guid.TryParse(actionPlanId, out var actionPlanGuid))
-                return _httpResponseMessageHelper.BadRequest(actionPlanGuid);
+            {
+                _loggerHelper.LogWarning($"[{correlationId}] Invalid 'actionPlanId' in request. actionPlanId can't be parsed to Guid");
+                return new BadRequestObjectResult(actionPlanGuid);
+            }
 
             if (!Guid.TryParse(actionId, out var actionGuid))
-                return _httpResponseMessageHelper.BadRequest(actionGuid);
+            {
+                _loggerHelper.LogWarning($"[{correlationId}] Invalid 'actionId' in request. actionId can't be parsed to Guid");
+                return new BadRequestObjectResult(actionId);
+            }
 
             ActionPatch actionPatchRequest;
 
             try
             {
-                log.LogInformation("Attempt to get resource from body of the request");
+                _loggerHelper.LogInformation("Attempt to get resource from body of the request");
                 actionPatchRequest = await _httpRequestHelper.GetResourceFromRequest<ActionPatch>(req);
             }
-            catch (JsonException ex)
+            catch (Exception ex)
             {
-                log.LogError("Unable to retrieve body from req", ex);
-                return _httpResponseMessageHelper.UnprocessableEntity(ex);
+                _loggerHelper.LogError("Unable to retrieve body from req", ex);
+                return new UnprocessableEntityObjectResult(_convertToDynamic.ExcludeProperty(ex, ["TargetSite", "InnerException"]));
             }
 
             if (actionPatchRequest == null)
             {
-                log.LogError("Action patch request is null");
-                return _httpResponseMessageHelper.UnprocessableEntity(req);
+                _loggerHelper.LogError("Action patch request is null");
+                return new UnprocessableEntityObjectResult(req);
             }
 
-            log.LogInformation("Attempt to set id's for action patch");
+            _loggerHelper.LogInformation("Attempt to set id's for action patch");
             actionPatchRequest.SetIds(touchpointId);
 
-            log.LogInformation(string.Format("Attempting to see if customer exists {0}", customerGuid));
+            _loggerHelper.LogInformation($"[{correlationId}] Attempting to see if customer exists {customerGuid}");
             var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
             {
-                log.LogError(string.Format("Customer does not exist {0}", customerGuid));
-                return _httpResponseMessageHelper.NoContent(customerGuid);
+                _loggerHelper.LogError($"[{correlationId}] Customer does not exist {customerGuid}");
+                return new NoContentResult();
             }
 
-            log.LogError(string.Format("Attempting to see if this is a read only customer {0}", customerGuid));
+            _loggerHelper.LogError($"[{correlationId}] Attempting to see if this is a read only customer {customerGuid}");
             var isCustomerReadOnly = _resourceHelper.IsCustomerReadOnly();
 
             if (isCustomerReadOnly)
             {
-                log.LogError(string.Format("Customer is read only {0}", customerGuid));
-                return _httpResponseMessageHelper.Forbidden(customerGuid);
+                _loggerHelper.LogError($"[{correlationId}] Customer is read only {customerGuid}");
+                return new ObjectResult(customerGuid) { StatusCode = (int)HttpStatusCode.Forbidden };
             }
 
-            log.LogError(string.Format("Attempting to see if interaction exists {0}", interactionGuid));
+            _loggerHelper.LogError($"[{correlationId}] Attempting to see if interaction exists {interactionGuid}");
             var doesInteractionExist = _resourceHelper.DoesInteractionExistAndBelongToCustomer(interactionGuid, customerGuid);
 
             if (!doesInteractionExist)
             {
-                log.LogError(string.Format("Interaction does not exist {0}", interactionGuid));
-                return _httpResponseMessageHelper.NoContent(interactionGuid);
+                _loggerHelper.LogError($"[{correlationId}] Interaction does not exist {interactionGuid}");
+                return new NoContentResult();
             }
 
             var doesActionPlanExistAndBelongToCustomer = _resourceHelper.DoesActionPlanExistAndBelongToCustomer(actionPlanGuid, interactionGuid, customerGuid);
 
             if (!doesActionPlanExistAndBelongToCustomer)
             {
-                log.LogError(string.Format("Action Plan does not exist {0}", actionPlanGuid));
-                return _httpResponseMessageHelper.NoContent(actionPlanGuid);
+                _loggerHelper.LogError($"[{correlationId}] Action Plan does not exist {actionPlanGuid}");
+                return new NoContentResult();
             }
 
-            log.LogInformation(string.Format("Attempting to get action {0} for customer {1}", actionGuid, customerGuid));
+            _loggerHelper.LogInformation($"[{correlationId}] Attempting to get action {actionGuid} for customer {customerGuid}");
             var actionForCustomer = await _actionsPatchService.GetActionsForCustomerAsync(customerGuid, actionGuid, actionPlanGuid);
 
             if (actionForCustomer == null)
             {
-                log.LogInformation(string.Format("Action does not exist {0}", actionGuid));
-                return _httpResponseMessageHelper.NoContent(actionGuid);
+                _loggerHelper.LogInformation($"[{correlationId}] Action does not exist {actionGuid}");
+                return new NoContentResult();
             }
 
             var patchedAction = _actionsPatchService.PatchResource(actionForCustomer, actionPatchRequest);
 
             if (patchedAction == null)
             {
-                log.LogInformation(string.Format("Action does not exist {0}", actionGuid));
-                return _httpResponseMessageHelper.NoContent(actionGuid);
+                _loggerHelper.LogInformation($"[{correlationId}] Action does not exist {actionGuid}");
+                return new NoContentResult();
             }
 
             Models.Action actionValidationObject;
 
             try
             {
-                actionValidationObject = JsonConvert.DeserializeObject<Models.Action>(patchedAction);
+                actionValidationObject = JsonSerializer.Deserialize<Models.Action>(patchedAction);
             }
-            catch (JsonException ex)
+            catch (Exception ex)
             {
-                log.LogError("Unable to retrieve body from req", ex);
+                _loggerHelper.LogError("Unable to retrieve body from req", _convertToDynamic.ExcludeProperty(ex, ["TargetSite", "InnerException"]));
                 throw;
             }
 
             if (actionValidationObject == null)
             {
-                log.LogError("Action Validation Object is null");
-                return _httpResponseMessageHelper.UnprocessableEntity(req);
+                _loggerHelper.LogError("Action Validation Object is null");
+                return new UnprocessableEntityObjectResult(req);
             }
 
-            log.LogInformation("Attempt to validate resource");
+            _loggerHelper.LogInformation("Attempt to validate resource");
             var errors = _validate.ValidateResource(actionValidationObject, false);
 
             if (errors != null && errors.Any())
             {
-                log.LogError("validation errors with resource");
-                return _httpResponseMessageHelper.UnprocessableEntity(errors);
+                _loggerHelper.LogError("validation errors with resource");
+                return new UnprocessableEntityObjectResult(errors);
             }
 
 
-            log.LogError(string.Format("Attempting to update action {0}", actionGuid));
+            _loggerHelper.LogInformation($"[{correlationId}] Attempting to update action {actionGuid}");
             var updatedAction = await _actionsPatchService.UpdateCosmosAsync(patchedAction, actionGuid);
 
             if (updatedAction != null)
             {
-                log.LogError(string.Format("attempting to send to service bus {0}", actionGuid));
+                _loggerHelper.LogInformation($"[{correlationId}] attempting to send to service bus {actionGuid}");
                 await _actionsPatchService.SendToServiceBusQueueAsync(updatedAction, customerGuid, apimUrl);
             }
 
-            _loggerHelper.LogMethodExit(log);
+            _loggerHelper.LogInformation("Exit from PatchActionHttpTrigger");
 
             return updatedAction == null ?
-                _httpResponseMessageHelper.BadRequest(actionGuid) :
-                _httpResponseMessageHelper.Ok(_jsonHelper.SerializeObjectAndRenameIdProperty(updatedAction, "id", "ActionId"));
+                 new BadRequestObjectResult(actionGuid) :
+                new JsonResult(updatedAction, new JsonSerializerOptions()) { StatusCode = (int)HttpStatusCode.OK };
         }
     }
 }

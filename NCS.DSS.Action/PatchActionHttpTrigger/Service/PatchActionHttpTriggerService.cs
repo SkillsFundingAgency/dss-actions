@@ -1,9 +1,7 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
-using NCS.DSS.Action.Cosmos.Provider;
+﻿using NCS.DSS.Action.Cosmos.Provider;
 using NCS.DSS.Action.Models;
 using NCS.DSS.Action.ServiceBus;
+using System.Net;
 
 namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
 {
@@ -12,7 +10,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
         private readonly IActionPatchService _actionPatchService;
         private readonly IDocumentDBProvider _documentDbProvider;
         private readonly IServiceBusClient _serviceBusClient;
-        
+
         public PatchActionHttpTriggerService(IActionPatchService actionPatchService, IDocumentDBProvider documentDbProvider, IServiceBusClient serviceBusClient)
         {
             _actionPatchService = actionPatchService;

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using DFC.JSON.Standard;
+﻿using DFC.JSON.Standard;
 using NCS.DSS.Action.Cosmos.Provider;
 
 namespace NCS.DSS.Action.Cosmos.Helper
@@ -33,7 +31,7 @@ namespace NCS.DSS.Action.Cosmos.Helper
 
             return !string.IsNullOrWhiteSpace(dateOfTermination);
         }
-        
+
         public bool DoesInteractionExistAndBelongToCustomer(Guid interactionId, Guid customerGuid)
         {
             return _documentDbProvider.DoesInteractionResourceExistAndBelongToCustomer(interactionId, customerGuid);

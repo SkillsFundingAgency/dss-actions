@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using NCS.DSS.Action.Models;
-
-namespace NCS.DSS.Action.ServiceBus
+﻿namespace NCS.DSS.Action.ServiceBus
 {
     public interface IServiceBusClient
     {

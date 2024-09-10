@@ -26,27 +26,27 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         public async Task GetActionHttpTriggerServiceTests_GetActionsAsync_ReturnsNullWhenResourceCannotBeFound()
         {
             // Arrange
-            _documentDbProvider.Setup(x=>x.GetActionsForCustomerAsync(_customerId, _actionPlanId)).Returns(Task.FromResult<List<Models.Action>>(null));
+            _documentDbProvider.Setup(x => x.GetActionsForCustomerAsync(_customerId, _actionPlanId)).Returns(Task.FromResult<List<Models.Action>>(null));
 
             // Act
             var result = await _actionHttpTriggerService.GetActionsAsync(_customerId, _actionPlanId);
 
             // Assert
-            Assert.Null(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
         public async Task GetActionHttpTriggerServiceTests_GetActionsAsync_ReturnsResource()
         {
             // Arrange
-            _documentDbProvider.Setup(x=>x.GetActionsForCustomerAsync(_customerId, _actionPlanId)).Returns(Task.FromResult(new List<Models.Action>()));
+            _documentDbProvider.Setup(x => x.GetActionsForCustomerAsync(_customerId, _actionPlanId)).Returns(Task.FromResult(new List<Models.Action>()));
 
             // Act
             var result = await _actionHttpTriggerService.GetActionsAsync(_customerId, _actionPlanId);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsInstanceOf<List<Models.Action>>(result);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<List<Models.Action>>());
         }
     }
 }
