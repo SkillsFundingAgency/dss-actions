@@ -34,7 +34,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public async Task<bool> DoesCustomerResourceExistAsync(Guid customerId)
         {
-            _logger.LogInformation("Checking if customer resource exists for Customer ID: {CustomerId}", customerId);
+            _logger.LogInformation("Checking if Customer resource exists for Customer ID: {CustomerId}", customerId);
 
             try
             {
@@ -50,7 +50,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking customer resource existence");
+                _logger.LogError(ex, "Error checking Customer resource existence. Exception: {ErrorMessage}", ex.Message)
                 throw;
             }
         }
@@ -79,15 +79,14 @@ namespace NCS.DSS.Action.Cosmos.Provider
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking termination date. Customer ID: {CustomerId}", customerId);
+                _logger.LogError(ex, "Error checking termination date. Customer ID: {CustomerId}. Exception: {ErrorMessage}", customerId, ex.Message);
                 throw;
             }
         }
 
-        //TODO: Need to test
         public async Task<bool> DoesInteractionResourceExistAndBelongToCustomerAsync(Guid interactionId, Guid customerId)
         {
-            _logger.LogInformation("Checking if interaction resource exists and belongs to Customer ID: {CustomerId}, Interaction ID: {InteractionId}", customerId, interactionId);
+            _logger.LogInformation("Checking if Interaction resource exists and belongs to Customer ID: {CustomerId}, Interaction ID: {InteractionId}", customerId, interactionId);
 
             try
             {
@@ -108,15 +107,14 @@ namespace NCS.DSS.Action.Cosmos.Provider
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Error checking interaction resource existence");
+                _logger.LogError(ex, "Error checking Interaction resource existence. Exception: {ErrorMessage}", ex.Message)
                 return false;
             }
         }
-
-        //TODO: Need to test
+        
         public async Task<bool> DoesActionPlanResourceExistAndBelongToCustomerAsync(Guid actionPlanId, Guid interactionId, Guid customerId)
         {
-            _logger.LogInformation("Checking if action plan resource exists for Action Plan ID: {ActionPlanId}, Interaction ID: {InteractionId}, Customer ID: {CustomerId}", actionPlanId, interactionId, customerId);
+            _logger.LogInformation("Checking if Action Plan resource exists for Action Plan ID: {ActionPlanId}, Interaction ID: {InteractionId}, Customer ID: {CustomerId}", actionPlanId, interactionId, customerId);
 
             try
             {
@@ -133,20 +131,20 @@ namespace NCS.DSS.Action.Cosmos.Provider
                 var count = (await iterator.ReadNextAsync()).Resource.FirstOrDefault();
                 var exists = count > 0;
 
-                _logger.LogInformation("Action plan resource existence check result: {Result}", exists);
+                _logger.LogInformation("Action Plan resource existence check result: {Result}", exists);
 
                 return exists;
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Error checking action plan resource existence");
+                _logger.LogError(ex, "Error checking Action Plan resource existence. Exception: {ErrorMessage}", ex.Message)
                 return false;
             }
         }
 
         public async Task<List<Models.Action>> GetActionsForCustomerAsync(Guid customerId, Guid actionPlanId)
         {
-            _logger.LogInformation("Retrieving actions for Customer ID: {CustomerId}, Action Plan ID: {ActionPlanId}", customerId, actionPlanId);
+            _logger.LogInformation("Retrieving Action(s) for Customer ID: {CustomerId}, Action Plan ID: {ActionPlanId}", customerId, actionPlanId);
 
             try
             {
@@ -166,20 +164,20 @@ namespace NCS.DSS.Action.Cosmos.Provider
                     actions.AddRange(response.Resource);
                 }
 
-                _logger.LogInformation("Retrieved {Count} actions for CustomerId: {CustomerId}", actions.Count, customerId);
+                _logger.LogInformation("Retrieved {Count} Action(s) for CustomerId: {CustomerId}", actions.Count, customerId);
 
                 return actions.Any() ? actions : null;
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Error fetching actions");
+                _logger.LogError(ex, "Error fetching Action(s). Exception: {ErrorMessage}", ex.Message);
                 return null;
             }
         }
 
         public async Task<Models.Action> GetActionForCustomerAsync(Guid customerId, Guid actionId, Guid actionPlanId)
         {
-            _logger.LogInformation("Retrieving action for Customer ID: {CustomerId}. Action ID: {ActionId}. Action Plan ID: {ActionPlanId}", customerId, actionId, actionPlanId);
+            _logger.LogInformation("Retrieving Action for Customer ID: {CustomerId}. Action ID: {ActionId}. Action Plan ID: {ActionPlanId}", customerId, actionId, actionPlanId);
 
             try
             {
@@ -203,7 +201,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Error retrieving action for customer");
+                _logger.LogError(ex, "Error retrieving Action for Customer. Exception: {ErrorMessage}", ex.Message);
                 return null;
             }
 
@@ -212,7 +210,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public async Task<string> GetActionForCustomerToUpdateAsync(Guid customerId, Guid actionId, Guid actionPlanId)
         {
-            _logger.LogInformation("Retrieving action for update for Customer ID: {CustomerId}. Action ID: {ActionId}. Action Plan ID: {ActionPlanId}", customerId, actionId, actionPlanId);
+            _logger.LogInformation("Retrieving Action for update for Customer ID: {CustomerId}. Action ID: {ActionId}. Action Plan ID: {ActionPlanId}", customerId, actionId, actionPlanId);
 
             try
             {
@@ -222,14 +220,14 @@ namespace NCS.DSS.Action.Cosmos.Provider
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Error retrieving action for update");
+                _logger.LogError(ex, "Error retrieving Action for update. Exception: {ErrorMessage}", ex.Message);
                 return null;
             }
         }
 
         public async Task<ItemResponse<Models.Action>> CreateActionAsync(Models.Action action)
         {
-            _logger.LogInformation("Creating action for Customer ID: {CustomerId}", action.CustomerId);
+            _logger.LogInformation("Creating Action for Customer ID: {CustomerId}", action.CustomerId);
 
             try
             {
@@ -240,25 +238,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Error creating action");
-                return null;
-            }
-        }
-
-        public async Task<ItemResponse<Models.Action>> UpdateActionAsync(Models.Action action, Guid actionId)
-        {
-            _logger.LogInformation("Updating action for Action ID: {ActionId}", actionId);
-
-            try
-            {
-                var response = await _actionContainer.ReplaceItemAsync(action, actionId.ToString(), PartitionKey.None);
-                _logger.LogInformation("Action updated successfully for Action ID: {ActionId}", actionId);
-
-                return response;
-            }
-            catch (CosmosException ex)
-            {
-                _logger.LogError(ex, "Error updating action");
+                _logger.LogError(ex, "Error creating Action. Exception: {ErrorMessage}", ex.Message);
                 return null;
             }
         }
@@ -267,13 +247,13 @@ namespace NCS.DSS.Action.Cosmos.Provider
         {
             if (string.IsNullOrWhiteSpace(actionJson))
             {
-                _logger.LogWarning("Empty or null action data provided for Action ID: {ActionId}", actionId);
+                _logger.LogWarning("Empty or null Action data provided for Action ID: {ActionId}", actionId);
                 return null;
             }
 
             try
             {
-                _logger.LogInformation("Updating action for Action ID: {ActionId}", actionId);
+                _logger.LogInformation("Updating Action for Action ID: {ActionId}", actionId);
 
                 var actionDocument = JsonSerializer.Deserialize<Models.Action>(actionJson);
 
@@ -290,11 +270,9 @@ namespace NCS.DSS.Action.Cosmos.Provider
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Error updating Action for Action ID: {ActionId}", actionId);
+                _logger.LogError(ex, "Error updating Action for Action ID: {ActionId}. Exception: {ErrorMessage}", actionId, ex.Message);
                 return null;
             }
         }
-
-
     }
 }

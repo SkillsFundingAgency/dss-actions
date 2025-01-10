@@ -144,7 +144,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
             }
             _logger.LogInformation("Customer exists. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", customerGuid, correlationGuid);
 
-            _logger.LogInformation("Attempting to check if customer is read only. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", customerGuid, correlationGuid);
+            _logger.LogInformation("Attempting to check if Customer is read only. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", customerGuid, correlationGuid);
             var isCustomerReadOnly = await _resourceHelper.IsCustomerReadOnly(customerGuid);
 
             if (isCustomerReadOnly)
@@ -157,7 +157,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
             }
             _logger.LogInformation("Customer is not read-only. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", customerGuid, correlationGuid);
 
-            _logger.LogInformation("Attempting to check if interaction exists. Interaction GUID: {InteractionGuid}. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", interactionGuid, customerGuid, correlationGuid);
+            _logger.LogInformation("Attempting to check if Interaction exists. Interaction GUID: {InteractionGuid}. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", interactionGuid, customerGuid, correlationGuid);
             var doesInteractionExist = await _resourceHelper.DoesInteractionExistAndBelongToCustomer(interactionGuid, customerGuid);
             if (!doesInteractionExist)
             {
@@ -184,12 +184,12 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
                 return new NoContentResult();
             }
 
-            _logger.LogInformation("Attempting to update Action for customer. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}", customerGuid, actionGuid);
+            _logger.LogInformation("Attempting to update Action for Customer. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}", customerGuid, actionGuid);
             var patchedAction = _actionsPatchService.PatchResource(actionForCustomer, actionPatchRequest);
 
             if (patchedAction == null)
             {
-                _logger.LogInformation("Failed to update Action for customer. The function {FunctionName} has returned NULL or empty. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}", nameof(_actionsPatchService.PatchResource), customerGuid, actionGuid);
+                _logger.LogInformation("Failed to update Action for Customer. The function {FunctionName} has returned NULL or empty. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}", nameof(_actionsPatchService.PatchResource), customerGuid, actionGuid);
                 return new NoContentResult();
             }
 
