@@ -12,13 +12,13 @@ namespace NCS.DSS.Action.Tests.ServiceTests
     public class GetActionHttpTriggerServiceTests
     {
         private readonly IGetActionHttpTriggerService _actionHttpTriggerService;
-        private readonly Mock<IDocumentDBProvider> _documentDbProvider;
+        private readonly Mock<ICosmosDBProvider> _documentDbProvider;
         private readonly Guid _customerId = Guid.Parse("58b43e3f-4a50-4900-9c82-a14682ee90fa");
         private readonly Guid _actionPlanId = Guid.Parse("12a16e3f-1c62-1660-3e81-b13122aa81aa");
 
         public GetActionHttpTriggerServiceTests()
         {
-            _documentDbProvider = new Mock<IDocumentDBProvider>();
+            _documentDbProvider = new Mock<ICosmosDBProvider>();
             _actionHttpTriggerService = new GetActionHttpTriggerService(_documentDbProvider.Object);
         }
 

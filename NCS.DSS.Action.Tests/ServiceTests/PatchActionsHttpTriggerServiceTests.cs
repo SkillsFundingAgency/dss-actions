@@ -1,5 +1,4 @@
-﻿using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
+﻿using Microsoft.Azure.Cosmos;
 using Moq;
 using NCS.DSS.Action.Cosmos.Provider;
 using NCS.DSS.Action.Models;
@@ -8,10 +7,7 @@ using NCS.DSS.Action.ServiceBus;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
-using System.Collections.Specialized;
-using System.IO;
 using System.Net;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace NCS.DSS.Action.Tests.ServiceTests
@@ -21,7 +17,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
     {
         private IPatchActionHttpTriggerService _actionHttpTriggerService;
         private Mock<IActionPatchService> _actionPatchService;
-        private Mock<IDocumentDBProvider> _documentDbProvider;
+        private Mock<ICosmosDBProvider> _documentDbProvider;
         private Mock<IServiceBusClient> _serviceBusClient;
         private string _json;
         private Models.Action _action;
@@ -34,13 +30,13 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         public void Setup()
         {
             _actionPatchService = new Mock<IActionPatchService>();
-            _documentDbProvider = new Mock<IDocumentDBProvider>();
+            _documentDbProvider = new Mock<ICosmosDBProvider>();
             _serviceBusClient = new Mock<IServiceBusClient>();
+
             _actionHttpTriggerService = new PatchActionHttpTriggerService(_actionPatchService.Object, _documentDbProvider.Object, _serviceBusClient.Object);
             _actionPatch = new ActionPatch();
             _action = new Models.Action();
             _json = JsonConvert.SerializeObject(_actionPatch);
-            //_actionPatchService.Patch(_json, _actionPatch).Returns(_action.ToString());
         }
 
         [Test]
@@ -70,7 +66,14 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         public async Task PatchActionHttpTriggerServiceTests_UpdateAsync_ReturnsNullWhenResourceCannotBeFound()
         {
             // Arrange
-            _documentDbProvider.Setup(x => x.CreateActionAsync(_action)).Returns(Task.FromResult(new ResourceResponse<Document>(null)));
+            var mockItemResponse = new Mock<ItemResponse<Models.Action>>();
+    
+            mockItemResponse.Setup(x => x.Resource).Returns((Models.Action)null);
+            mockItemResponse.Setup(x => x.StatusCode).Returns(HttpStatusCode.NotFound);
+
+            _documentDbProvider
+                .Setup(x => x.UpdateActionAsync(It.IsAny<string>(), It.IsAny<Guid>()))
+                .ReturnsAsync(mockItemResponse.Object);
 
             // Act
             var result = await _actionHttpTriggerService.UpdateCosmosAsync(_action.ToString(), _actionId);
@@ -83,29 +86,14 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         public async Task PatchActionPlanHttpTriggerServiceTests_UpdateAsync_ReturnsResourceWhenUpdated()
         {
             // Arrange
-            const string documentServiceResponseClass = "Microsoft.Azure.Documents.DocumentServiceResponse, Microsoft.Azure.DocumentDB.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35";
-            const string dictionaryNameValueCollectionClass = "Microsoft.Azure.Documents.Collections.DictionaryNameValueCollection, Microsoft.Azure.DocumentDB.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35";
+            var mockItemResponse = new Mock<ItemResponse<Models.Action>>();
+    
+            mockItemResponse.Setup(x => x.Resource).Returns(_action);
+            mockItemResponse.Setup(x => x.StatusCode).Returns(HttpStatusCode.OK);
 
-            var resourceResponse = new ResourceResponse<Document>(new Document());
-            var documentServiceResponseType = Type.GetType(documentServiceResponseClass);
-
-            const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance;
-
-            var headers = new NameValueCollection { { "x-ms-request-charge", "0" } };
-
-            var headersDictionaryType = Type.GetType(dictionaryNameValueCollectionClass);
-
-            var headersDictionaryInstance = Activator.CreateInstance(headersDictionaryType, headers);
-
-            var arguments = new[] { Stream.Null, headersDictionaryInstance, HttpStatusCode.OK, null };
-
-            var documentServiceResponse = documentServiceResponseType.GetTypeInfo().GetConstructors(flags)[0].Invoke(arguments);
-
-            var responseField = typeof(ResourceResponse<Document>).GetTypeInfo().GetField("response", flags);
-
-            responseField?.SetValue(resourceResponse, documentServiceResponse);
-
-            _documentDbProvider.Setup(x => x.UpdateActionAsync(_json, _actionId)).Returns(Task.FromResult(resourceResponse));
+            _documentDbProvider
+                .Setup(x => x.UpdateActionAsync(_json, _actionId))
+                .ReturnsAsync(mockItemResponse.Object);
 
             // Act
             var result = await _actionHttpTriggerService.UpdateCosmosAsync(_json, _actionId);
@@ -113,7 +101,6 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<Models.Action>());
-
         }
 
         [Test]
