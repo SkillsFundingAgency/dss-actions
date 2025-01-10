@@ -26,6 +26,9 @@ namespace NCS.DSS.Action.APIDefinition
         {
             var swagger = _swaggerDocumentGenerator.GenerateSwaggerDocument(req, ApiTitle, ApiDescription, ApiDefinitionName, ApiVersion, Assembly.GetExecutingAssembly());
 
+            if (string.IsNullOrEmpty(swagger))
+                return new NoContentResult();
+
             return new OkObjectResult(swagger);
         }
     }
