@@ -221,7 +221,6 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
                 return new UnprocessableEntityObjectResult(errors);
             }
 
-
             _logger.LogInformation("Attempting to PATCH an Action. Action GUID: {ActionGuid}. Customer GUID: {CustomerGuid}", actionGuid, customerGuid);
             var updatedAction = await _actionsPatchService.UpdateCosmosAsync(patchedAction, actionGuid);
 
