@@ -8,10 +8,10 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Service
     public class PatchActionHttpTriggerService : IPatchActionHttpTriggerService
     {
         private readonly IActionPatchService _actionPatchService;
-        private readonly IDocumentDBProvider _documentDbProvider;
+        private readonly ICosmosDBProvider _documentDbProvider;
         private readonly IServiceBusClient _serviceBusClient;
 
-        public PatchActionHttpTriggerService(IActionPatchService actionPatchService, IDocumentDBProvider documentDbProvider, IServiceBusClient serviceBusClient)
+        public PatchActionHttpTriggerService(IActionPatchService actionPatchService, ICosmosDBProvider documentDbProvider, IServiceBusClient serviceBusClient)
         {
             _actionPatchService = actionPatchService;
             _documentDbProvider = documentDbProvider;

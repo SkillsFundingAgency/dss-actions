@@ -5,9 +5,9 @@ namespace NCS.DSS.Action.GetActionByIdHttpTrigger.Service
     public class GetActionByIdHttpTriggerService : IGetActionByIdHttpTriggerService
     {
 
-        private readonly IDocumentDBProvider _documentDbProvider;
+        private readonly ICosmosDBProvider _documentDbProvider;
 
-        public GetActionByIdHttpTriggerService(IDocumentDBProvider documentDbProvider)
+        public GetActionByIdHttpTriggerService(ICosmosDBProvider documentDbProvider)
         {
             _documentDbProvider = documentDbProvider;
         }
