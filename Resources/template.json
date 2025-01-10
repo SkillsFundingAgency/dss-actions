@@ -57,9 +57,6 @@
                 "functionAppName": {
                   "value": "[parameters('functionAppNames')[copyIndex()]]"
                 },
-                "appServicePlanId": {
-                  "value": "[variables('sharedAppServicePlanId')]"
-                },
                 "configEnvironmentName": {
                   "value": "[parameters('environmentName')]"
                 },
