@@ -183,25 +183,31 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
             try
             {
-                var query = new QueryDefinition("SELECT * FROM c WHERE c.CustomerId = @customerId AND c.ActionId = @actionId AND c.ActionPlanId = @actionPlanId")
+                var query = new QueryDefinition("SELECT * FROM c WHERE c.id = @actionId AND c.CustomerId = @customerId AND c.ActionPlanId = @actionPlanId")
                     .WithParameter("@customerId", customerId)
                     .WithParameter("@actionId", actionId)
                     .WithParameter("@actionPlanId", actionPlanId);
 
-                var iterator = _actionContainer.GetItemQueryIterator<Models.Action>(query, requestOptions: new QueryRequestOptions
+                using var feedIterator = _actionContainer.GetItemQueryIterator<Models.Action>(query,
+                    requestOptions: new QueryRequestOptions
+                    {
+                        PartitionKey = _partitionKey,
+                        MaxItemCount = 1
+                    });
+
+                if (feedIterator.HasMoreResults)
                 {
-                    PartitionKey = _partitionKey
-                });
-
-                var response = await iterator.ReadNextAsync();
-
-                return response.Resource.FirstOrDefault();
+                    var response = await feedIterator.ReadNextAsync();
+                    return response.Resource.FirstOrDefault();
+                }
             }
             catch (CosmosException ex)
             {
                 _logger.LogError(ex, "Error retrieving action for customer");
                 return null;
             }
+
+            return null;
         }
 
         public async Task<string> GetActionForCustomerToUpdateAsync(Guid customerId, Guid actionId, Guid actionPlanId)
@@ -211,7 +217,8 @@ namespace NCS.DSS.Action.Cosmos.Provider
             try
             {
                 var action = await GetActionForCustomerAsync(customerId, actionId, actionPlanId);
-                return action?.ToString();
+                var actionJson = JsonSerializer.Serialize(action);
+                return actionJson;
             }
             catch (CosmosException ex)
             {
