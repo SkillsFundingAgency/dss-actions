@@ -48,7 +48,7 @@
         "MSDEPLOY_RENAME_LOCKED_FILES": "1",
         "AzureWebJobsStorage": "[format('DefaultEndpointsProtocol=https;AccountName{0};AccountKey={1};EndpointSuffix=core.windows.net', parameters('storageAccountName'),parameters('storageAccountKey'))]",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[parameters('appInsightsInstrumentationKey')]",
-        "CosmosDBConnectionString": "[concat('AccountEndpoint={0}/;AccountKey={1};', parameters('cosmosDbEndpoint'), parameters('cosmosDbKey'))]",
+        "CosmosDBConnectionString": "[format('AccountEndpoint={0}/;AccountKey={1};', parameters('cosmosDbEndpoint'), parameters('cosmosDbKey'))]",
         "CollectionId": "[parameters('cosmosDbCollectionId')]",
         "DatabaseId": "[parameters('cosmosDbDatabaseId')]",
         "CustomerCollectionId": "customers",
