@@ -50,7 +50,8 @@ namespace NCS.DSS.Action.Cosmos.Provider
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking Customer resource existence. Exception: {ErrorMessage}", ex.Message)
+                _logger.LogError(ex, "Error checking Customer resource existence. Exception: {ErrorMessage}",
+                    ex.Message);
                 throw;
             }
         }
@@ -107,7 +108,8 @@ namespace NCS.DSS.Action.Cosmos.Provider
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Error checking Interaction resource existence. Exception: {ErrorMessage}", ex.Message)
+                _logger.LogError(ex, "Error checking Interaction resource existence. Exception: {ErrorMessage}",
+                    ex.Message);
                 return false;
             }
         }
@@ -137,7 +139,8 @@ namespace NCS.DSS.Action.Cosmos.Provider
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Error checking Action Plan resource existence. Exception: {ErrorMessage}", ex.Message)
+                _logger.LogError(ex, "Error checking Action Plan resource existence. Exception: {ErrorMessage}",
+                    ex.Message);
                 return false;
             }
         }
