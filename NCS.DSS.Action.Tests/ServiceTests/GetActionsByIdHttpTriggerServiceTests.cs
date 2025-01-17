@@ -12,7 +12,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
     public class GetActionByIdHttpTriggerServiceTests
     {
         private readonly IGetActionByIdHttpTriggerService _actionHttpTriggerService;
-        private readonly Mock<ICosmosDBProvider> _documentDbProvider;
+        private readonly Mock<ICosmosDBProvider> _cosmosDbProvider;
         private readonly Guid _actionId = Guid.Parse("7E467BDB-213F-407A-B86A-1954053D3C24");
         private readonly Guid _customerId = Guid.Parse("58b43e3f-4a50-4900-9c82-a14682ee90fa");
         private readonly Guid _actionPlanId = Guid.Parse("12a16e3f-1c62-1660-3e81-b13122aa81aa");
@@ -20,15 +20,15 @@ namespace NCS.DSS.Action.Tests.ServiceTests
 
         public GetActionByIdHttpTriggerServiceTests()
         {
-            _documentDbProvider = new Mock<ICosmosDBProvider>();
-            _actionHttpTriggerService = new GetActionByIdHttpTriggerService(_documentDbProvider.Object);
+            _cosmosDbProvider = new Mock<ICosmosDBProvider>();
+            _actionHttpTriggerService = new GetActionByIdHttpTriggerService(_cosmosDbProvider.Object);
         }
 
         [Test]
         public async Task GetActionHttpTriggerServiceTests_GetActionForCustomerAsync_ReturnsNullWhenResourceCannotBeFound()
         {
             // Arrange
-            _documentDbProvider.Setup(x => x.GetActionForCustomerAsync(_customerId, _actionId, _actionPlanId)).Returns(Task.FromResult<Models.Action>(null));
+            _cosmosDbProvider.Setup(x => x.GetActionForCustomerAsync(_customerId, _actionId, _actionPlanId)).Returns(Task.FromResult<Models.Action>(null));
 
             // Act
             var result = await _actionHttpTriggerService.GetActionForCustomerAsync(_customerId, _actionId, _actionPlanId);

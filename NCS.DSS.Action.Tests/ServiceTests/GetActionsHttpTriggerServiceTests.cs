@@ -12,21 +12,21 @@ namespace NCS.DSS.Action.Tests.ServiceTests
     public class GetActionHttpTriggerServiceTests
     {
         private readonly IGetActionHttpTriggerService _actionHttpTriggerService;
-        private readonly Mock<ICosmosDBProvider> _documentDbProvider;
+        private readonly Mock<ICosmosDBProvider> _cosmosDbProvider;
         private readonly Guid _customerId = Guid.Parse("58b43e3f-4a50-4900-9c82-a14682ee90fa");
         private readonly Guid _actionPlanId = Guid.Parse("12a16e3f-1c62-1660-3e81-b13122aa81aa");
 
         public GetActionHttpTriggerServiceTests()
         {
-            _documentDbProvider = new Mock<ICosmosDBProvider>();
-            _actionHttpTriggerService = new GetActionHttpTriggerService(_documentDbProvider.Object);
+            _cosmosDbProvider = new Mock<ICosmosDBProvider>();
+            _actionHttpTriggerService = new GetActionHttpTriggerService(_cosmosDbProvider.Object);
         }
 
         [Test]
         public async Task GetActionHttpTriggerServiceTests_GetActionsAsync_ReturnsNullWhenResourceCannotBeFound()
         {
             // Arrange
-            _documentDbProvider.Setup(x => x.GetActionsForCustomerAsync(_customerId, _actionPlanId)).Returns(Task.FromResult<List<Models.Action>>(null));
+            _cosmosDbProvider.Setup(x => x.GetActionsForCustomerAsync(_customerId, _actionPlanId)).Returns(Task.FromResult<List<Models.Action>>(null));
 
             // Act
             var result = await _actionHttpTriggerService.GetActionsAsync(_customerId, _actionPlanId);
@@ -39,7 +39,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         public async Task GetActionHttpTriggerServiceTests_GetActionsAsync_ReturnsResource()
         {
             // Arrange
-            _documentDbProvider.Setup(x => x.GetActionsForCustomerAsync(_customerId, _actionPlanId)).Returns(Task.FromResult(new List<Models.Action>()));
+            _cosmosDbProvider.Setup(x => x.GetActionsForCustomerAsync(_customerId, _actionPlanId)).Returns(Task.FromResult(new List<Models.Action>()));
 
             // Act
             var result = await _actionHttpTriggerService.GetActionsAsync(_customerId, _actionPlanId);

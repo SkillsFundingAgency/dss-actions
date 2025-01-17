@@ -5,33 +5,33 @@ namespace NCS.DSS.Action.Cosmos.Helper
     public class ResourceHelper : IResourceHelper
     {
 
-        private readonly ICosmosDBProvider _documentDbProvider;
+        private readonly ICosmosDBProvider _cosmosDbProvider;
 
-        public ResourceHelper(ICosmosDBProvider documentDbProvider)
+        public ResourceHelper(ICosmosDBProvider cosmosDbProvider)
         {
-            _documentDbProvider = documentDbProvider;
+            _cosmosDbProvider = cosmosDbProvider;
         }
 
         public async Task<bool> DoesCustomerExist(Guid customerId)
         {
-            return await _documentDbProvider.DoesCustomerResourceExistAsync(customerId);
+            return await _cosmosDbProvider.DoesCustomerResourceExistAsync(customerId);
         }
 
         public async Task<bool> IsCustomerReadOnly(Guid customerId)
         {
-            var isCustomerReadOnly = await _documentDbProvider.DoesCustomerHaveATerminationDateAsync(customerId);
+            var isCustomerReadOnly = await _cosmosDbProvider.DoesCustomerHaveATerminationDateAsync(customerId);
 
             return isCustomerReadOnly;
         }
 
         public Task<bool> DoesInteractionExistAndBelongToCustomer(Guid interactionId, Guid customerGuid)
         {
-            return _documentDbProvider.DoesInteractionResourceExistAndBelongToCustomerAsync(interactionId, customerGuid);
+            return _cosmosDbProvider.DoesInteractionResourceExistAndBelongToCustomerAsync(interactionId, customerGuid);
         }
 
         public Task<bool> DoesActionPlanExistAndBelongToCustomer(Guid actionPlanId, Guid interactionId, Guid customerId)
         {
-            return _documentDbProvider.DoesActionPlanResourceExistAndBelongToCustomerAsync(actionPlanId, interactionId, customerId);
+            return _cosmosDbProvider.DoesActionPlanResourceExistAndBelongToCustomerAsync(actionPlanId, interactionId, customerId);
         }
 
     }

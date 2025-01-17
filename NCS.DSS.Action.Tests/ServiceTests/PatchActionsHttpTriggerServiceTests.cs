@@ -17,7 +17,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
     {
         private IPatchActionHttpTriggerService _actionHttpTriggerService;
         private Mock<IActionPatchService> _actionPatchService;
-        private Mock<ICosmosDBProvider> _documentDbProvider;
+        private Mock<ICosmosDBProvider> _cosmosDbProvider;
         private Mock<IServiceBusClient> _serviceBusClient;
         private string _json;
         private Models.Action _action;
@@ -30,10 +30,10 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         public void Setup()
         {
             _actionPatchService = new Mock<IActionPatchService>();
-            _documentDbProvider = new Mock<ICosmosDBProvider>();
+            _cosmosDbProvider = new Mock<ICosmosDBProvider>();
             _serviceBusClient = new Mock<IServiceBusClient>();
 
-            _actionHttpTriggerService = new PatchActionHttpTriggerService(_actionPatchService.Object, _documentDbProvider.Object, _serviceBusClient.Object);
+            _actionHttpTriggerService = new PatchActionHttpTriggerService(_actionPatchService.Object, _cosmosDbProvider.Object, _serviceBusClient.Object);
             _actionPatch = new ActionPatch();
             _action = new Models.Action();
             _json = JsonConvert.SerializeObject(_actionPatch);
@@ -53,7 +53,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         public async Task PatchActionHttpTriggerServiceTests_UpdateAsync_ReturnsNullWhenResourceCannotBeUpdated()
         {
             // Arrange
-            _documentDbProvider.Setup(x => x.UpdateActionAsync(_json, _actionId)).Returns<string>(null);
+            _cosmosDbProvider.Setup(x => x.UpdateActionAsync(_json, _actionId)).Returns<string>(null);
 
             // Act
             var result = await _actionHttpTriggerService.UpdateCosmosAsync(_action.ToString(), _actionId);
@@ -71,7 +71,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             mockItemResponse.Setup(x => x.Resource).Returns((Models.Action)null);
             mockItemResponse.Setup(x => x.StatusCode).Returns(HttpStatusCode.NotFound);
 
-            _documentDbProvider
+            _cosmosDbProvider
                 .Setup(x => x.UpdateActionAsync(It.IsAny<string>(), It.IsAny<Guid>()))
                 .ReturnsAsync(mockItemResponse.Object);
 
@@ -91,7 +91,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             mockItemResponse.Setup(x => x.Resource).Returns(_action);
             mockItemResponse.Setup(x => x.StatusCode).Returns(HttpStatusCode.OK);
 
-            _documentDbProvider
+            _cosmosDbProvider
                 .Setup(x => x.UpdateActionAsync(_json, _actionId))
                 .ReturnsAsync(mockItemResponse.Object);
 
@@ -107,7 +107,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         public async Task PatchActionHttpTriggerServiceTests_GetActionForCustomerAsync_ReturnsNullWhenResourceHasNotBeenFound()
         {
             // Arrange
-            _documentDbProvider.Setup(x => x.GetActionForCustomerToUpdateAsync(_customerId, _actionId, _actionPlanId)).Returns(Task.FromResult<string>(null));
+            _cosmosDbProvider.Setup(x => x.GetActionForCustomerToUpdateAsync(_customerId, _actionId, _actionPlanId)).Returns(Task.FromResult<string>(null));
 
             // Act
             var result = await _actionHttpTriggerService.GetActionsForCustomerAsync(_customerId, _actionId, _actionPlanId);
@@ -120,8 +120,8 @@ namespace NCS.DSS.Action.Tests.ServiceTests
         public async Task PatchActionHttpTriggerServiceTests_GetActionForCustomerAsync_ReturnsResourceWhenResourceHasBeenFound()
         {
             // Arrange
-            _documentDbProvider.Setup(x => x.GetActionForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult(_action));
-            _documentDbProvider.Setup(x => x.GetActionForCustomerToUpdateAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult("some string"));
+            _cosmosDbProvider.Setup(x => x.GetActionForCustomerAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult(_action));
+            _cosmosDbProvider.Setup(x => x.GetActionForCustomerToUpdateAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(Task.FromResult("some string"));
 
             // Act
             var result = await _actionHttpTriggerService.GetActionsForCustomerAsync(_customerId, _actionId, _actionPlanId);

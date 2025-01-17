@@ -13,17 +13,17 @@ namespace NCS.DSS.Action.Tests.ServiceTests
     public class PostActionHttpTriggerServiceTests
     {
         private IPostActionHttpTriggerService _actionHttpTriggerService;
-        private Mock<ICosmosDBProvider> _documentDbProvider;
+        private Mock<ICosmosDBProvider> _cosmosDbProvider;
         private Mock<IServiceBusClient> _serviceBusClient;
         private Models.Action _action;
 
         [SetUp]
         public void Setup()
         {
-            _documentDbProvider = new Mock<ICosmosDBProvider>();
+            _cosmosDbProvider = new Mock<ICosmosDBProvider>();
             _serviceBusClient = new Mock<IServiceBusClient>();
 
-            _actionHttpTriggerService = new PostActionHttpTriggerService(_documentDbProvider.Object, _serviceBusClient.Object);
+            _actionHttpTriggerService = new PostActionHttpTriggerService(_cosmosDbProvider.Object, _serviceBusClient.Object);
             _action = new Models.Action();
         }
 
@@ -46,7 +46,7 @@ namespace NCS.DSS.Action.Tests.ServiceTests
             mockItemResponse.Setup(x => x.Resource).Returns(_action);
             mockItemResponse.Setup(x => x.StatusCode).Returns(HttpStatusCode.Created);
 
-            _documentDbProvider
+            _cosmosDbProvider
                 .Setup(x => x.CreateActionAsync(_action))
                 .ReturnsAsync(mockItemResponse.Object);
 
