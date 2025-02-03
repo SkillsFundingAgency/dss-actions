@@ -1,8 +1,8 @@
 ﻿using System.Dynamic;
 
-namespace NCS.DSS.Action.Models
+namespace NCS.DSS.Action.Cosmos.Helper
 {
-    public interface IConvertToDynamic
+    public interface IDynamicHelper
     {
         public ExpandoObject ExcludeProperty(Exception exception, string[] names);
 
