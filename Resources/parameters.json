@@ -37,6 +37,9 @@
         },
         "templateBaseUrl": {
             "value": "__NestedArmTemplateBaseUrl__"
+        },
+        "keyVaultName": {
+            "value": "__SharedKeyVaultName__"
         }
     }
 }
