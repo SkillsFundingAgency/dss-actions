@@ -18,7 +18,6 @@ namespace NCS.DSS.Action.ReferenceData
         [Description("Specialist Organisation")]
         SpecialistOrganisation = 7,
 
-        JCP = 8,
         Employer = 9,
 
         [Description("Traineeships")]
