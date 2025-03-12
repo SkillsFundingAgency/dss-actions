@@ -217,7 +217,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
 
             if (errors != null && errors.Any())
             {
-                _logger.LogError("Falied to validate {ActionValidationObject}", nameof(actionValidationObject));
+                _logger.LogError("Failed to validate {ActionValidationObject}", nameof(actionValidationObject));
                 return new UnprocessableEntityObjectResult(errors);
             }
 
