@@ -61,17 +61,6 @@ namespace NCS.DSS.Action
 
                     services.AddSingleton(sp =>
                     {
-                        var settings = sp.GetRequiredService<IOptions<ActionConfigurationSettings>>().Value;
-                        var options = new CosmosClientOptions()
-                        {
-                            ConnectionMode = ConnectionMode.Gateway
-                        };
-
-                        return new CosmosClient(settings.CosmosDBConnectionString, options);
-                    });
-
-                    services.AddSingleton(serviceProvider =>
-                    {
                         var cosmosDbEndpoint = configuration["CosmosDbEndpoint"];
                         if (string.IsNullOrEmpty(cosmosDbEndpoint))
                         {
@@ -80,6 +69,12 @@ namespace NCS.DSS.Action
 
                         var options = new CosmosClientOptions() { ConnectionMode = ConnectionMode.Gateway };
                         return new CosmosClient(cosmosDbEndpoint, new DefaultAzureCredential(), options);
+                    });
+
+                    services.AddSingleton(serviceProvider =>
+                    {
+                        var settings = serviceProvider.GetRequiredService<IOptions<ActionConfigurationSettings>>().Value;
+                        return new Azure.Messaging.ServiceBus.ServiceBusClient(settings.ServiceBusConnectionString);
                     });
                 })
                 .ConfigureLogging(logging =>
