@@ -133,7 +133,7 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
 
             if (errors != null && errors.Any())
             {
-                _logger.LogError("Failed to validate {ActionRequest}. Correlation GUID: {CorrelationGuid}", nameof(actionRequest), correlationGuid);
+                _logger.LogError("Falied to validate {ActionRequest}. Correlation GUID: {CorrelationGuid}", nameof(actionRequest), correlationGuid);
                 return new UnprocessableEntityObjectResult(errors);
             }
 
