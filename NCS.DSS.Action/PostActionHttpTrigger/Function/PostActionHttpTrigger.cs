@@ -111,7 +111,7 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unable to parse {ActionRequest} from request body. Correlation GUID: {CorrelationGuid}. Exception: {Exception}", nameof(actionRequest), correlationGuid, ex.Message);
-                return new UnprocessableEntityObjectResult($"An error occurred when attempting to parse body from request. Error: {ex.Message}");
+                return new UnprocessableEntityObjectResult("An error occurred when attempting to parse body from request.");
             }
 
             if (actionRequest == null)

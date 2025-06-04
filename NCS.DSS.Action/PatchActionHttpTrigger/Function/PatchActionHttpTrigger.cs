@@ -118,7 +118,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unable to parse {ActionPatch} from request body. Correlation GUID: {CorrelationGuid}. Exception: {Exception}", nameof(actionPatchRequest), correlationGuid, ex.Message);
-                return new UnprocessableEntityObjectResult($"An error occurred when attempting to parse body from request. Error: {ex.Message}");
+                return new UnprocessableEntityObjectResult("An error occurred when attempting to parse body from request.");
             }
             _logger.LogInformation("Retrieved resource from request body. Correlation GUID: {CorrelationGuid}", correlationGuid);
 
@@ -198,8 +198,8 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred when attempting to deserialise {patchedAction} validation object. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}. Error message: {ErrorMessage}", nameof(patchedAction), ex.Message, customerGuid, actionGuid);
-                return new UnprocessableEntityObjectResult($"An error occurred when attempting to deserialise validation object. Error: {ex.Message}");
+                _logger.LogError(ex, "An error occurred when attempting to deserialise {PatchedAction} validation object. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}. Error message: {ErrorMessage}", nameof(patchedAction), customerGuid, actionGuid, ex.Message);
+                return new UnprocessableEntityObjectResult("An error occurred when attempting to deserialise validation object.");
             }
 
             if (actionValidationObject == null)
