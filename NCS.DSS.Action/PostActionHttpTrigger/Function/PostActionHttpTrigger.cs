@@ -21,23 +21,18 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
         private readonly ILogger<PostActionHttpTrigger> _logger;
         private readonly IValidate _validate;
         private readonly IHttpRequestHelper _httpRequestHelper;
-        private readonly IDynamicHelper _dynamicHelper;
-
-        private static readonly string[] PropertiesToExclude = { "TargetSite", "InnerException" };
 
         public PostActionHttpTrigger(
             IPostActionHttpTriggerService actionsPostService, 
             IHttpRequestHelper httpRequestHelper, 
             IResourceHelper resourceHelper, 
             IValidate validate, 
-            IDynamicHelper dynamicHelper,
             ILogger<PostActionHttpTrigger> logger)
         {
             _actionsPostService = actionsPostService;
             _httpRequestHelper = httpRequestHelper;
             _resourceHelper = resourceHelper;
             _validate = validate;
-            _dynamicHelper = dynamicHelper;
             _logger = logger;
         }
 
@@ -116,7 +111,7 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Function
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unable to parse {ActionRequest} from request body. Correlation GUID: {CorrelationGuid}. Exception: {Exception}", nameof(actionRequest), correlationGuid, ex.Message);
-                return new UnprocessableEntityObjectResult(_dynamicHelper.ExcludeProperty(ex, PropertiesToExclude));
+                return new UnprocessableEntityObjectResult($"An error occurred when attempting to parse body from request. Error: {ex.Message}");
             }
 
             if (actionRequest == null)

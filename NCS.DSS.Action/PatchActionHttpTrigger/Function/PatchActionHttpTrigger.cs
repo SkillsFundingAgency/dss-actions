@@ -20,24 +20,20 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
         private readonly IHttpRequestHelper _httpRequestHelper;
         private readonly IResourceHelper _resourceHelper;
         private readonly IValidate _validate;
-        private readonly IDynamicHelper _dynamicHelper;
         private readonly ILogger<PatchActionHttpTrigger> _logger;
 
-        private static readonly string[] PropertiesToExclude = { "TargetSite", "InnerException" };
 
         public PatchActionHttpTrigger(
             IPatchActionHttpTriggerService actionsPatchService, 
             IHttpRequestHelper httpRequestHelper, 
             IResourceHelper resourceHelper, 
             IValidate validate, 
-            IDynamicHelper dynamicHelper,
             ILogger<PatchActionHttpTrigger> logger)
         {
             _actionsPatchService = actionsPatchService;
             _httpRequestHelper = httpRequestHelper;
             _resourceHelper = resourceHelper;
             _validate = validate;
-            _dynamicHelper = dynamicHelper;
             _logger = logger;
         }
 
@@ -122,7 +118,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unable to parse {ActionPatch} from request body. Correlation GUID: {CorrelationGuid}. Exception: {Exception}", nameof(actionPatchRequest), correlationGuid, ex.Message);
-                return new UnprocessableEntityObjectResult(_dynamicHelper.ExcludeProperty(ex, PropertiesToExclude));
+                return new UnprocessableEntityObjectResult($"An error occurred when attempting to parse body from request. Error: {ex.Message}");
             }
             _logger.LogInformation("Retrieved resource from request body. Correlation GUID: {CorrelationGuid}", correlationGuid);
 
@@ -197,13 +193,13 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
 
             try
             {
-                _logger.LogInformation("Attempting to deserialize {PatchedAction} validation object. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}", nameof(patchedAction), customerGuid, actionGuid);
+                _logger.LogInformation("Attempting to deserialise {PatchedAction} validation object. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}", nameof(patchedAction), customerGuid, actionGuid);
                 actionValidationObject = JsonSerializer.Deserialize<Models.Action>(patchedAction);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occured when attempting to deserialize {patchedAction} validation object. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}. Error message: {ErrorMessage}", nameof(patchedAction), ex.Message, customerGuid, actionGuid);
-                return new UnprocessableEntityObjectResult(_dynamicHelper.ExcludeProperty(ex, PropertiesToExclude));
+                _logger.LogError(ex, "An error occurred when attempting to deserialise {patchedAction} validation object. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}. Error message: {ErrorMessage}", nameof(patchedAction), ex.Message, customerGuid, actionGuid);
+                return new UnprocessableEntityObjectResult($"An error occurred when attempting to deserialise validation object. Error: {ex.Message}");
             }
 
             if (actionValidationObject == null)
