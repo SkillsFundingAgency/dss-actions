@@ -19,6 +19,7 @@ namespace NCS.DSS.Action.ReferenceData
         SpecialistOrganisation = 7,
 
         JCP = 8,
+
         Employer = 9,
 
         [Description("Traineeships")]
@@ -32,6 +33,12 @@ namespace NCS.DSS.Action.ReferenceData
 
         [Description("Community Centres")]
         CommunityCentres = 13,
+        
+        [Description("Job Centre Plus WITH Data")]
+        JCPWithData = 14,
+        
+        [Description("Job Centre Plus WITHOUT Data")]
+        JCPWithoutData = 15,
 
         [Description("Not Applicable")]
         NotApplicable = 98,

@@ -6,12 +6,12 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Service
 {
     public class PostActionHttpTriggerService : IPostActionHttpTriggerService
     {
-        private readonly IDocumentDBProvider _documentDbProvider;
+        private readonly ICosmosDBProvider _cosmosDbProvider;
         private readonly IServiceBusClient _serviceBusClient;
 
-        public PostActionHttpTriggerService(IDocumentDBProvider documentDbProvider, IServiceBusClient serviceBusClient)
+        public PostActionHttpTriggerService(ICosmosDBProvider cosmosDbProvider, IServiceBusClient serviceBusClient)
         {
-            _documentDbProvider = documentDbProvider;
+            _cosmosDbProvider = cosmosDbProvider;
             _serviceBusClient = serviceBusClient;
         }
 
@@ -22,7 +22,7 @@ namespace NCS.DSS.Action.PostActionHttpTrigger.Service
 
             action.SetDefaultValues();
 
-            var response = await _documentDbProvider.CreateActionAsync(action);
+            var response = await _cosmosDbProvider.CreateActionAsync(action);
 
             return response.StatusCode == HttpStatusCode.Created ? (dynamic)response.Resource : null;
         }

@@ -11,7 +11,7 @@ namespace NCS.DSS.Action.Tests.ModelTests
         public void ActionTests_PopulatesDefaultValues_WhenSetDefaultValuesIsCalled()
         {
             // Arrange
-            var action = new Action.Models.Action();
+            var action = new Models.Action();
 
             // Act
             action.SetDefaultValues();
@@ -25,7 +25,7 @@ namespace NCS.DSS.Action.Tests.ModelTests
         public void ActionTests_CheckLastModifiedDateDoesNotGetPopulated_WhenSetDefaultValuesIsCalled()
         {
             // Arrange
-            var action = new Action.Models.Action { LastModifiedDate = DateTime.MaxValue };
+            var action = new Models.Action { LastModifiedDate = DateTime.MaxValue };
 
             // Act
             action.SetDefaultValues();
@@ -38,7 +38,7 @@ namespace NCS.DSS.Action.Tests.ModelTests
         public void ActionTests_CheckActionIdIsSet_WhenSetIdsIsCalled()
         {
             // Arrange
-            var action = new Action.Models.Action();
+            var action = new Models.Action();
             var actionPlanId = Guid.NewGuid();
 
             // Act
@@ -52,7 +52,7 @@ namespace NCS.DSS.Action.Tests.ModelTests
         public void ActionTests_CheckCustomerIdIsSet_WhenSetIdsIsCalled()
         {
             // Arrange
-            var action = new Action.Models.Action();
+            var action = new Models.Action();
             var customerId = Guid.NewGuid();
 
             // Act
@@ -66,7 +66,7 @@ namespace NCS.DSS.Action.Tests.ModelTests
         public void ActionTests_CheckLastModifiedTouchpointIdIsSet_WhenSetIdsIsCalled()
         {
             // Arrange
-            var action = new Action.Models.Action();
+            var action = new Models.Action();
 
             // Act
             action.SetIds(Guid.NewGuid(), Guid.NewGuid(), "0000000000");

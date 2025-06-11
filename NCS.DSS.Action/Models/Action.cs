@@ -1,5 +1,4 @@
-﻿using DFC.JSON.Standard.Attributes;
-using DFC.Swagger.Standard.Annotations;
+﻿using DFC.Swagger.Standard.Annotations;
 using NCS.DSS.Action.ReferenceData;
 using System.ComponentModel.DataAnnotations;
 
@@ -77,16 +76,20 @@ namespace NCS.DSS.Action.Models
         [Example(Description = "0000000001")]
         public string LastModifiedTouchpointId { get; set; }
 
-        [JsonIgnoreOnSerialize]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string CreatedBy { get; set; }
 
         public void SetDefaultValues()
         {
             if (!LastModifiedDate.HasValue)
+            {
                 LastModifiedDate = DateTime.UtcNow;
+            }
 
             if (ActionStatus == null)
+            {
                 ActionStatus = ReferenceData.ActionStatus.NotStarted;
+            }
         }
 
         public void SetIds(Guid customerId, Guid actionPlanId, string touchpointId)
@@ -97,6 +100,5 @@ namespace NCS.DSS.Action.Models
             LastModifiedTouchpointId = touchpointId;
             CreatedBy = touchpointId;
         }
-
     }
 }

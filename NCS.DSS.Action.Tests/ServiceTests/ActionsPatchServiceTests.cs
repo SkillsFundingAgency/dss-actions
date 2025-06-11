@@ -10,9 +10,9 @@ namespace NCS.DSS.Action.Tests.ServiceTests
     [TestFixture]
     public class ActionPatchServiceTests
     {
-        private IJsonHelper _jsonHelper;
-        private IActionPatchService _actionPatchService;
-        private ActionPatch _actionPatch;
+        private readonly IJsonHelper _jsonHelper;
+        private readonly IActionPatchService _actionPatchService;
+        private readonly ActionPatch _actionPatch;
         private readonly string _json;
 
         public ActionPatchServiceTests()

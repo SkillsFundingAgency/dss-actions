@@ -1,10 +1,13 @@
-using DFC.Common.Standard.GuidHelper;
-using DFC.Common.Standard.Logging;
 using DFC.HTTP.Standard;
 using DFC.JSON.Standard;
 using DFC.Swagger.Standard;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NCS.DSS.Action.Cosmos.Helper;
 using NCS.DSS.Action.Cosmos.Provider;
 using NCS.DSS.Action.GetActionByIdHttpTrigger.Service;
@@ -15,28 +18,78 @@ using NCS.DSS.Action.PostActionHttpTrigger.Service;
 using NCS.DSS.Action.ServiceBus;
 using NCS.DSS.Action.Validation;
 
-var host = new HostBuilder()
-    .ConfigureFunctionsWebApplication()
-    .ConfigureServices(services =>
+namespace NCS.DSS.Action
+{
+    internal class Program
     {
-        services.AddLogging();
-        services.AddSingleton<IResourceHelper, ResourceHelper>();
-        services.AddSingleton<IValidate, Validate>();
-        services.AddSingleton<ILoggerHelper, LoggerHelper>();
-        services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>();
-        services.AddSingleton<IHttpResponseMessageHelper, HttpResponseMessageHelper>();
-        services.AddSingleton<IJsonHelper, JsonHelper>();
-        services.AddSingleton<IConvertToDynamic, ConvertToDynamic>();
-        services.AddSingleton<IDocumentDBProvider, DocumentDBProvider>();
-        services.AddSingleton<IServiceBusClient, ServiceBusClient>();
-        services.AddSingleton<IGuidHelper, GuidHelper>();
-        services.AddScoped<IActionPatchService, ActionPatchService>();
-        services.AddScoped<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();
-        services.AddScoped<IGetActionHttpTriggerService, GetActionHttpTriggerService>();
-        services.AddScoped<IGetActionByIdHttpTriggerService, GetActionByIdHttpTriggerService>();
-        services.AddScoped<IPostActionHttpTriggerService, PostActionHttpTriggerService>();
-        services.AddScoped<IPatchActionHttpTriggerService, PatchActionHttpTriggerService>();
-    })
-    .Build();
+        private static async Task Main(string[] args)
+        {
+            var host = new HostBuilder()
+                .ConfigureFunctionsWebApplication()
+                .ConfigureAppConfiguration(configBuilder =>
+                {
+                    configBuilder.SetBasePath(Environment.CurrentDirectory)
+                        .AddJsonFile("local.settings.json", optional: true,
+                            reloadOnChange: false)
+                        .AddEnvironmentVariables();
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    var configuration = context.Configuration;
+                    services.AddOptions<ActionConfigurationSettings>()
+                        .Bind(configuration);
 
-host.Run();
+                    services.AddApplicationInsightsTelemetryWorkerService(); 
+                    services.ConfigureFunctionsApplicationInsights();
+
+                    services.AddLogging();
+                    services.AddSingleton<IResourceHelper, ResourceHelper>();
+                    services.AddSingleton<IValidate, Validate>();
+                    services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>();
+                    services.AddSingleton<IHttpResponseMessageHelper, HttpResponseMessageHelper>();
+                    services.AddSingleton<IJsonHelper, JsonHelper>();
+                    services.AddSingleton<IDynamicHelper, DynamicHelper>();
+                    services.AddSingleton<ICosmosDBProvider, CosmosDBProvider>();
+                    services.AddSingleton<IServiceBusClient, ServiceBusClient>();
+                    services.AddScoped<IActionPatchService, ActionPatchService>();
+                    services.AddScoped<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();
+                    services.AddScoped<IGetActionHttpTriggerService, GetActionHttpTriggerService>();
+                    services.AddScoped<IGetActionByIdHttpTriggerService, GetActionByIdHttpTriggerService>();
+                    services.AddScoped<IPostActionHttpTriggerService, PostActionHttpTriggerService>();
+                    services.AddScoped<IPatchActionHttpTriggerService, PatchActionHttpTriggerService>();
+
+                    services.AddSingleton(sp =>
+                    {
+                        var settings = sp.GetRequiredService<IOptions<ActionConfigurationSettings>>().Value;
+                        var options = new CosmosClientOptions()
+                        {
+                            ConnectionMode = ConnectionMode.Gateway
+                        };
+
+                        return new CosmosClient(settings.CosmosDBConnectionString, options);
+                    });
+
+                    services.AddSingleton(serviceProvider =>
+                    {
+                        var settings = serviceProvider.GetRequiredService<IOptions<ActionConfigurationSettings>>().Value;
+                        return new Azure.Messaging.ServiceBus.ServiceBusClient(settings.ServiceBusConnectionString);
+                    });
+                })
+                .ConfigureLogging(logging =>
+                {
+                    logging.Services.Configure<LoggerFilterOptions>(options =>
+                    {
+                        LoggerFilterRule defaultRule = options.Rules.FirstOrDefault(rule => rule.ProviderName
+                            == "Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider");
+                        if (defaultRule is not null)
+                        {
+                            options.Rules.Remove(defaultRule);
+                        }
+                    });
+                })
+                .Build();
+
+            await host.RunAsync();
+        }
+    }
+}

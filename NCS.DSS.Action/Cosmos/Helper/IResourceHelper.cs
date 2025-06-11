@@ -3,8 +3,8 @@
     public interface IResourceHelper
     {
         Task<bool> DoesCustomerExist(Guid customerId);
-        bool IsCustomerReadOnly();
-        bool DoesInteractionExistAndBelongToCustomer(Guid interactionId, Guid customerGuid);
-        bool DoesActionPlanExistAndBelongToCustomer(Guid actionPlanId, Guid interactionId, Guid customerId);
+        Task<bool> IsCustomerReadOnly(Guid customerId);
+        Task<bool> DoesInteractionExistAndBelongToCustomer(Guid interactionId, Guid customerGuid);
+        Task<bool> DoesActionPlanExistAndBelongToCustomer(Guid actionPlanId, Guid interactionId, Guid customerId);
     }
 }

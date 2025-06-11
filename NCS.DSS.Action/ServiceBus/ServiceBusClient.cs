@@ -1,57 +1,126 @@
-﻿using Microsoft.Azure.ServiceBus;
-using Newtonsoft.Json;
+﻿using Azure.Messaging.ServiceBus;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using NCS.DSS.Action.Models;
 using System.Text;
+using System.Text.Json;
 
 namespace NCS.DSS.Action.ServiceBus
 {
     public class ServiceBusClient : IServiceBusClient
     {
-        public readonly string QueueName = Environment.GetEnvironmentVariable("QueueName");
-        public readonly string ServiceBusConnectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString");
+        private readonly ILogger<ServiceBusClient> _logger;
+        private readonly ServiceBusSender _serviceBusSender;
+
+        public ServiceBusClient(Azure.Messaging.ServiceBus.ServiceBusClient serviceBusClient, IOptions<ActionConfigurationSettings> configOptions, ILogger<ServiceBusClient> logger)
+        {
+            var config = configOptions.Value;
+            if (string.IsNullOrEmpty(config.QueueName))
+            {
+                throw new ArgumentNullException(nameof(config.QueueName), "QueueName cannot be null or empty.");
+            }
+
+            _serviceBusSender = serviceBusClient.CreateSender(config.QueueName);
+            _logger = logger;
+        }
 
         public async Task SendPostMessageAsync(Models.Action action, string reqUrl)
         {
-            var messageModel = new MessageModel()
+            try
             {
-                TitleMessage = "New Action record {" + action.ActionId + "} added at " + DateTime.UtcNow,
-                CustomerGuid = action.CustomerId,
-                LastModifiedDate = action.LastModifiedDate,
-                URL = reqUrl + "/" + action.ActionId,
-                IsNewCustomer = false,
-                TouchpointId = action.LastModifiedTouchpointId
-            };
+                _logger.LogInformation(
+                    "Starting {MethodName}. Action ID: {ActionId}. Customer ID: {CustomerId}",
+                    nameof(SendPostMessageAsync), action.ActionId, action.CustomerId);
 
-            await SendMessageToQueue(messageModel);
+                var messageModel = new MessageModel()
+                {
+                    TitleMessage = "New Action record {" + action.ActionId + "} added at " + DateTime.UtcNow,
+                    CustomerGuid = action.CustomerId,
+                    LastModifiedDate = action.LastModifiedDate,
+                    URL = reqUrl + "/" + action.ActionId,
+                    IsNewCustomer = false,
+                    TouchpointId = action.LastModifiedTouchpointId
+                };
+
+                await SendMessageToQueue(messageModel);
+
+                _logger.LogInformation(
+                    "Completed {MethodName}. Action ID: {ActionId}. Customer ID: {CustomerId}",
+                    nameof(SendPostMessageAsync), action.ActionId, action.CustomerId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "An error occurred in {MethodName}. Action ID: {ActionId}. Customer ID: {CustomerId}",
+                    nameof(SendPostMessageAsync), action.ActionId, action.CustomerId);
+            }
         }
 
         public async Task SendPatchMessageAsync(Models.Action action, Guid customerId, string reqUrl)
         {
-
-            var messageModel = new MessageModel
+            try
             {
-                TitleMessage = "Action record modification for {" + customerId + "} at " + DateTime.UtcNow,
-                CustomerGuid = customerId,
-                LastModifiedDate = action.LastModifiedDate,
-                URL = reqUrl,
-                IsNewCustomer = false,
-                TouchpointId = action.LastModifiedTouchpointId
-            };
+                _logger.LogInformation(
+                    "Starting {MethodName}. Action ID: {ActionId}. Customer ID: {CustomerId}",
+                    nameof(SendPostMessageAsync), action.ActionId, customerId);
 
-            await SendMessageToQueue(messageModel);
+                var messageModel = new MessageModel
+                {
+                    TitleMessage = "Action record modification for {" + customerId + "} at " + DateTime.UtcNow,
+                    CustomerGuid = customerId,
+                    LastModifiedDate = action.LastModifiedDate,
+                    URL = reqUrl,
+                    IsNewCustomer = false,
+                    TouchpointId = action.LastModifiedTouchpointId
+                };
 
+                var msg = new ServiceBusMessage(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(messageModel)))
+                {
+                    ContentType = "application/json",
+                    MessageId = messageModel.CustomerGuid + " " + DateTime.UtcNow
+                };
+
+                await _serviceBusSender.SendMessageAsync(msg);
+
+                _logger.LogInformation(
+                    "Completed {MethodName}. Action ID: {ActionId}. Customer ID: {CustomerId}",
+                    nameof(SendPostMessageAsync), action.ActionId, action.CustomerId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "An error occurred in {MethodName}. Action ID: {ActionId}. Customer ID: {CustomerId}",
+                    nameof(SendPatchMessageAsync), action.ActionId, customerId);
+            }
         }
 
         private async Task SendMessageToQueue(MessageModel messageModel)
         {
-            var queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
-
-            var msg = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(messageModel)))
+            try
             {
-                ContentType = "application/json",
-                MessageId = messageModel.CustomerGuid + " " + DateTime.UtcNow
-            };
+                var msg = new ServiceBusMessage(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(messageModel)))
+                {
+                    ContentType = "application/json",
+                    MessageId = messageModel.CustomerGuid + " " + DateTime.UtcNow
+                };
 
-            await queueClient.SendAsync(msg);
+                var messageModelSerialized = JsonSerializer.Serialize(messageModel, new JsonSerializerOptions()
+                {
+                    WriteIndented = true
+                });
+
+                _logger.LogInformation(
+                    "New Action record serialized: {MessageModel}. Customer GUID: {CustomerGuid}",
+                    messageModelSerialized, messageModel.CustomerGuid);
+
+                await _serviceBusSender.SendMessageAsync(msg);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "An error occurred while sending message to queue. Customer GUID: {CustomerGuid}",
+                    messageModel.CustomerGuid);
+            }
         }
     }
 
@@ -64,5 +133,4 @@ namespace NCS.DSS.Action.ServiceBus
         public bool IsNewCustomer { get; set; }
         public string TouchpointId { get; set; }
     }
-
 }
