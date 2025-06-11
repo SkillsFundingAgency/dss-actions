@@ -33,7 +33,6 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         private readonly Mock<IResourceHelper> _resourceHelper;
         private readonly Mock<IPatchActionHttpTriggerService> _patchActionHttpTriggerService;
         private readonly Mock<IHttpRequestHelper> _httpRequestHelper;
-        private readonly Mock<IDynamicHelper> _dynamicHelper;
         private readonly Mock<ILogger<PatchActionHttpTriggerRun>> _logger;
 
         private PatchActionHttpTriggerRun _patchActionHttpTrigger;
@@ -47,7 +46,6 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             _resourceHelper = new Mock<IResourceHelper>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
             _logger = new Mock<ILogger<PatchActionHttpTriggerRun>>();
-            _dynamicHelper = new Mock<IDynamicHelper>();
 
             IValidate validate = new Validate();
             _patchActionHttpTriggerService = new Mock<IPatchActionHttpTriggerService>();
@@ -56,7 +54,6 @@ namespace NCS.DSS.Action.Tests.FunctionTests
                 _httpRequestHelper.Object,
                 _resourceHelper.Object,
                 validate,
-                _dynamicHelper.Object,
                 _logger.Object);
 
             _request = new DefaultHttpContext().Request;
@@ -161,7 +158,6 @@ namespace NCS.DSS.Action.Tests.FunctionTests
                 _httpRequestHelper.Object,
                 _resourceHelper.Object,
                 val.Object,
-                _dynamicHelper.Object,
                 _logger.Object);
 
             var result = await RunFunction(ValidCustomerId, ValidInteractionId, ValidActionPlanId, ValidActionId);
@@ -255,7 +251,6 @@ namespace NCS.DSS.Action.Tests.FunctionTests
                 _httpRequestHelper.Object,
                 _resourceHelper.Object,
                 val.Object,
-                _dynamicHelper.Object,
                 _logger.Object);
 
             // Act

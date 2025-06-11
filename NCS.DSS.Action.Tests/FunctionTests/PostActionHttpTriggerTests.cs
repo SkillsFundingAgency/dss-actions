@@ -33,7 +33,6 @@ namespace NCS.DSS.Action.Tests.FunctionTests
         private Mock<IPostActionHttpTriggerService> _postActionHttpTriggerService;
         private Mock<IHttpRequestHelper> _httpRequestHelper;
         private Mock<IResourceHelper> _resourceHelper;
-        private Mock<IDynamicHelper> _dynamicHelper;
         private Mock<ILogger<PostActionHttpTriggerRun>> _logger;
 
         private PostActionHttpTriggerRun _postActionHttpTrigger;
@@ -48,7 +47,6 @@ namespace NCS.DSS.Action.Tests.FunctionTests
             _request = (new DefaultHttpContext()).Request;
             _resourceHelper = new Mock<IResourceHelper>();
             _httpRequestHelper = new Mock<IHttpRequestHelper>();
-            _dynamicHelper = new Mock<IDynamicHelper>();
             _logger = new Mock<ILogger<PostActionHttpTriggerRun>>();
             _validate = new Validate();
             _postActionHttpTriggerService = new Mock<IPostActionHttpTriggerService>();
@@ -57,7 +55,6 @@ namespace NCS.DSS.Action.Tests.FunctionTests
                 _httpRequestHelper.Object,
                 _resourceHelper.Object,
                 _validate,
-                _dynamicHelper.Object,
                 _logger.Object
                 );
 
@@ -134,7 +131,6 @@ namespace NCS.DSS.Action.Tests.FunctionTests
                 _httpRequestHelper.Object,
                 _resourceHelper.Object,
                 val.Object,
-                _dynamicHelper.Object,
                 _logger.Object);
 
             _postActionHttpTriggerService.Setup(x => x.CreateAsync(_action)).Returns(Task.FromResult<Models.Action>(_action));
@@ -179,7 +175,6 @@ namespace NCS.DSS.Action.Tests.FunctionTests
                 _httpRequestHelper.Object,
                 _resourceHelper.Object,
                 val.Object,
-                _dynamicHelper.Object,
                 _logger.Object);
 
             // Act
@@ -205,7 +200,6 @@ namespace NCS.DSS.Action.Tests.FunctionTests
                 _httpRequestHelper.Object,
                 _resourceHelper.Object,
                 val.Object,
-                _dynamicHelper.Object,
                 _logger.Object);
 
             _postActionHttpTriggerService.Setup(x => x.CreateAsync(_action)).Returns(Task.FromResult<Models.Action>(null));
@@ -235,7 +229,6 @@ namespace NCS.DSS.Action.Tests.FunctionTests
                 _httpRequestHelper.Object,
                 _resourceHelper.Object,
                 val.Object,
-                _dynamicHelper.Object,
                 _logger.Object);
 
             _postActionHttpTriggerService.Setup(x => x.CreateAsync(_action)).Returns(Task.FromResult<Models.Action>(_action));
