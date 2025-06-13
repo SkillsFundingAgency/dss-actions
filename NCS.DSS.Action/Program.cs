@@ -48,7 +48,6 @@ namespace NCS.DSS.Action
                     services.AddSingleton<IHttpRequestHelper, HttpRequestHelper>();
                     services.AddSingleton<IHttpResponseMessageHelper, HttpResponseMessageHelper>();
                     services.AddSingleton<IJsonHelper, JsonHelper>();
-                    services.AddSingleton<IDynamicHelper, DynamicHelper>();
                     services.AddSingleton<ICosmosDBProvider, CosmosDBProvider>();
                     services.AddSingleton<IServiceBusClient, ServiceBusClient>();
                     services.AddScoped<IActionPatchService, ActionPatchService>();
