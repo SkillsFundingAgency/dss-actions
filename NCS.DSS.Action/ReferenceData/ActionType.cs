@@ -4,9 +4,6 @@ namespace NCS.DSS.Action.ReferenceData
 {
     public enum ActionType
     {
-        [Description("Skills Health Check")]
-        SkillsHealthCheck = 1,
-
         [Description("Create or update CV")]
         CreateOrUpdateCV = 2,
 

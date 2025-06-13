@@ -31,6 +31,12 @@ namespace NCS.DSS.Action.ReferenceData
 
         [Description("Community Centres")]
         CommunityCentres = 13,
+        
+        [Description("Job Centre Plus WITH Data")]
+        JCPWithData = 14,
+        
+        [Description("Job Centre Plus WITHOUT Data")]
+        JCPWithoutData = 15,
 
         [Description("Not Applicable")]
         NotApplicable = 98,
