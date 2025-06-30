@@ -11,7 +11,7 @@
     "cosmosDbDatabaseId": {
       "type": "string"
     },
-    "cosmosDbEndpoint": {
+    "CosmosDbEndpoint": {
       "type": "string"
     },
     "cosmosDbKey": {
@@ -54,7 +54,7 @@
         "MSDEPLOY_RENAME_LOCKED_FILES": "1",
         "AzureWebJobStorage": "[format('@Microsoft.KeyVault(VaultName={0};SecretName=SharedStorageAccountConnectionString)', parameters('keyVaultName'))]",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[parameters('appInsightsInstrumentationKey')]",
-        "CosmosDBConnectionString": "[format('AccountEndpoint={0}/;AccountKey={1};', parameters('cosmosDbEndpoint'), parameters('cosmosDbKey'))]",
+        "CosmosDBConnectionString": "[format('AccountEndpoint={0}/;AccountKey={1};', parameters('CosmosDbEndpoint'), parameters('cosmosDbKey'))]",
         "CollectionId": "[parameters('cosmosDbCollectionId')]",
         "DatabaseId": "[parameters('cosmosDbDatabaseId')]",
         "CustomerCollectionId": "customers",
@@ -64,7 +64,8 @@
         "ActionPlanCollectionId": "actionplans",
         "ActionPlanDatabaseId": "actionplans",
         "ServiceBusConnectionString": "[parameters('serviceBusConnectionString')]",
-        "QueueName": "[parameters('serviceBusQueueName')]"
+        "QueueName": "[parameters('serviceBusQueueName')]",
+        "CosmosDbEndpoint": "[parameters('CosmosDbEndpoint')]"
       },
       "copy": {
         "name": "FunctionAppSettingsCopy",

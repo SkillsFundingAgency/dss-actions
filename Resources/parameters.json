@@ -11,7 +11,7 @@
         "cosmosDbDatabaseId": {
             "value": "__ApiResourceName__"
         },
-        "cosmosDbEndpoint": {
+        "CosmosDbEndpoint": {
             "value": "__CosmosDbEndpoint__"
         },
         "cosmosDbKey": {

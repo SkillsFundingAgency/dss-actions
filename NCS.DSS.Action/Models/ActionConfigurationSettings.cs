@@ -2,6 +2,7 @@
 
 public class ActionConfigurationSettings
 {
+    public required string CosmosDbEndpoint { get; set; }
     public required string CosmosDBConnectionString { get; set; }
     public required string ServiceBusConnectionString { get; set; }
     public required string QueueName { get; set; }
