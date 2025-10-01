@@ -98,6 +98,7 @@ namespace NCS.DSS.Action
                     {
                         LoggerFilterRule defaultRule = options.Rules.FirstOrDefault(rule => rule.ProviderName
                             == "Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider");
+                        options.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
                         if (defaultRule is not null)
                         {
                             options.Rules.Remove(defaultRule);
