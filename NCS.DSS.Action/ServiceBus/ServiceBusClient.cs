@@ -28,7 +28,7 @@ namespace NCS.DSS.Action.ServiceBus
         {
             try
             {
-                _logger.LogInformation(
+                _logger.LogTrace(
                     "Starting {MethodName}. Action ID: {ActionId}. Customer ID: {CustomerId}",
                     nameof(SendPostMessageAsync), action.ActionId, action.CustomerId);
 
@@ -44,7 +44,7 @@ namespace NCS.DSS.Action.ServiceBus
 
                 await SendMessageToQueue(messageModel);
 
-                _logger.LogInformation(
+                _logger.LogTrace(
                     "Completed {MethodName}. Action ID: {ActionId}. Customer ID: {CustomerId}",
                     nameof(SendPostMessageAsync), action.ActionId, action.CustomerId);
             }
@@ -60,7 +60,7 @@ namespace NCS.DSS.Action.ServiceBus
         {
             try
             {
-                _logger.LogInformation(
+                _logger.LogTrace(
                     "Starting {MethodName}. Action ID: {ActionId}. Customer ID: {CustomerId}",
                     nameof(SendPostMessageAsync), action.ActionId, customerId);
 
@@ -82,7 +82,7 @@ namespace NCS.DSS.Action.ServiceBus
 
                 await _serviceBusSender.SendMessageAsync(msg);
 
-                _logger.LogInformation(
+                _logger.LogTrace(
                     "Completed {MethodName}. Action ID: {ActionId}. Customer ID: {CustomerId}",
                     nameof(SendPostMessageAsync), action.ActionId, action.CustomerId);
             }
@@ -109,7 +109,7 @@ namespace NCS.DSS.Action.ServiceBus
                     WriteIndented = true
                 });
 
-                _logger.LogInformation(
+                _logger.LogTrace(
                     "New Action record serialized: {MessageModel}. Customer GUID: {CustomerGuid}",
                     messageModelSerialized, messageModel.CustomerGuid);
 
