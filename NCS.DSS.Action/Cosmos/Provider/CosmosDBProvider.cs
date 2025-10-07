@@ -34,12 +34,12 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public async Task<bool> DoesCustomerResourceExistAsync(Guid customerId)
         {
-            _logger.LogInformation("Checking if Customer resource exists for Customer ID: {CustomerId}", customerId);
+            _logger.LogTrace("Checking if Customer resource exists for Customer ID: {CustomerId}", customerId);
 
             try
             {
                 var response = await _customerContainer.ReadItemAsync<Customer>(customerId.ToString(), _partitionKey);
-                _logger.LogInformation("Customer resource found for Customer ID: {CustomerId}", customerId);
+                _logger.LogTrace("Customer resource found for Customer ID: {CustomerId}", customerId);
 
                 return response.Resource != null;
             }
@@ -58,7 +58,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public async Task<bool> DoesCustomerHaveATerminationDateAsync(Guid customerId)
         {
-            _logger.LogInformation("Checking for termination date. Customer ID: {CustomerId}", customerId);
+            _logger.LogTrace("Checking for termination date. Customer ID: {CustomerId}", customerId);
 
             try
             {
@@ -69,12 +69,11 @@ namespace NCS.DSS.Action.Cosmos.Provider
                 var dateOfTermination = response.Resource?.DateOfTermination;
                 var hasTerminationDate = dateOfTermination != null;
 
-                _logger.LogInformation("Termination date check completed. CustomerId: {CustomerId}. HasTerminationDate: {HasTerminationDate}", customerId, hasTerminationDate);
+                _logger.LogTrace("Termination date check completed. CustomerId: {CustomerId}. HasTerminationDate: {HasTerminationDate}", customerId, hasTerminationDate);
                 return hasTerminationDate;
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                // If a 404 occurs, the resource does not exist
                 _logger.LogInformation("Customer does not exist. Customer ID: {CustomerId}", customerId);
                 return false;
             }
@@ -87,7 +86,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public async Task<bool> DoesInteractionResourceExistAndBelongToCustomerAsync(Guid interactionId, Guid customerId)
         {
-            _logger.LogInformation("Checking if Interaction resource exists and belongs to Customer ID: {CustomerId}, Interaction ID: {InteractionId}", customerId, interactionId);
+            _logger.LogTrace("Checking if Interaction resource exists and belongs to Customer ID: {CustomerId}, Interaction ID: {InteractionId}", customerId, interactionId);
 
             try
             {
@@ -102,7 +101,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
                 var count = (await iterator.ReadNextAsync()).Resource.FirstOrDefault();
                 var exists = count > 0;
-                _logger.LogInformation("Interaction resource existence check result: {Result}", exists);
+                _logger.LogTrace("Interaction resource existence check result: {Result}", exists);
 
                 return exists;
             }
@@ -116,7 +115,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
         
         public async Task<bool> DoesActionPlanResourceExistAndBelongToCustomerAsync(Guid actionPlanId, Guid interactionId, Guid customerId)
         {
-            _logger.LogInformation("Checking if Action Plan resource exists for Action Plan ID: {ActionPlanId}, Interaction ID: {InteractionId}, Customer ID: {CustomerId}", actionPlanId, interactionId, customerId);
+            _logger.LogTrace("Checking if Action Plan resource exists for Action Plan ID: {ActionPlanId}, Interaction ID: {InteractionId}, Customer ID: {CustomerId}", actionPlanId, interactionId, customerId);
 
             try
             {
@@ -133,7 +132,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
                 var count = (await iterator.ReadNextAsync()).Resource.FirstOrDefault();
                 var exists = count > 0;
 
-                _logger.LogInformation("Action Plan resource existence check result: {Result}", exists);
+                _logger.LogTrace("Action Plan resource existence check result: {Result}", exists);
 
                 return exists;
             }
@@ -147,7 +146,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public async Task<List<Models.Action>> GetActionsForCustomerAsync(Guid customerId, Guid actionPlanId)
         {
-            _logger.LogInformation("Retrieving Action(s) for Customer ID: {CustomerId}, Action Plan ID: {ActionPlanId}", customerId, actionPlanId);
+            _logger.LogTrace("Retrieving Action(s) for Customer ID: {CustomerId}, Action Plan ID: {ActionPlanId}", customerId, actionPlanId);
 
             try
             {
@@ -167,7 +166,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
                     actions.AddRange(response.Resource);
                 }
 
-                _logger.LogInformation("Retrieved {Count} Action(s) for CustomerId: {CustomerId}", actions.Count, customerId);
+                _logger.LogTrace("Retrieved {Count} Action(s) for CustomerId: {CustomerId}", actions.Count, customerId);
 
                 return actions.Any() ? actions : null;
             }
@@ -180,7 +179,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public async Task<Models.Action> GetActionForCustomerAsync(Guid customerId, Guid actionId, Guid actionPlanId)
         {
-            _logger.LogInformation("Retrieving Action for Customer ID: {CustomerId}. Action ID: {ActionId}. Action Plan ID: {ActionPlanId}", customerId, actionId, actionPlanId);
+            _logger.LogTrace("Retrieving Action for Customer ID: {CustomerId}. Action ID: {ActionId}. Action Plan ID: {ActionPlanId}", customerId, actionId, actionPlanId);
 
             try
             {
@@ -213,7 +212,7 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public async Task<string> GetActionForCustomerToUpdateAsync(Guid customerId, Guid actionId, Guid actionPlanId)
         {
-            _logger.LogInformation("Retrieving Action for update for Customer ID: {CustomerId}. Action ID: {ActionId}. Action Plan ID: {ActionPlanId}", customerId, actionId, actionPlanId);
+            _logger.LogTrace("Retrieving Action for update for Customer ID: {CustomerId}. Action ID: {ActionId}. Action Plan ID: {ActionPlanId}", customerId, actionId, actionPlanId);
 
             try
             {
@@ -230,12 +229,12 @@ namespace NCS.DSS.Action.Cosmos.Provider
 
         public async Task<ItemResponse<Models.Action>> CreateActionAsync(Models.Action action)
         {
-            _logger.LogInformation("Creating Action for Customer ID: {CustomerId}", action.CustomerId);
+            _logger.LogTrace("Creating Action for Customer ID: {CustomerId}", action.CustomerId);
 
             try
             {
                 var response = await _actionContainer.CreateItemAsync(action, _partitionKey);
-                _logger.LogInformation("Action created successfully for Customer ID: {CustomerId}", action.CustomerId);
+                _logger.LogTrace("Action created successfully for Customer ID: {CustomerId}", action.CustomerId);
 
                 return response;
             }
@@ -250,19 +249,19 @@ namespace NCS.DSS.Action.Cosmos.Provider
         {
             if (string.IsNullOrWhiteSpace(actionJson))
             {
-                _logger.LogWarning("Empty or null Action data provided for Action ID: {ActionId}", actionId);
+                _logger.LogInformation("Empty or null Action data provided for Action ID: {ActionId}", actionId);
                 return null;
             }
 
             try
             {
-                _logger.LogInformation("Updating Action for Action ID: {ActionId}", actionId);
+                _logger.LogTrace("Updating Action for Action ID: {ActionId}", actionId);
 
                 var actionDocument = JsonSerializer.Deserialize<Models.Action>(actionJson);
 
                 var response = await _actionContainer.ReplaceItemAsync(actionDocument, actionId.ToString(), _partitionKey);
 
-                _logger.LogInformation("Action updated successfully for Action ID: {ActionId}", actionId);
+                _logger.LogTrace("Action updated successfully for Action ID: {ActionId}", actionId);
 
                 return response;
             }

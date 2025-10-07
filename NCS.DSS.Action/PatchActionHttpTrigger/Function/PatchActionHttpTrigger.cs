@@ -53,14 +53,9 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "Customers/{customerId}/Interactions/{interactionId}/ActionPlans/{actionPlanId}/Actions/{actionId}")]
             HttpRequest req, string customerId, string interactionId, string actionPlanId, string actionId)
         {
-            _logger.LogInformation("Function {FunctionName} has been invoked", nameof(PatchActionHttpTrigger));
+            _logger.LogTrace("Function {FunctionName} has been invoked", nameof(PatchActionHttpTrigger));
 
             var correlationId = _httpRequestHelper.GetDssCorrelationId(req);
-
-            if (string.IsNullOrEmpty(correlationId))
-            {
-                _logger.LogInformation("Unable to locate 'DssCorrelationId' in request header");
-            }
 
             if (!Guid.TryParse(correlationId, out var correlationGuid))
             {
@@ -71,7 +66,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
             var touchpointId = _httpRequestHelper.GetDssTouchpointId(req);
             if (string.IsNullOrEmpty(touchpointId))
             {
-                _logger.LogWarning("Unable to locate 'TouchpointId' in request header. Correlation GUID: {CorrelationGuid}", correlationGuid);
+                _logger.LogInformation("Unable to locate 'TouchpointId' in request header. Correlation GUID: {CorrelationGuid}", correlationGuid);
                 return new BadRequestResult();
             }
 
@@ -84,35 +79,35 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
 
             if (!Guid.TryParse(customerId, out var customerGuid))
             {
-                _logger.LogWarning("Unable to parse 'customerId' to a GUID. Customer ID: {CustomerId}. Correlation GUID: {CorrelationGuid}", customerId, correlationGuid);
+                _logger.LogInformation("Unable to parse 'customerId' to a GUID. Customer ID: {CustomerId}. Correlation GUID: {CorrelationGuid}", customerId, correlationGuid);
                 return new BadRequestObjectResult(customerGuid);
             }
 
             if (!Guid.TryParse(interactionId, out var interactionGuid))
             {
-                _logger.LogWarning("Unable to parse 'interactionId' to a GUID. Interaction ID: {InteractionId}. Correlation GUID: {CorrelationGuid}", interactionId, correlationGuid);
+                _logger.LogInformation("Unable to parse 'interactionId' to a GUID. Interaction ID: {InteractionId}. Correlation GUID: {CorrelationGuid}", interactionId, correlationGuid);
                 return new BadRequestObjectResult(interactionGuid);
             }
 
             if (!Guid.TryParse(actionPlanId, out var actionPlanGuid))
             {
-                _logger.LogWarning("Unable to parse 'actionPlanId' to a GUID. Action Plan ID: {ActionPlanId}. Correlation GUID: {CorrelationGuid}", actionPlanId, correlationGuid);
+                _logger.LogInformation("Unable to parse 'actionPlanId' to a GUID. Action Plan ID: {ActionPlanId}. Correlation GUID: {CorrelationGuid}", actionPlanId, correlationGuid);
                 return new BadRequestObjectResult(actionPlanGuid);
             }
 
             if (!Guid.TryParse(actionId, out var actionGuid))
             {
-                _logger.LogWarning("Unable to parse 'actionId' to a GUID. Action ID: {ActionId}. Correlation GUID: {CorrelationGuid}", actionId, correlationGuid);
+                _logger.LogInformation("Unable to parse 'actionId' to a GUID. Action ID: {ActionId}. Correlation GUID: {CorrelationGuid}", actionId, correlationGuid);
                 return new BadRequestObjectResult(actionGuid);
             }
 
-            _logger.LogInformation("Header validation has succeeded. Touchpoint ID: {TouchpointId}. Correlation GUID: {CorrelationGuid}", touchpointId, correlationGuid);
+            _logger.LogTrace("Header validation has succeeded. Touchpoint ID: {TouchpointId}. Correlation GUID: {CorrelationGuid}", touchpointId, correlationGuid);
 
             ActionPatch actionPatchRequest;
 
             try
             {
-                _logger.LogInformation("Attempting to retrieve resource from request body. Correlation GUID: {CorrelationGuid}", correlationGuid);
+                _logger.LogTrace("Attempting to retrieve resource from request body. Correlation GUID: {CorrelationGuid}", correlationGuid);
                 actionPatchRequest = await _httpRequestHelper.GetResourceFromRequest<ActionPatch>(req);
             }
             catch (Exception ex)
@@ -120,7 +115,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
                 _logger.LogError(ex, "Unable to parse {ActionPatch} from request body. Correlation GUID: {CorrelationGuid}. Exception: {Exception}", nameof(actionPatchRequest), correlationGuid, ex.Message);
                 return new UnprocessableEntityObjectResult("An error occurred when attempting to parse body from request.");
             }
-            _logger.LogInformation("Retrieved resource from request body. Correlation GUID: {CorrelationGuid}", correlationGuid);
+            _logger.LogTrace("Retrieved resource from request body. Correlation GUID: {CorrelationGuid}", correlationGuid);
 
             if (actionPatchRequest == null)
             {
@@ -128,50 +123,50 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
                 return new UnprocessableEntityObjectResult(req);
             }
 
-            _logger.LogInformation("Initialise TouchPoint ID for Action");
+            _logger.LogTrace("Initialise TouchPoint ID for Action");
             actionPatchRequest.SetIds(touchpointId);
 
             var doesCustomerExist = await _resourceHelper.DoesCustomerExist(customerGuid);
 
             if (!doesCustomerExist)
             {
-                _logger.LogWarning("Customer does not exist. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", customerGuid, correlationGuid);
+                _logger.LogInformation("Customer does not exist. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", customerGuid, correlationGuid);
                 return new NoContentResult();
             }
-            _logger.LogInformation("Customer exists. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", customerGuid, correlationGuid);
+            _logger.LogTrace("Customer exists. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", customerGuid, correlationGuid);
 
-            _logger.LogInformation("Attempting to check if Customer is read only. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", customerGuid, correlationGuid);
+            _logger.LogTrace("Attempting to check if Customer is read only. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", customerGuid, correlationGuid);
             var isCustomerReadOnly = await _resourceHelper.IsCustomerReadOnly(customerGuid);
 
             if (isCustomerReadOnly)
             {
-                _logger.LogWarning("Customer is read-only. Operation is forbidden. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", customerGuid, correlationGuid);
+                _logger.LogInformation("Customer is read-only. Operation is forbidden. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", customerGuid, correlationGuid);
                 return new ObjectResult(customerGuid.ToString())
                 {
                     StatusCode = (int)HttpStatusCode.Forbidden
                 };
             }
-            _logger.LogInformation("Customer is not read-only. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", customerGuid, correlationGuid);
+            _logger.LogTrace("Customer is not read-only. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", customerGuid, correlationGuid);
 
-            _logger.LogInformation("Attempting to check if Interaction exists. Interaction GUID: {InteractionGuid}. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", interactionGuid, customerGuid, correlationGuid);
+            _logger.LogTrace("Attempting to check if Interaction exists. Interaction GUID: {InteractionGuid}. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", interactionGuid, customerGuid, correlationGuid);
             var doesInteractionExist = await _resourceHelper.DoesInteractionExistAndBelongToCustomer(interactionGuid, customerGuid);
             if (!doesInteractionExist)
             {
-                _logger.LogWarning("Interaction does not exist. Interaction GUID: {InteractionGuid}. Correlation GUID: {CorrelationGuid}", interactionGuid, correlationGuid);
+                _logger.LogInformation("Interaction does not exist. Interaction GUID: {InteractionGuid}. Correlation GUID: {CorrelationGuid}", interactionGuid, correlationGuid);
                 return new NoContentResult();
             }
-            _logger.LogInformation("Interaction exists. Interaction GUID: {InteractionGuid}. Correlation GUID: {CorrelationGuid}", interactionGuid, correlationGuid);
+            _logger.LogTrace("Interaction exists. Interaction GUID: {InteractionGuid}. Correlation GUID: {CorrelationGuid}", interactionGuid, correlationGuid);
 
-            _logger.LogInformation("Attempting to check if Action Plan exists and is assigned to Customer. Interaction GUID: {InteractionGuid}. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", interactionGuid, customerGuid, correlationGuid);
+            _logger.LogTrace("Attempting to check if Action Plan exists and is assigned to Customer. Interaction GUID: {InteractionGuid}. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", interactionGuid, customerGuid, correlationGuid);
             var doesActionPlanExistAndBelongToCustomer = await _resourceHelper.DoesActionPlanExistAndBelongToCustomer(actionPlanGuid, interactionGuid, customerGuid);
             if (!doesActionPlanExistAndBelongToCustomer)
             {
-                _logger.LogWarning("Action Plan does not exist and is not assigned to Customer. Action Plan GUID: {ActionPlanGuid}. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", actionPlanGuid, customerGuid, correlationGuid);
+                _logger.LogInformation("Action Plan does not exist and is not assigned to Customer. Action Plan GUID: {ActionPlanGuid}. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", actionPlanGuid, customerGuid, correlationGuid);
                 return new NoContentResult();
             }
-            _logger.LogInformation("Action Plan exists and is assigned to Customer. Action Plan GUID: {ActionPlanGuid}. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", actionPlanGuid, customerGuid, correlationGuid);
+            _logger.LogTrace("Action Plan exists and is assigned to Customer. Action Plan GUID: {ActionPlanGuid}. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", actionPlanGuid, customerGuid, correlationGuid);
 
-            _logger.LogInformation("Attempting to retrieve Action for Customer. Action GUID: {ActionGuid}. Customer GUID: {CustomerGuid}", actionGuid, customerGuid);
+            _logger.LogTrace("Attempting to retrieve Action for Customer. Action GUID: {ActionGuid}. Customer GUID: {CustomerGuid}", actionGuid, customerGuid);
             var actionForCustomer = await _actionsPatchService.GetActionsForCustomerAsync(customerGuid, actionGuid, actionPlanGuid);
 
             if (actionForCustomer == null)
@@ -180,7 +175,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
                 return new NoContentResult();
             }
 
-            _logger.LogInformation("Attempting to update Action for Customer. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}", customerGuid, actionGuid);
+            _logger.LogTrace("Attempting to update Action for Customer. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}", customerGuid, actionGuid);
             var patchedAction = _actionsPatchService.PatchResource(actionForCustomer, actionPatchRequest);
 
             if (patchedAction == null)
@@ -193,7 +188,7 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
 
             try
             {
-                _logger.LogInformation("Attempting to deserialise {PatchedAction} validation object. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}", nameof(patchedAction), customerGuid, actionGuid);
+                _logger.LogTrace("Attempting to deserialise {PatchedAction} validation object. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}", nameof(patchedAction), customerGuid, actionGuid);
                 actionValidationObject = JsonSerializer.Deserialize<Models.Action>(patchedAction);
             }
             catch (Exception ex)
@@ -204,11 +199,11 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
 
             if (actionValidationObject == null)
             {
-                _logger.LogWarning("Deserializing {ActionValidationObject} validation object has returned NULL. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}", nameof(actionValidationObject), customerGuid, actionGuid);
+                _logger.LogInformation("Deserializing {ActionValidationObject} validation object has returned NULL. Customer GUID: {CustomerGuid}. Action GUID: {ActionGuid}", nameof(actionValidationObject), customerGuid, actionGuid);
                 return new UnprocessableEntityObjectResult(req);
             }
 
-            _logger.LogInformation("Attempting to validate {ActionValidationObject} object", nameof(actionValidationObject));
+            _logger.LogTrace("Attempting to validate {ActionValidationObject} object", nameof(actionValidationObject));
             var errors = _validate.ValidateResource(actionValidationObject, false);
 
             if (errors != null && errors.Any())
@@ -217,22 +212,20 @@ namespace NCS.DSS.Action.PatchActionHttpTrigger.Function
                 return new UnprocessableEntityObjectResult(errors);
             }
 
-            _logger.LogInformation("Attempting to PATCH an Action. Action GUID: {ActionGuid}. Customer GUID: {CustomerGuid}", actionGuid, customerGuid);
+            _logger.LogTrace("Attempting to PATCH an Action. Action GUID: {ActionGuid}. Customer GUID: {CustomerGuid}", actionGuid, customerGuid);
             var updatedAction = await _actionsPatchService.UpdateCosmosAsync(patchedAction, actionGuid);
 
             if (updatedAction == null)
             {
-                _logger.LogWarning("PATCH request unsuccessful. Action GUID: {ActionGuid}", actionGuid);
-                _logger.LogInformation("Function {FunctionName} has finished invoking", nameof(PatchActionHttpTrigger));
-
+                _logger.LogInformation("PATCH request unsuccessful. Action GUID: {ActionGuid}", actionGuid);
                 return new BadRequestObjectResult(actionGuid);
             }
 
-            _logger.LogInformation("Attempting to send Action to service bus. Action ID: {ActionId}. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", updatedAction.ActionId.GetValueOrDefault(), customerGuid, correlationGuid);
+            _logger.LogTrace("Attempting to send Action to service bus. Action ID: {ActionId}. Customer GUID: {CustomerGuid}. Correlation GUID: {CorrelationGuid}", updatedAction.ActionId.GetValueOrDefault(), customerGuid, correlationGuid);
             await _actionsPatchService.SendToServiceBusQueueAsync(updatedAction, customerGuid, apimUrl);
 
-            _logger.LogInformation("PATCH request successful. Action ID: {ActionId}", updatedAction.ActionId.GetValueOrDefault());
-            _logger.LogInformation("Function {FunctionName} has finished invoking", nameof(PatchActionHttpTrigger));
+            _logger.LogTrace("PATCH request successful. Action ID: {ActionId}", updatedAction.ActionId.GetValueOrDefault());
+            _logger.LogTrace("Function {FunctionName} has finished invoking", nameof(PatchActionHttpTrigger));
 
             return new JsonResult(updatedAction, new JsonSerializerOptions())
             {
